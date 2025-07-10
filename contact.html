@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | CreatorLaunch</title>
+    <meta name="description" content="Have a question or want to partner with us? Get in touch with the CreatorLaunch team. We're based in St. Louis and dedicated to empowering young entrepreneurs.">
+    <link rel="icon" type="image/png" href="/assets/images/favicon.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { 'primary': '#F55F55', 'accent': '#387ADF', 'light': '#F7F9FC', 'dark': '#2D3748', 'medium': '#4A5568' } } } }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CK1GR2RSRB"></script>
+</head>
+<body class="text-dark">
+    <div id="header-placeholder"></div>
+    <main>
+        <section class="bg-light py-20 sm:py-28">
+            <div class="container mx-auto px-6 text-center" data-aos="fade-up">
+                <h1 class="text-5xl sm:text-6xl font-black">Get in Touch</h1>
+                <p class="text-lg text-medium mt-4 max-w-2xl mx-auto">Have a question, an idea, or want to partner with us? We'd love to hear from you.</p>
+            </div>
+        </section>
+        <section class="py-20 sm:py-28">
+            <div class="container mx-auto px-6 max-w-4xl">
+                <div class="bg-white p-8 sm:p-12 rounded-2xl shadow-lg" data-aos="fade-up">
+                    <form action="https://formspree.io/f/mzzgwzqd" method="POST">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div><label for="name" class="block text-left font-bold mb-2">Full Name</label><input type="text" name="name" id="name" required class="form-input-light"></div>
+                            <div><label for="email" class="block text-left font-bold mb-2">Email Address</label><input type="email" name="email" id="email" required class="form-input-light"></div>
+                        </div>
+                        <div class="mb-6"><label for="subject" class="block text-left font-bold mb-2">Subject</label><input type="text" name="subject" id="subject" required class="form-input-light"></div>
+                        <div class="mb-8"><label for="message" class="block text-left font-bold mb-2">Message</label><textarea name="message" id="message" rows="6" required class="form-input-light"></textarea></div>
+                        <div class="text-center"><button type="submit" class="px-12 py-4 rounded-lg btn-submit-form font-bold text-lg">Send Message</button></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+    <div id="footer-placeholder"></div>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>AOS.init({duration:800,once:true});</script>
+    <script src="/assets/js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+/* Custom styles moved from HTML files */
+body { 
+    font-family: 'Raleway', sans-serif; 
+    background-color: #F7F9FC; 
+    text-rendering: optimizeLegibility; 
+}
+.glass-nav { 
+    background-color: rgba(255, 255, 255, 0.8); 
+    backdrop-filter: blur(10px); 
+}
+.animated-gradient { 
+    background: linear-gradient(-45deg, #f55f55, #f7b733, #387adf, #23d5ab); 
+    background-size: 400% 400%; 
+    animation: gradient 15s ease infinite; 
+}
+@keyframes gradient { 
+    0% { background-position: 0% 50%; } 
+    50% { background-position: 100% 50%; } 
+    100% { background-position: 0% 50%; } 
+}
+.content-card { 
+    background-color: white; 
+    border-radius: 1.5rem; 
+    padding: 2rem; 
+    box-shadow: 0 10px 30px -15px rgba(0,0,0,0.05); 
+}
+.icon-box { 
+    background-color: #eef4ff; 
+    color: #387ADF; 
+    padding: 0.75rem; 
+    border-radius: 0.75rem; 
+    display: inline-flex; 
+}
+.btn-primary { 
+    transition: all 0.3s ease; 
+}
+.btn-primary:hover { 
+    transform: translateY(-3px); 
+    box-shadow: 0 10px 20px -10px rgba(245, 95, 85, 0.6); 
+}
+.btn-primary-solid { 
+    background-color: #F55F55; 
+    color: white; 
+    transition: all 0.3s ease; 
+}
+.btn-primary-solid:hover { 
+    background-color: #E44D41; 
+    transform: translateY(-2px);
+}
+.accordion-content { 
+    max-height: 0; 
+    overflow: hidden; 
+    transition: max-height 0.5s ease-out; 
+}
+.team-card {
+    background-color: white;
+    border-radius: 1.5rem;
+    padding: 2.5rem;
+    box-shadow: 0 10px 30px -15px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.team-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1);
+}
+.team-card img { margin-bottom: 1rem; }
+.team-card h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.team-card p.role { font-size: 1rem; font-weight: bold; color: #F55F55; margin-bottom: 1rem; }
+.team-card p.description { font-size: 1rem; color: #4A5568; line-height: 1.4; margin-bottom: 1rem; }
+.team-card a.email-link { font-size: 0.9rem; color: #387ADF; text-decoration: underline; margin-bottom: 0.5rem; display: inline-block; }
+.team-card a.learn-more-btn { display: inline-flex; align-items: center; font-weight: bold; color: #387ADF; transition: color 0.3s ease; }
+.team-card a.learn-more-btn:hover { color: #2a68c0; text-decoration: underline; }
+.partner-card { background-color: white; border-radius: 1.5rem; padding: 2.5rem; box-shadow: 0 10px 30px -15px rgba(0,0,0,0.05); transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.partner-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1); }
+.partner-logo { max-height: 80px; width: auto; margin-bottom: 1.5rem; }
+.contact-link { display: flex; align-items: center; justify-content: center; font-weight: bold; color: #387ADF; transition: color 0.3s ease; }
+.contact-link:hover { color: #2a68c0; text-decoration: underline; }
+.blog-content p { margin-bottom: 1rem; line-height: 1.75; }
+.blog-content h2, .blog-content h3 { margin-top: 2rem; margin-bottom: 1rem; font-weight: bold; }
+.blog-content h2 { font-size: 2.25rem; color: #2D3748; }
+.blog-content h3 { font-size: 1.75rem; color: #387ADF; }
+.blog-content ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; }
+.blog-content ul li { margin-bottom: 0.5rem; }
+.blog-post-card { background-color: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 30px -15px rgba(0,0,0,0.05); transition: all 0.3s ease; display: flex; flex-direction: column; justify-content: space-between; }
+.blog-post-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1); }
+.impact-card { transition: all 0.3s ease; border: 1px solid transparent; }
+.impact-card:hover { transform: translateY(-5px); border-color: #F55F55; box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1); }
+.involvement-card { transition: all 0.3s ease; }
+.involvement-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1); }
+.form-input-light { width: 100%; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; background-color: #f8fafc; color: #2D3748; transition: all 0.3s ease; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
+.form-input-light::placeholder { color: #4A5568; }
+.form-input-light:focus { outline: none; border-color: #387ADF; box-shadow: 0 0 0 3px rgba(56, 122, 223, 0.2); }
+.application-form-card { background-color: white; border-radius: 1.5rem; padding: 2.5rem; box-shadow: 0 10px 30px -15px rgba(0,0,0,0.05); }
+.btn-submit-form { background-color: #387ADF; color: white; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(56, 122, 223, 0.4); }
+.btn-submit-form:hover { background-color: #2a68c0; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(56, 122, 223, 0.6); }
+.btn-apply { background-color: #F55F55; color: white; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(245, 95, 85, 0.4); }
+.btn-apply:hover { background-color: #E44D41; transform: translateY(-3px); box-shadow: 0 8px 20px rgba(245, 95, 85, 0.6); }
+.section-card { background-color: white; border-radius: 1.5rem; padding: 2rem; box-shadow: 0 10px 30px -15px rgba(0,0,0,0.05); color: #2D3748; }
+.feature-icon-box { background-color: rgba(245, 95, 85, 0.1); color: #F55F55; padding: 0.75rem; border-radius: 0.75rem; display: inline-flex; }
+.timeline-container { position: relative; padding-left: 20px; }
+.timeline-line { position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background-color: rgba(245, 95, 85, 0.5); }
+.timeline-item { position: relative; margin-bottom: 2.5rem; padding-left: 2rem; }
+.timeline-item::before { content: ''; position: absolute; left: -11px; top: 0; width: 1.5rem; height: 1.5rem; background-color: #F55F55; border-radius: 50%; border: 3px solid #F7F9FC; z-index: 1; }
+
+.footer-link {
+    transition: color 0.2s ease-in-out;
+}
+.footer-link:hover {
+    color: #F55F55; /* primary color */
+}
+
+.social-icon {
+    transition: transform 0.2s ease-in-out;
+}
+.social-icon:hover {
+    transform: scale(1.1);
+}
+/* Announcement Banner Styles */
+.announcement-banner {
+    background-color: #387ADF; /* accent color */
+    color: white;
+    padding: 0.75rem 1.5rem;
+    text-align: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+.announcement-banner.hidden {
+    display: none;
+}
+.announcement-close-btn {
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+.announcement-close-btn:hover {
+    opacity: 1;
+}

@@ -1,0 +1,9 @@
+This robots.txt file tells search engine crawlers which pages or files
+the crawler can or can't request from your site.
+Allow all web crawlers to access all content
+User-agent: *
+Disallow:
+
+Providing the location of the sitemap is a best practice.
+Replace the URL with your actual domain once it's live.
+Sitemap: https://www.youthcreatorlaunch.org/sitemap.xml
