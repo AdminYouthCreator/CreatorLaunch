@@ -1,4 +1,4 @@
-(https://github.com/AdminYouthCreator/CreatorLaunch/blob/static-website/assets/images/header-logo.png?raw=true)
+<img src="https://github.com/AdminYouthCreator/CreatorLaunch/blob/static-website/assets/images/header-logo.png?raw=true">
 # Young CEO Platform
 
 An interactive, database-driven e‑commerce application proposal that empowers young entrepreneurs to launch and manage their own online businesses.
