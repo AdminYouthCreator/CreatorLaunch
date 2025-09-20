@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  auth:
+    build: .
+    ports:
+      - "5001:5001"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/authdb
+      - PORT=5001
+      - FRONTEND_URL=http://localhost:3000
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:7
+    container_name: mongodb
+    restart: always
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
