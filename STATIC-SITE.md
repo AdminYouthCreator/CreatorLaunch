@@ -1,3 +1,6 @@
+## Static Site Structure
+
+```plaintext
 youthcreatorlaunch.org/
 ├── 📄 index.html
 ├── 📄 not_found.html
@@ -81,3 +84,5 @@ youthcreatorlaunch.org/
         ├── 📄 index.html
         ├── 📄 apply.html
         └── 📄 Application-sent.html
+```
+
