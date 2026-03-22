@@ -6,6 +6,10 @@ const authRoutes = require('./routes/authRoutes');
 const brandRoutes = require('./routes/brandRoutes');
 const todoRoutes = require('./routes/todoRoutes');
 const productRoutes = require('./routes/productRoutes');
+const storeRoutes = require('./routes/storeRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+const serviceRoutes = require('./routes/serviceRoutes');
+const checkoutRoutes = require('./routes/checkoutRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -41,6 +45,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/brands', brandRoutes);
 app.use('/api/todo', todoRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/store', storeRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/services', serviceRoutes);
+app.use('/api/checkout', checkoutRoutes);
 
 app.use(errorHandler);
 module.exports = app;
