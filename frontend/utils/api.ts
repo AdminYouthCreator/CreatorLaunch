@@ -387,21 +387,131 @@ export const productAPI = {
 // ################################################################
 
 export const storeAPI = {
-  // Get public store information
+  // Get public store information (products + services)
   getStore: async (storeUrl: string) => {
-    const response = await api.get(`/api/stores/${storeUrl}`);
-    return response.data;
-  },
-
-  // Get all products from a store
-  getStoreProducts: async (storeUrl: string) => {
-    const response = await api.get(`/api/stores/${storeUrl}/products`);
+    const response = await api.get(`/api/store/${storeUrl}`);
     return response.data;
   },
 
   // Get specific product from a store
   getStoreProduct: async (storeUrl: string, productId: string) => {
-    const response = await api.get(`/api/stores/${storeUrl}/products/${productId}`);
+    const response = await api.get(`/api/store/${storeUrl}/products/${productId}`);
+    return response.data;
+  },
+
+  // Get specific service from a store
+  getStoreService: async (storeUrl: string, serviceId: string) => {
+    const response = await api.get(`/api/store/${storeUrl}/services/${serviceId}`);
+    return response.data;
+  },
+};
+
+// ################## ----- SERVICE API FUNCTIONS ----- ##################
+// Service management related API calls
+// ################################################################
+
+export const serviceAPI = {
+  // Get all services for authenticated user's brand
+  getAll: async () => {
+    const response = await api.get('/api/services');
+    return response.data;
+  },
+
+  // Get single service
+  getById: async (id: string) => {
+    const response = await api.get(`/api/services/${id}`);
+    return response.data;
+  },
+
+  // Create a new service
+  create: async (serviceData: {
+    title: string;
+    description: string;
+    category: string;
+    price: number;
+    deliveryTime: string;
+    revisions?: number;
+    requirements?: string;
+  }) => {
+    const response = await api.post('/api/services', serviceData);
+    return response.data;
+  },
+
+  // Update a service
+  update: async (id: string, serviceData: any) => {
+    const response = await api.put(`/api/services/${id}`, serviceData);
+    return response.data;
+  },
+
+  // Delete a service
+  delete: async (id: string) => {
+    const response = await api.delete(`/api/services/${id}`);
+    return response.data;
+  },
+};
+
+// ################## ----- ORDER API FUNCTIONS ----- ##################
+// Order management related API calls
+// ################################################################
+
+export const orderAPI = {
+  // Get all orders for authenticated user's brand
+  getAll: async (page?: number, status?: string) => {
+    const params = new URLSearchParams();
+    if (page) params.append('page', page.toString());
+    if (status) params.append('status', status);
+    const response = await api.get(`/api/orders?${params.toString()}`);
+    return response.data;
+  },
+
+  // Get single order
+  getById: async (orderId: string) => {
+    const response = await api.get(`/api/orders/${orderId}`);
+    return response.data;
+  },
+
+  // Update order fulfillment
+  updateFulfillment: async (orderId: string, data: {
+    fulfillmentStatus?: string;
+    trackingNumber?: string;
+    trackingUrl?: string;
+  }) => {
+    const response = await api.patch(`/api/orders/${orderId}/fulfillment`, data);
+    return response.data;
+  },
+
+  // Get revenue metrics
+  getMetrics: async () => {
+    const response = await api.get('/api/orders/metrics');
+    return response.data;
+  },
+};
+
+// ################## ----- CHECKOUT API FUNCTIONS ----- ##################
+// Checkout and payment related API calls
+// ################################################################
+
+export const checkoutAPI = {
+  // Create a Stripe checkout session
+  createSession: async (data: {
+    items: Array<{
+      name: string;
+      unitPrice: number;
+      quantity: number;
+      variant?: { size?: string; color?: string };
+      mockupUrl?: string;
+      itemType: 'product' | 'service';
+    }>;
+    brandId: string;
+    buyer: { name: string; email: string };
+  }) => {
+    const response = await api.post('/api/checkout/create-session', data);
+    return response.data;
+  },
+
+  // Get checkout session status
+  getSessionStatus: async (sessionId: string) => {
+    const response = await api.get(`/api/checkout/session/${sessionId}`);
     return response.data;
   },
 };
