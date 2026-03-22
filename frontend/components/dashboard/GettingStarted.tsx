@@ -181,3 +181,5 @@ export const GettingStarted: React.FC<GettingStartedProps> = ({
     </div>
   );
 };
+
+export default GettingStarted;

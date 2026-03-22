@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Layout from '@/components/common/Layout';
 import AuthGuard from '@/components/common/AuthGuard';
 import { useAuth } from '@/hooks/useAuth';
-import { GettingStarted, PolicyNotificationWidget } from '@/components/dashboard';
+import { GettingStarted, MetricsCards, PolicyNotificationWidget } from '@/components/dashboard';
 
 // ################## ----- DASHBOARD COMPONENT ----- ##################
 // Main dashboard page for authenticated users
@@ -56,52 +56,50 @@ const Dashboard: React.FC = () => {
               className="mb-8"
             />
 
+            {/* Revenue Metrics */}
+            <MetricsCards className="mb-8" />
+
             {/* Quick Actions */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <a href="/products" className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow block">
                 <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M8 11v6h8v-6M8 11H6a2 2 0 00-2 2v6a2 2 0 002 2h12a2 2 0 002-2v-6a2 2 0 00-2-2h-2" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-dark mb-2">Customize Your Store</h3>
-                <p className="text-medium text-sm mb-4">
-                  Add products, update your branding, and make your store uniquely yours.
-                </p>
-                <button className="text-primary font-medium text-sm hover:text-red-600 transition-colors">
-                  Get Started →
-                </button>
-              </div>
+                <h3 className="text-lg font-semibold text-dark mb-2">Products</h3>
+                <p className="text-medium text-sm">Manage your product catalog</p>
+              </a>
 
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+              <a href="/services" className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow block">
                 <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-4">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.193 23.193 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-dark mb-2">View Analytics</h3>
-                <p className="text-medium text-sm mb-4">
-                  Track your store's performance, visitor stats, and sales data.
-                </p>
-                <button className="text-primary font-medium text-sm hover:text-red-600 transition-colors">
-                  View Reports →
-                </button>
-              </div>
+                <h3 className="text-lg font-semibold text-dark mb-2">Services</h3>
+                <p className="text-medium text-sm">Offer digital services</p>
+              </a>
 
-              <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
+              <a href="/orders" className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow block">
                 <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-4">
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                   </svg>
                 </div>
-                <h3 className="text-lg font-semibold text-dark mb-2">Learn & Grow</h3>
-                <p className="text-medium text-sm mb-4">
-                  Access workshops, tutorials, and resources to grow your business.
-                </p>
-                <button className="text-primary font-medium text-sm hover:text-red-600 transition-colors">
-                  Explore →
-                </button>
-              </div>
+                <h3 className="text-lg font-semibold text-dark mb-2">Orders</h3>
+                <p className="text-medium text-sm">Track customer orders</p>
+              </a>
+
+              <a href="/store/share" className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow block">
+                <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-4">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-semibold text-dark mb-2">Share Store</h3>
+                <p className="text-medium text-sm">Promote your store</p>
+              </a>
             </div>
 
             {/* Store Preview */}
