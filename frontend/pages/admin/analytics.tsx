@@ -1,169 +1,200 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { 
-  FiTrendingUp, 
-  FiUsers, 
-  FiShoppingBag, 
+import { adminAPI } from '@/utils/adminApi';
+import {
+  FiRefreshCw,
+  FiUsers,
+  FiShoppingBag,
   FiDollarSign,
-  FiCalendar,
-  FiDownload,
-  FiRefreshCw
+  FiPackage,
+  FiTool,
+  FiBarChart,
 } from 'react-icons/fi';
 
-// ################## ----- ANALYTICS DATA INTERFACES ----- ##################
-// Interfaces for analytics data structures
-// ####################################################################
+interface Overview {
+  totalUsers: number;
+  totalStores: number;
+  totalRevenue: number;
+  totalOrders: number;
+  totalProducts: number;
+  totalServices: number;
+  userGrowth: number;
+  storeGrowth: number;
+  revenueGrowth: number;
+  orderGrowth: number;
+}
+
+interface ChartPoint {
+  date: string;
+  count?: number;
+  amount?: number;
+}
+
 interface AnalyticsData {
-  overview: {
-    totalUsers: number;
-    totalStores: number;
-    totalRevenue: number;
-    totalOrders: number;
-    userGrowth: number;
-    storeGrowth: number;
-    revenueGrowth: number;
-    orderGrowth: number;
-  };
+  overview: Overview;
   chartData: {
-    userRegistrations: { date: string; count: number }[];
-    storeCreations: { date: string; count: number }[];
-    revenue: { date: string; amount: number }[];
-    orders: { date: string; count: number }[];
+    userRegistrations: ChartPoint[];
+    storeCreations: ChartPoint[];
+    revenue: ChartPoint[];
+    orders: ChartPoint[];
   };
   demographics: {
-    ageGroups: { label: string; value: number }[];
-    locations: { country: string; users: number; stores: number }[];
-    categories: { category: string; stores: number; revenue: number }[];
+    ageGroups: Array<{
+      label: string;
+      value: number;
+      percent: number;
+    }>;
+    productStatuses: Array<{
+      status: string;
+      count: number;
+    }>;
+    serviceCategories: Array<{
+      category: string;
+      count: number;
+    }>;
   };
 }
 
-// ################## ----- ANALYTICS PAGE ----- ##################
-// Admin analytics dashboard with comprehensive metrics
-// ############################################################
-
-const AnalyticsPage: React.FC = () => {
-  const [data, setData] = useState<AnalyticsData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [dateRange, setDateRange] = useState('30d');
-  const [refreshing, setRefreshing] = useState(false);
+const AdminAnalyticsPage: React.FC = () => {
+  const [range, setRange] = useState('30d');
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    loadAnalyticsData();
-  }, [dateRange]);
+    loadAnalytics();
+  }, [range]);
 
-  const loadAnalyticsData = async () => {
+  const loadAnalytics = async () => {
     try {
-      setIsLoading(true);
-      
-      // Mock data - replace with real API call
-      const mockData: AnalyticsData = {
-        overview: {
-          totalUsers: 1247,
-          totalStores: 156,
-          totalRevenue: 45320.50,
-          totalOrders: 892,
-          userGrowth: 12.5,
-          storeGrowth: 8.3,
-          revenueGrowth: 15.7,
-          orderGrowth: 10.2
-        },
-        chartData: {
-          userRegistrations: [
-            { date: '2024-01-01', count: 15 },
-            { date: '2024-01-02', count: 23 },
-            { date: '2024-01-03', count: 18 },
-            { date: '2024-01-04', count: 31 },
-            { date: '2024-01-05', count: 27 },
-            { date: '2024-01-06', count: 19 },
-            { date: '2024-01-07', count: 25 }
-          ],
-          storeCreations: [
-            { date: '2024-01-01', count: 3 },
-            { date: '2024-01-02', count: 5 },
-            { date: '2024-01-03', count: 2 },
-            { date: '2024-01-04', count: 7 },
-            { date: '2024-01-05', count: 4 },
-            { date: '2024-01-06', count: 6 },
-            { date: '2024-01-07', count: 3 }
-          ],
-          revenue: [
-            { date: '2024-01-01', amount: 1250.50 },
-            { date: '2024-01-02', amount: 1890.75 },
-            { date: '2024-01-03', amount: 1420.25 },
-            { date: '2024-01-04', amount: 2150.00 },
-            { date: '2024-01-05', amount: 1750.50 },
-            { date: '2024-01-06', amount: 1980.25 },
-            { date: '2024-01-07', amount: 1650.75 }
-          ],
-          orders: [
-            { date: '2024-01-01', count: 25 },
-            { date: '2024-01-02', count: 38 },
-            { date: '2024-01-03', count: 29 },
-            { date: '2024-01-04', count: 45 },
-            { date: '2024-01-05', count: 35 },
-            { date: '2024-01-06', count: 42 },
-            { date: '2024-01-07', count: 33 }
-          ]
-        },
-        demographics: {
-          ageGroups: [
-            { label: '13-17', value: 35 },
-            { label: '18-24', value: 45 },
-            { label: '25-30', value: 20 }
-          ],
-          locations: [
-            { country: 'United States', users: 567, stores: 89 },
-            { country: 'Canada', users: 234, stores: 34 },
-            { country: 'United Kingdom', users: 189, stores: 22 },
-            { country: 'Australia', users: 123, stores: 11 },
-            { country: 'Germany', users: 89, stores: 8 }
-          ],
-          categories: [
-            { category: 'Art & Design', stores: 45, revenue: 15250.75 },
-            { category: 'Technology', stores: 32, revenue: 12890.50 },
-            { category: 'Fashion', stores: 28, revenue: 8940.25 },
-            { category: 'Music', stores: 25, revenue: 5670.00 },
-            { category: 'Business', stores: 18, revenue: 3890.25 },
-            { category: 'Other', stores: 8, revenue: 1290.50 }
-          ]
-        }
-      };
-      
-      setData(mockData);
-    } catch (error) {
-      console.error('Failed to load analytics data:', error);
+      setLoading(true);
+      setError('');
+
+      const data = await adminAPI.getAnalytics(range);
+      setAnalytics(data);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load analytics.');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
-  };
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    await loadAnalyticsData();
-    setRefreshing(false);
-  };
-
-  const exportReport = () => {
-    // TODO: Implement report export
-    alert('Exporting analytics report...');
   };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+      currency: 'USD',
+    }).format(amount || 0);
   };
 
-  const formatPercentage = (value: number) => {
-    return `${value > 0 ? '+' : ''}${value.toFixed(1)}%`;
+  const formatDate = (date: string) => {
+    const parsed = new Date(date);
+    return parsed.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+    });
   };
 
-  const getGrowthColor = (growth: number) => {
-    return growth > 0 ? 'text-green-600' : growth < 0 ? 'text-red-600' : 'text-gray-600';
+  const getMaxCount = (points: ChartPoint[], key: 'count' | 'amount') => {
+    const max = Math.max(...points.map((point) => Number(point[key] || 0)), 1);
+    return max;
   };
 
-  if (isLoading) {
+  const renderMiniBarChart = (
+    title: string,
+    points: ChartPoint[],
+    key: 'count' | 'amount',
+    type: 'number' | 'currency' = 'number'
+  ) => {
+    const max = getMaxCount(points, key);
+    const visiblePoints = points.slice(-14);
+
+    return (
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-bold mb-4">{title}</h3>
+
+        {visiblePoints.length === 0 ? (
+          <p className="text-gray-500">No data yet.</p>
+        ) : (
+          <div className="flex items-end gap-2 h-48">
+            {visiblePoints.map((point) => {
+              const value = Number(point[key] || 0);
+              const height = Math.max((value / max) * 100, value > 0 ? 8 : 2);
+
+              return (
+                <div key={point.date} className="flex-1 flex flex-col items-center gap-2">
+                  <div className="w-full flex items-end h-36">
+                    <div
+                      className="w-full bg-blue-600 rounded-t"
+                      style={{ height: `${height}%` }}
+                      title={`${formatDate(point.date)}: ${
+                        type === 'currency' ? formatCurrency(value) : value
+                      }`}
+                    />
+                  </div>
+
+                  <span className="text-[10px] text-gray-500 rotate-45 origin-left whitespace-nowrap">
+                    {formatDate(point.date)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderBreakdown = (
+    title: string,
+    items: Array<{ label?: string; status?: string; category?: string; value?: number; count?: number; percent?: number }>
+  ) => {
+    const normalized = items.map((item) => ({
+      label: item.label || item.status || item.category || 'Unknown',
+      value: Number(item.value ?? item.count ?? 0),
+      percent: item.percent,
+    }));
+
+    const total = normalized.reduce((sum, item) => sum + item.value, 0) || 1;
+
+    return (
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h3 className="text-lg font-bold mb-4">{title}</h3>
+
+        {normalized.length === 0 ? (
+          <p className="text-gray-500">No data yet.</p>
+        ) : (
+          <div className="space-y-4">
+            {normalized.map((item) => {
+              const percent =
+                typeof item.percent === 'number'
+                  ? item.percent
+                  : Math.round((item.value / total) * 100);
+
+              return (
+                <div key={item.label}>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="font-medium capitalize">{item.label}</span>
+                    <span className="text-gray-500">
+                      {item.value} · {percent}%
+                    </span>
+                  </div>
+
+                  <div className="w-full bg-gray-100 rounded-full h-2">
+                    <div
+                      className="bg-blue-600 h-2 rounded-full"
+                      style={{ width: `${percent}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  if (loading && !analytics) {
     return (
       <AdminLayout>
         <div className="admin-loading">
@@ -176,204 +207,156 @@ const AnalyticsPage: React.FC = () => {
   return (
     <AdminLayout>
       <div className="admin-page">
-        {/* Header */}
         <div className="admin-page-header">
           <div>
-            <h1 className="admin-page-title">Analytics Dashboard</h1>
-            <p className="admin-page-subtitle">Platform performance metrics and insights</p>
+            <h1>Analytics</h1>
+            <p>Real platform growth, revenue, product, service, and user analytics.</p>
           </div>
-          <div className="admin-page-actions">
+
+          <div className="flex gap-3">
             <select
-              value={dateRange}
-              onChange={(e) => setDateRange(e.target.value)}
-              className="admin-filter-select"
+              value={range}
+              onChange={(event) => setRange(event.target.value)}
+              className="px-4 py-2 border rounded-lg bg-white"
             >
               <option value="7d">Last 7 days</option>
               <option value="30d">Last 30 days</option>
-              <option value="90d">Last 3 months</option>
+              <option value="90d">Last 90 days</option>
               <option value="1y">Last year</option>
             </select>
-            <button
-              onClick={handleRefresh}
-              disabled={refreshing}
-              className="admin-btn secondary"
-            >
+
+            <button onClick={loadAnalytics} className="admin-btn secondary">
               <FiRefreshCw />
               Refresh
             </button>
-            <button onClick={exportReport} className="admin-btn">
-              <FiDownload />
-              Export Report
-            </button>
           </div>
         </div>
 
-        {/* Overview Cards */}
-        <div className="admin-analytics-grid">
-          <div className="admin-analytics-card">
-            <div className="admin-analytics-header">
-              <h3 className="admin-analytics-title">Total Users</h3>
-              <div style={{ padding: '0.5rem', background: '#dbeafe', borderRadius: '0.5rem' }}>
-                <FiUsers style={{ color: '#3b82f6' }} />
-              </div>
-            </div>
-            <div className="admin-analytics-value">{data?.overview.totalUsers.toLocaleString()}</div>
-            <div className={`admin-analytics-change ${(data?.overview.userGrowth || 0) > 0 ? 'positive' : 'negative'}`}>
-              {formatPercentage(data?.overview.userGrowth || 0)}
-            </div>
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 mb-6">
+            {error}
           </div>
+        )}
 
-          <div className="admin-analytics-card">
-            <div className="admin-analytics-header">
-              <h3 className="admin-analytics-title">Total Stores</h3>
-              <div style={{ padding: '0.5rem', background: '#d1fae5', borderRadius: '0.5rem' }}>
-                <FiShoppingBag style={{ color: '#10b981' }} />
-              </div>
-            </div>
-            <div className="admin-analytics-value">{data?.overview.totalStores}</div>
-            <div className={`admin-analytics-change ${(data?.overview.storeGrowth || 0) > 0 ? 'positive' : 'negative'}`}>
-              {formatPercentage(data?.overview.storeGrowth || 0)}
-            </div>
-          </div>
-
-          <div className="admin-analytics-card">
-            <div className="admin-analytics-header">
-              <h3 className="admin-analytics-title">Total Revenue</h3>
-              <div style={{ padding: '0.5rem', background: '#fef3c7', borderRadius: '0.5rem' }}>
-                <FiDollarSign style={{ color: '#f59e0b' }} />
-              </div>
-            </div>
-            <div className="admin-analytics-value">{formatCurrency(data?.overview.totalRevenue || 0)}</div>
-            <div className={`admin-analytics-change ${(data?.overview.revenueGrowth || 0) > 0 ? 'positive' : 'negative'}`}>
-              {formatPercentage(data?.overview.revenueGrowth || 0)}
-            </div>
-          </div>
-
-          <div className="admin-analytics-card">
-            <div className="admin-analytics-header">
-              <h3 className="admin-analytics-title">Total Orders</h3>
-              <div style={{ padding: '0.5rem', background: '#e0e7ff', borderRadius: '0.5rem' }}>
-                <FiTrendingUp style={{ color: '#6366f1' }} />
-              </div>
-            </div>
-            <div className="admin-analytics-value">{data?.overview.totalOrders}</div>
-            <div className={`admin-analytics-change ${(data?.overview.orderGrowth || 0) > 0 ? 'positive' : 'negative'}`}>
-              {formatPercentage(data?.overview.orderGrowth || 0)}
-            </div>
-          </div>
-        </div>
-
-        {/* Charts Section */}
-        <div className="admin-analytics-chart-grid">
-          {/* User Registrations Chart */}
-          <div className="admin-analytics-card">
-            <div className="admin-analytics-header">
-              <h3 className="admin-analytics-title">User Registrations</h3>
-            </div>
-            <div className="admin-chart-container">
-              {data?.chartData.userRegistrations.map((item, index) => (
-                <div key={index} className="admin-chart-bar">
-                  <div
-                    className="admin-chart-fill blue"
-                    style={{
-                      height: `${(item.count / Math.max(...data.chartData.userRegistrations.map(d => d.count))) * 100}%`
-                    }}
-                  ></div>
-                  <span className="admin-chart-label">
-                    {new Date(item.date).getDate()}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Revenue Chart */}
-          <div className="admin-analytics-card">
-            <div className="admin-analytics-header">
-              <h3 className="admin-analytics-title">Daily Revenue</h3>
-            </div>
-            <div className="admin-chart-container">
-              {data?.chartData.revenue.map((item, index) => (
-                <div key={index} className="admin-chart-bar">
-                  <div
-                    className="admin-chart-fill green"
-                    style={{
-                      height: `${(item.amount / Math.max(...data.chartData.revenue.map(d => d.amount))) * 100}%`
-                    }}
-                  ></div>
-                  <span className="admin-chart-label">
-                    {new Date(item.date).getDate()}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Demographics Section */}
-        <div className="admin-analytics-chart-grid demographics">
-          {/* Age Demographics */}
-          <div className="admin-analytics-card">
-            <div className="admin-analytics-header">
-              <h3 className="admin-analytics-title">Age Demographics</h3>
-            </div>
-            <div className="admin-demographics-list">
-              {data?.demographics.ageGroups.map((group, index) => (
-                <div key={index} className="admin-demographic-item">
-                  <span className="admin-demographic-label">{group.label} years</span>
-                  <div className="admin-progress-container">
-                    <div className="admin-progress-bar">
-                      <div
-                        className="admin-progress-fill"
-                        style={{ width: `${group.value}%` }}
-                      ></div>
-                    </div>
-                    <span className="admin-demographic-value">{group.value}%</span>
+        {analytics && (
+          <>
+            <div className="admin-stats-grid mb-8">
+              <div className="admin-stat-card">
+                <div className="admin-stat-header">
+                  <div className="admin-stat-icon users">
+                    <FiUsers />
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
+                <h3 className="admin-stat-value">{analytics.overview.totalUsers}</h3>
+                <p className="admin-stat-label">Total Users</p>
+                <p className="admin-stat-change positive">
+                  +{analytics.overview.userGrowth} in range
+                </p>
+              </div>
 
-          {/* Top Countries */}
-          <div className="admin-analytics-card">
-            <div className="admin-analytics-header">
-              <h3 className="admin-analytics-title">Top Countries</h3>
-            </div>
-            <div className="admin-demographics-list">
-              {data?.demographics.locations.map((location, index) => (
-                <div key={index} className="admin-demographic-item">
-                  <span className="admin-demographic-label">{location.country}</span>
-                  <div className="admin-demographic-stats">
-                    <div className="admin-stat-value">{location.users} users</div>
-                    <div className="admin-stat-label">{location.stores} stores</div>
+              <div className="admin-stat-card">
+                <div className="admin-stat-header">
+                  <div className="admin-stat-icon stores">
+                    <FiShoppingBag />
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
+                <h3 className="admin-stat-value">{analytics.overview.totalStores}</h3>
+                <p className="admin-stat-label">Stores</p>
+                <p className="admin-stat-change positive">
+                  +{analytics.overview.storeGrowth} in range
+                </p>
+              </div>
 
-          {/* Store Categories */}
-          <div className="admin-analytics-card">
-            <div className="admin-analytics-header">
-              <h3 className="admin-analytics-title">Store Categories</h3>
-            </div>
-            <div className="admin-demographics-list">
-              {data?.demographics.categories.map((category, index) => (
-                <div key={index} className="admin-demographic-item">
-                  <span className="admin-demographic-label">{category.category}</span>
-                  <div className="admin-demographic-stats">
-                    <div className="admin-stat-value">{category.stores} stores</div>
-                    <div className="admin-stat-label">{formatCurrency(category.revenue)}</div>
+              <div className="admin-stat-card">
+                <div className="admin-stat-header">
+                  <div className="admin-stat-icon revenue">
+                    <FiDollarSign />
                   </div>
                 </div>
-              ))}
+                <h3 className="admin-stat-value">
+                  {formatCurrency(analytics.overview.totalRevenue)}
+                </h3>
+                <p className="admin-stat-label">Revenue</p>
+                <p className="admin-stat-change positive">
+                  {formatCurrency(analytics.overview.revenueGrowth)} in range
+                </p>
+              </div>
+
+              <div className="admin-stat-card">
+                <div className="admin-stat-header">
+                  <div className="admin-stat-icon alerts">
+                    <FiBarChart />
+                  </div>
+                </div>
+                <h3 className="admin-stat-value">{analytics.overview.totalOrders}</h3>
+                <p className="admin-stat-label">Orders</p>
+                <p className="admin-stat-change">
+                  +{analytics.overview.orderGrowth} in range
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
+
+            <div className="admin-stats-grid mb-8">
+              <div className="admin-stat-card">
+                <div className="admin-stat-header">
+                  <div className="admin-stat-icon stores">
+                    <FiPackage />
+                  </div>
+                </div>
+                <h3 className="admin-stat-value">{analytics.overview.totalProducts}</h3>
+                <p className="admin-stat-label">Products</p>
+                <p className="admin-stat-change">All stores</p>
+              </div>
+
+              <div className="admin-stat-card">
+                <div className="admin-stat-header">
+                  <div className="admin-stat-icon users">
+                    <FiTool />
+                  </div>
+                </div>
+                <h3 className="admin-stat-value">{analytics.overview.totalServices}</h3>
+                <p className="admin-stat-label">Services</p>
+                <p className="admin-stat-change">All stores</p>
+              </div>
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-6 mb-8">
+              {renderMiniBarChart(
+                'User Registrations',
+                analytics.chartData.userRegistrations,
+                'count'
+              )}
+
+              {renderMiniBarChart(
+                'Store Creations',
+                analytics.chartData.storeCreations,
+                'count'
+              )}
+
+              {renderMiniBarChart(
+                'Revenue',
+                analytics.chartData.revenue,
+                'amount',
+                'currency'
+              )}
+
+              {renderMiniBarChart(
+                'Orders',
+                analytics.chartData.orders,
+                'count'
+              )}
+            </div>
+
+            <div className="grid lg:grid-cols-3 gap-6">
+              {renderBreakdown('User Age Groups', analytics.demographics.ageGroups)}
+              {renderBreakdown('Product Statuses', analytics.demographics.productStatuses)}
+              {renderBreakdown('Service Categories', analytics.demographics.serviceCategories)}
+            </div>
+          </>
+        )}
       </div>
     </AdminLayout>
   );
 };
 
-export default AnalyticsPage;
+export default AdminAnalyticsPage;
