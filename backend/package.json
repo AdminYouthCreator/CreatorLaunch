@@ -26,7 +26,7 @@
     "node-cache": "^5.1.2",
     "nodemailer": "^7.0.5",
     "stripe": "^20.4.1",
-    "cloudinary": "^2.5.1",
+    "cloudinary": "^2.5.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
