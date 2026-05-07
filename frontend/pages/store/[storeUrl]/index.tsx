@@ -15,7 +15,7 @@ interface StoreInfo {
 }
 
 interface ProductVariant {
-  retailPrice: number;
+  retailPrice?: number;
   price?: number;
   size?: string;
   color?: string;
@@ -35,7 +35,7 @@ interface Product {
   imageUrl?: string;
   mockupUrl?: string;
   status?: string;
-  variants: ProductVariant[];
+  variants?: ProductVariant[];
 }
 
 interface Service {
@@ -56,7 +56,7 @@ interface StoreData {
 }
 
 const getProductImage = (product: Product) => {
-  const firstVariant = product.variants?.[0] || {};
+  const firstVariant: ProductVariant = product.variants?.[0] || {};
 
   return (
     product.imageUrl ||
@@ -68,7 +68,7 @@ const getProductImage = (product: Product) => {
 };
 
 const getProductPrice = (product: Product) => {
-  const firstVariant = product.variants?.[0] || {};
+  const firstVariant: ProductVariant = product.variants?.[0] || {};
 
   const rawPrice =
     product.price ??
@@ -103,7 +103,12 @@ const StorePage: React.FC = () => {
       setError('');
 
       const response = await storeAPI.getStore(subdomain);
-      setData(response);
+
+      setData({
+        store: response.store,
+        products: response.products || [],
+        services: response.services || [],
+      });
     } catch (err: any) {
       console.error('Failed to load store:', err);
       setError(err?.response?.data?.message || 'Store not found');
@@ -118,7 +123,7 @@ const StorePage: React.FC = () => {
       return;
     }
 
-    const firstVariant = product.variants?.[0] || {};
+    const firstVariant: ProductVariant = product.variants?.[0] || {};
     const price = getProductPrice(product);
     const imageUrl = getProductImage(product);
 
@@ -275,8 +280,18 @@ const StorePage: React.FC = () => {
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-gray-300">
-                              <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                              <svg
+                                className="w-16 h-16"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={1.5}
+                                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                                />
                               </svg>
                             </div>
                           )}
