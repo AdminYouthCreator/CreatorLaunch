@@ -147,6 +147,20 @@ exports.getMockupStatus = asyncHandler(async (req, res) => {
   });
 });
 
+exports.getProducts = asyncHandler(async (req, res) => {
+  const userBrands = await Brand.find({ user: req.user.id }).select('_id');
+  const brandIds = userBrands.map((brand) => brand._id);
+
+  const products = await Product.find({ brand: { $in: brandIds } })
+    .populate('brand')
+    .sort({ createdAt: -1 });
+
+  res.status(200).json({
+    products,
+    data: products,
+  });
+});
+
 // ################## ----- PRODUCT CREATION ----- ##################
 exports.createProduct = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
