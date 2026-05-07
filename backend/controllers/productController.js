@@ -295,21 +295,57 @@ exports.createProduct = asyncHandler(async (req, res) => {
       .json({ message: 'You are not authorized to create a product for this brand.' });
   }
 
-  for (const variant of variants) {
-    if (parseFloat(variant.retailPrice) < parseFloat(variant.baseCost)) {
+  if (!Array.isArray(variants) || variants.length === 0) {
+    return res.status(400).json({ message: 'At least one product variant is required.' });
+  }
+
+  const parseMoney = (value) => {
+    if (typeof value === 'number') return value;
+
+    if (typeof value === 'string') {
+      const cleaned = value.replace(/[^0-9.]/g, '');
+      const parsed = Number(cleaned);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    return 0;
+  };
+
+  const normalizedVariants = variants.map((variant) => {
+    const retailPrice = parseMoney(variant.retailPrice ?? variant.price);
+    const baseCost = parseMoney(variant.baseCost);
+
+    return {
+      ...variant,
+      retailPrice,
+      price: retailPrice,
+      baseCost,
+      size: variant.size || '',
+      color: variant.color || '',
+      mockupUrl: variant.mockupUrl || variant.mockup_url || '',
+      imageUrl: variant.mockupUrl || variant.mockup_url || '',
+    };
+  });
+
+  for (const variant of normalizedVariants) {
+    if (variant.retailPrice < variant.baseCost) {
       return res
         .status(400)
         .json({ message: 'Retail price cannot be less than the base cost.' });
     }
   }
 
+  const firstVariant = normalizedVariants[0];
+  const firstRetailPrice = firstVariant.retailPrice || 0;
+  const firstMockupUrl = firstVariant.mockupUrl || '';
+
   const printfulPayload = {
     sync_product: {
       name,
-      thumbnail: variants[0]?.mockupUrl || '',
+      thumbnail: firstMockupUrl,
     },
-    sync_variants: variants.map((variant) => ({
-      retail_price: variant.retailPrice,
+    sync_variants: normalizedVariants.map((variant) => ({
+      retail_price: variant.retailPrice.toString(),
       variant_id: variant.printfulVariantId,
       files: [
         {
@@ -327,14 +363,12 @@ exports.createProduct = asyncHandler(async (req, res) => {
   } catch (error) {
     console.error('Printful sync product creation failed:', error.message);
 
-    // Continue saving locally so the user's product still appears in CreatorLaunch.
-    // Printful fulfillment can be fixed later if needed.
     printfulProduct = {
       id: null,
       sync_product: {
         id: null,
       },
-      sync_variants: variants.map((variant) => ({
+      sync_variants: normalizedVariants.map((variant) => ({
         id: null,
         variant_id: variant.printfulVariantId,
       })),
@@ -346,18 +380,26 @@ exports.createProduct = asyncHandler(async (req, res) => {
     printfulProductId,
     printfulSyncProductId:
       printfulProduct?.sync_product?.id || printfulProduct?.id || null,
+
     name,
     description,
-    status: 'inactive',
+
+    price: firstRetailPrice,
+    retailPrice: firstRetailPrice,
+
+    imageUrl: firstMockupUrl,
+    image: firstMockupUrl,
+    thumbnail: firstMockupUrl,
+    mockupUrl: firstMockupUrl,
+
+    status: 'published',
     isActive: false,
-    variants: variants.map((variant, index) => ({
+
+    variants: normalizedVariants.map((variant, index) => ({
       ...variant,
       printfulVariantId:
         printfulProduct?.sync_variants?.[index]?.variant_id || variant.printfulVariantId,
       printfulSyncVariantId: printfulProduct?.sync_variants?.[index]?.id || null,
-      mockupUrl: variant.mockupUrl,
-      retailPrice: variant.retailPrice,
-      baseCost: variant.baseCost,
     })),
   });
 
