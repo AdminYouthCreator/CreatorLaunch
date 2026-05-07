@@ -16,6 +16,7 @@ interface AdminAuthContextType {
   logout: () => void;
   hasPermission: (permission: string) => boolean;
   getAdminToken: () => string | null;
+  refreshAdminToken: () => Promise<string | null>;
 }
 
 export const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
@@ -35,6 +36,17 @@ const adminPermissions = [
   'invites.write',
 ];
 
+const saveAdminToken = (token: string) => {
+  localStorage.setItem('admin_token', token);
+
+  // Also save as normal token so shared auth utilities stay consistent.
+  localStorage.setItem('token', token);
+};
+
+const clearAdminToken = () => {
+  localStorage.removeItem('admin_token');
+};
+
 export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
   const [admin, setAdmin] = useState<Admin | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,28 +57,85 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
 
   const getAdminToken = () => {
     if (typeof window === 'undefined') return null;
-    return localStorage.getItem('admin_token');
+
+    return localStorage.getItem('admin_token') || localStorage.getItem('token');
+  };
+
+  const normalizeAdmin = (user: any): Admin => {
+    return {
+      id: user.id || user._id,
+      email: user.email,
+      name: user.username || user.name || user.email,
+      role: 'Admin',
+      permissions: adminPermissions,
+    };
+  };
+
+  const refreshAdminToken = async (): Promise<string | null> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/refresh-token`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        clearAdminToken();
+        return null;
+      }
+
+      const data = await response.json();
+      const newToken = data.accessToken || data.token;
+
+      if (!newToken) {
+        clearAdminToken();
+        return null;
+      }
+
+      saveAdminToken(newToken);
+      return newToken;
+    } catch (error) {
+      console.error('Failed to refresh admin token:', error);
+      clearAdminToken();
+      return null;
+    }
+  };
+
+  const fetchAdminProfile = async (token: string) => {
+    return fetch(`${API_BASE_URL}/api/auth/profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      credentials: 'include',
+    });
   };
 
   const checkAdminSession = async () => {
     try {
       if (typeof window === 'undefined') return;
 
-      const token = localStorage.getItem('admin_token');
+      let token = getAdminToken();
 
       if (!token) {
         setAdmin(null);
         return;
       }
 
-      const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      let response = await fetchAdminProfile(token);
+
+      // Access tokens can expire. Try refreshing once before forcing login.
+      if (response.status === 401 || response.status === 403) {
+        token = await refreshAdminToken();
+
+        if (!token) {
+          setAdmin(null);
+          return;
+        }
+
+        response = await fetchAdminProfile(token);
+      }
 
       if (!response.ok) {
-        localStorage.removeItem('admin_token');
+        clearAdminToken();
         setAdmin(null);
         return;
       }
@@ -74,21 +143,15 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
       const data = await response.json();
 
       if (data.user?.role !== 'Admin') {
-        localStorage.removeItem('admin_token');
+        clearAdminToken();
         setAdmin(null);
         return;
       }
 
-      setAdmin({
-        id: data.user.id,
-        email: data.user.email,
-        name: data.user.username || data.user.email,
-        role: 'Admin',
-        permissions: adminPermissions,
-      });
+      setAdmin(normalizeAdmin(data.user));
     } catch (error) {
       console.error('Failed to check admin session:', error);
-      localStorage.removeItem('admin_token');
+      clearAdminToken();
       setAdmin(null);
     } finally {
       setIsLoading(false);
@@ -121,15 +184,8 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
         return false;
       }
 
-      localStorage.setItem('admin_token', data.accessToken);
-
-      setAdmin({
-        id: data.user.id,
-        email: data.user.email,
-        name: data.user.username || data.user.email,
-        role: 'Admin',
-        permissions: adminPermissions,
-      });
+      saveAdminToken(data.accessToken);
+      setAdmin(normalizeAdmin(data.user));
 
       return true;
     } catch (error) {
@@ -144,7 +200,7 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
     setAdmin(null);
 
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('admin_token');
+      clearAdminToken();
     }
   };
 
@@ -162,6 +218,7 @@ export const AdminAuthProvider = ({ children }: { children: ReactNode }) => {
         logout,
         hasPermission,
         getAdminToken,
+        refreshAdminToken,
       }}
     >
       {children}
