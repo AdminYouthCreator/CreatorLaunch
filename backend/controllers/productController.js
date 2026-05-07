@@ -411,10 +411,19 @@ exports.createProduct = asyncHandler(async (req, res) => {
 
   await newProduct.save();
 
-  await Todo.updateOne(
-    { user: req.user.id },
-    { $set: { productCreated: true } }
-  );
+await Todo.findOneAndUpdate(
+  { user: req.user.id },
+  {
+    $set: {
+      productCreated: true,
+      firstProductCreated: true,
+      createProduct: true,
+      productStepCompleted: true,
+      updatedAt: new Date(),
+    },
+  },
+  { upsert: true, new: true }
+);
 
   const normalizedProduct = normalizeProductForFrontend(newProduct);
 
