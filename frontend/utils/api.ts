@@ -416,6 +416,11 @@ export const orderAPI = {
 // ################################################################
 
 export const checkoutAPI = {
+  createSession: async (checkoutData: any) => {
+    const response = await api.post('/api/checkout/create-session', checkoutData);
+    return response.data;
+  },
+
   createCheckoutSession: async (checkoutData: any) => {
     const response = await api.post('/api/checkout/create-session', checkoutData);
     return response.data;
