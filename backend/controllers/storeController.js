@@ -14,7 +14,10 @@ exports.getStore = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: 'Store not found' });
   }
 
-  const products = await Product.find({ brand: brand._id, status: 'published' });
+  const products = await Product.find({
+  brand: brand._id,
+  status: { $in: ['published', 'active'] }
+});
   const services = await Service.find({ brand: brand._id, status: 'published' });
 
   res.status(200).json({
@@ -41,12 +44,10 @@ exports.getStoreProduct = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: 'Store not found' });
   }
 
-  const product = await Product.findOne({ _id: productId, brand: brand._id, status: 'published' });
-  if (!product) {
-    return res.status(404).json({ message: 'Product not found' });
-  }
-
-  res.status(200).json({ product, store: { brandName: brand.brandName, subdomain: brand.subdomain, logoUrl: brand.logoUrl } });
+const product = await Product.findOne({
+  _id: productId,
+  brand: brand._id,
+  status: { $in: ['published', 'active'] }
 });
 
 // @desc    Get single service from a public store
