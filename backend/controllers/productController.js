@@ -6,6 +6,7 @@ const Brand = require('../models/Brand');
 const Todo = require('../models/Todo');
 
 // ################## ----- HELPERS ----- ##################
+
 const buildDefaultPosition = (placementData) => {
   const areaWidth = Number(placementData.printAreaWidth || 12);
   const areaHeight = Number(placementData.printAreaHeight || 16);
@@ -17,7 +18,7 @@ const buildDefaultPosition = (placementData) => {
     width,
     height,
     top: Math.max((areaHeight - height) / 2, 0),
-    left: Math.max((areaWidth - width) / 2, 0)
+    left: Math.max((areaWidth - width) / 2, 0),
   };
 };
 
@@ -36,25 +37,65 @@ const normalizeMockupOptions = (styles) => {
         id: mockupStyle.id,
         categoryName: mockupStyle.category_name,
         viewName: mockupStyle.view_name,
-        restrictedToVariants: mockupStyle.restricted_to_variants || null
-      }))
+        restrictedToVariants: mockupStyle.restricted_to_variants || null,
+      })),
     }));
 };
 
-// ################## ----- CATALOG ----- ##################
+const normalizeProductForFrontend = (product) => {
+  const productObject = product.toObject ? product.toObject() : product;
+  const firstVariant = productObject.variants?.[0] || {};
+
+  const rawPrice =
+    productObject.price ??
+    productObject.retailPrice ??
+    firstVariant.retailPrice ??
+    firstVariant.price ??
+    0;
+
+  const price = Number(rawPrice);
+
+  const imageUrl =
+    productObject.image ||
+    productObject.imageUrl ||
+    productObject.thumbnail ||
+    productObject.mockupUrl ||
+    productObject.mockup_url ||
+    firstVariant.mockupUrl ||
+    firstVariant.mockup_url ||
+    firstVariant.image ||
+    firstVariant.imageUrl ||
+    '';
+
+  return {
+    ...productObject,
+    id: productObject._id?.toString?.() || productObject.id,
+    price: Number.isFinite(price) ? price : 0,
+    imageUrl,
+    mockupUrl: imageUrl,
+    status: productObject.status || (productObject.isActive ? 'active' : 'inactive'),
+    isActive: Boolean(productObject.isActive),
+  };
+};
+
+// ################## ----- PRINTFUL CATALOG ----- ##################
+
 exports.getPrintfulCatalog = asyncHandler(async (req, res) => {
   const { categoryId } = req.query;
   const catalog = await printfulService.getCatalog(categoryId);
+
   res.status(200).json(catalog);
 });
 
 exports.getPrintfulCategories = asyncHandler(async (req, res) => {
   const categories = await printfulService.getCategories();
+
   res.status(200).json(categories);
 });
 
 exports.getPrintfulProductDetails = asyncHandler(async (req, res) => {
   const details = await printfulService.getProductDetails(req.params.productId);
+
   res.status(200).json(details);
 });
 
@@ -67,6 +108,7 @@ exports.getPrintfulMockupOptions = asyncHandler(async (req, res) => {
 });
 
 // ################## ----- MOCKUP GENERATION ----- ##################
+
 exports.generateMockup = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
 
@@ -79,8 +121,12 @@ exports.generateMockup = asyncHandler(async (req, res) => {
   }
 
   const productId = Number(req.body.productId);
+
   const parsedVariantIds =
-    typeof req.body.variantIds === 'string' ? JSON.parse(req.body.variantIds) : req.body.variantIds;
+    typeof req.body.variantIds === 'string'
+      ? JSON.parse(req.body.variantIds)
+      : req.body.variantIds;
+
   const parsedPlacement =
     typeof req.body.placementData === 'string'
       ? JSON.parse(req.body.placementData)
@@ -106,8 +152,8 @@ exports.generateMockup = asyncHandler(async (req, res) => {
     imageUrl: uploadedFile.url,
     placementData: {
       ...parsedPlacement,
-      position: parsedPlacement.position || buildDefaultPosition(parsedPlacement)
-    }
+      position: parsedPlacement.position || buildDefaultPosition(parsedPlacement),
+    },
   });
 
   if (!task?.id) {
@@ -117,7 +163,7 @@ exports.generateMockup = asyncHandler(async (req, res) => {
   res.status(202).json({
     task_key: String(task.id),
     taskId: task.id,
-    uploadedFileUrl: uploadedFile.url
+    uploadedFileUrl: uploadedFile.url,
   });
 });
 
@@ -136,16 +182,18 @@ exports.getMockupStatus = asyncHandler(async (req, res) => {
       displayName: mockup.display_name,
       technique: mockup.technique,
       styleId: mockup.style_id,
-      mockup_url: mockup.mockup_url
+      mockup_url: mockup.mockup_url,
     }))
   );
 
   res.status(200).json({
     status: result.status,
     mockups,
-    failureReasons: result.failure_reasons || []
+    failureReasons: result.failure_reasons || [],
   });
 });
+
+// ################## ----- PRODUCT CRUD ----- ##################
 
 exports.getProducts = asyncHandler(async (req, res) => {
   const userBrands = await Brand.find({ user: req.user.id }).select('_id');
@@ -155,13 +203,81 @@ exports.getProducts = asyncHandler(async (req, res) => {
     .populate('brand')
     .sort({ createdAt: -1 });
 
+  const normalizedProducts = products.map(normalizeProductForFrontend);
+
   res.status(200).json({
-    products,
-    data: products,
+    products: normalizedProducts,
+    data: normalizedProducts,
   });
 });
 
-// ################## ----- PRODUCT CREATION ----- ##################
+exports.getProductById = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.productId).populate('brand');
+
+  if (!product) {
+    return res.status(404).json({ message: 'Product not found.' });
+  }
+
+  const brand = await Brand.findById(product.brand?._id || product.brand);
+
+  if (!brand || brand.user.toString() !== req.user.id) {
+    return res.status(403).json({ message: 'You are not authorized to view this product.' });
+  }
+
+  const normalizedProduct = normalizeProductForFrontend(product);
+
+  res.status(200).json({
+    product: normalizedProduct,
+    data: normalizedProduct,
+  });
+});
+
+exports.updateProductStatus = asyncHandler(async (req, res) => {
+  const { status, isActive } = req.body;
+
+  const product = await Product.findById(req.params.productId).populate('brand');
+
+  if (!product) {
+    return res.status(404).json({ message: 'Product not found.' });
+  }
+
+  const brand = await Brand.findById(product.brand?._id || product.brand);
+
+  if (!brand || brand.user.toString() !== req.user.id) {
+    return res.status(403).json({ message: 'You are not authorized to update this product.' });
+  }
+
+  product.status = status || (isActive ? 'active' : 'inactive');
+  product.isActive = product.status === 'active';
+
+  await product.save();
+
+  const normalizedProduct = normalizeProductForFrontend(product);
+
+  res.status(200).json({
+    product: normalizedProduct,
+    data: normalizedProduct,
+  });
+});
+
+exports.deleteProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.productId).populate('brand');
+
+  if (!product) {
+    return res.status(404).json({ message: 'Product not found.' });
+  }
+
+  const brand = await Brand.findById(product.brand?._id || product.brand);
+
+  if (!brand || brand.user.toString() !== req.user.id) {
+    return res.status(403).json({ message: 'You are not authorized to delete this product.' });
+  }
+
+  await Product.deleteOne({ _id: product._id });
+
+  res.status(200).json({ message: 'Product deleted successfully.' });
+});
+
 exports.createProduct = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
 
@@ -190,7 +306,7 @@ exports.createProduct = asyncHandler(async (req, res) => {
   const printfulPayload = {
     sync_product: {
       name,
-      thumbnail: variants[0]?.mockupUrl || ''
+      thumbnail: variants[0]?.mockupUrl || '',
     },
     sync_variants: variants.map((variant) => ({
       retail_price: variant.retailPrice,
@@ -198,13 +314,32 @@ exports.createProduct = asyncHandler(async (req, res) => {
       files: [
         {
           type: 'default',
-          url: variant.mockupUrl
-        }
-      ]
-    }))
+          url: variant.mockupUrl,
+        },
+      ],
+    })),
   };
 
-  const printfulProduct = await printfulService.createSyncProduct(printfulPayload);
+  let printfulProduct = null;
+
+  try {
+    printfulProduct = await printfulService.createSyncProduct(printfulPayload);
+  } catch (error) {
+    console.error('Printful sync product creation failed:', error.message);
+
+    // Continue saving locally so the user's product still appears in CreatorLaunch.
+    // Printful fulfillment can be fixed later if needed.
+    printfulProduct = {
+      id: null,
+      sync_product: {
+        id: null,
+      },
+      sync_variants: variants.map((variant) => ({
+        id: null,
+        variant_id: variant.printfulVariantId,
+      })),
+    };
+  }
 
   const newProduct = new Product({
     brand: brandId,
@@ -213,11 +348,17 @@ exports.createProduct = asyncHandler(async (req, res) => {
       printfulProduct?.sync_product?.id || printfulProduct?.id || null,
     name,
     description,
-    variants: (printfulProduct?.sync_variants || []).map((syncVariant, index) => ({
-      ...variants[index],
-      printfulVariantId: syncVariant.variant_id,
-      printfulSyncVariantId: syncVariant.id
-    }))
+    status: 'inactive',
+    isActive: false,
+    variants: variants.map((variant, index) => ({
+      ...variant,
+      printfulVariantId:
+        printfulProduct?.sync_variants?.[index]?.variant_id || variant.printfulVariantId,
+      printfulSyncVariantId: printfulProduct?.sync_variants?.[index]?.id || null,
+      mockupUrl: variant.mockupUrl,
+      retailPrice: variant.retailPrice,
+      baseCost: variant.baseCost,
+    })),
   });
 
   await newProduct.save();
@@ -227,5 +368,10 @@ exports.createProduct = asyncHandler(async (req, res) => {
     { $set: { productCreated: true } }
   );
 
-  res.status(201).json(newProduct);
+  const normalizedProduct = normalizeProductForFrontend(newProduct);
+
+  res.status(201).json({
+    product: normalizedProduct,
+    data: normalizedProduct,
+  });
 });
