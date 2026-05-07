@@ -14,6 +14,7 @@ const checkoutRoutes = require('./routes/checkoutRoutes');
 
 let inviteRoutes = null;
 let adminRoutes = null;
+let adminModerationRoutes = null;
 
 try {
   inviteRoutes = require('./routes/inviteRoutes');
@@ -25,6 +26,12 @@ try {
   adminRoutes = require('./routes/adminRoutes');
 } catch (error) {
   adminRoutes = null;
+}
+
+try {
+  adminModerationRoutes = require('./routes/adminModerationRoutes');
+} catch (error) {
+  adminModerationRoutes = null;
 }
 
 const errorHandler = require('./middlewares/errorHandler');
@@ -70,6 +77,10 @@ if (inviteRoutes) {
 
 if (adminRoutes) {
   app.use('/api/admin', adminRoutes);
+}
+
+if (adminModerationRoutes) {
+  app.use('/api/admin/moderation', adminModerationRoutes);
 }
 
 app.use(errorHandler);
