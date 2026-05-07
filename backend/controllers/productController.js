@@ -247,8 +247,14 @@ exports.updateProductStatus = asyncHandler(async (req, res) => {
     return res.status(403).json({ message: 'You are not authorized to update this product.' });
   }
 
-  product.status = status || (isActive ? 'active' : 'inactive');
-  product.isActive = product.status === 'active';
+  let nextStatus = status;
+
+  if (!nextStatus) {
+    nextStatus = isActive ? 'active' : 'inactive';
+  }
+
+  product.status = nextStatus;
+  product.isActive = nextStatus === 'active';
 
   await product.save();
 
