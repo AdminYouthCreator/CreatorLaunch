@@ -55,7 +55,7 @@ router.post(
 router.get('/mockup-status/:taskKey', protect, productController.getMockupStatus);
 
 // ################## ----- PRODUCT CRUD ROUTES ----- ##################
-// Keep these AFTER the /printful and /mockup routes, so :productId does not catch those routes.
+// Keep these AFTER /printful and /mockup routes so :productId does not catch those routes.
 
 router.get('/', protect, productController.getProducts);
 
