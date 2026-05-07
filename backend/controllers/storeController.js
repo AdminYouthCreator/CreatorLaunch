@@ -16,20 +16,22 @@ const normalizeProduct = (product) => {
     firstVariant.imageUrl ||
     '';
 
-  const price =
-    Number(productObject.price) ||
-    Number(productObject.retailPrice) ||
-    Number(firstVariant.retailPrice) ||
-    Number(firstVariant.price) ||
+  const rawPrice =
+    productObject.price ??
+    productObject.retailPrice ??
+    firstVariant.retailPrice ??
+    firstVariant.price ??
     0;
+
+  const price = Number(rawPrice);
 
   return {
     ...productObject,
     id: productObject._id?.toString?.() || productObject.id,
     imageUrl,
     mockupUrl: imageUrl,
-    price,
-    retailPrice: price,
+    price: Number.isFinite(price) ? price : 0,
+    retailPrice: Number.isFinite(price) ? price : 0,
   };
 };
 
@@ -40,6 +42,7 @@ exports.getStore = asyncHandler(async (req, res) => {
   const { subdomain } = req.params;
 
   const brand = await Brand.findOne({ subdomain }).populate('user', 'username email');
+
   if (!brand) {
     return res.status(404).json({ message: 'Store not found' });
   }
@@ -75,6 +78,7 @@ exports.getStoreProduct = asyncHandler(async (req, res) => {
   const { subdomain, productId } = req.params;
 
   const brand = await Brand.findOne({ subdomain }).populate('user', 'username email');
+
   if (!brand) {
     return res.status(404).json({ message: 'Store not found' });
   }
@@ -136,6 +140,7 @@ exports.getStoreService = asyncHandler(async (req, res) => {
   const { subdomain, serviceId } = req.params;
 
   const brand = await Brand.findOne({ subdomain }).populate('user', 'username email');
+
   if (!brand) {
     return res.status(404).json({ message: 'Store not found' });
   }
