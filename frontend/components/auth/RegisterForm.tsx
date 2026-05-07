@@ -3,15 +3,16 @@ import { useAuthContext } from '../../context/AuthContext';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-// ################## ----- REGISTER FORM COMPONENT ----- ##################
-// User registration form with age verification and guardian consent
-// Handles both adult and minor registration workflows
-// ####################################################################
 export const RegisterForm = () => {
   const { register } = useAuthContext();
   const router = useRouter();
+
+  const inviteFromQuery =
+    typeof router.query.invite === 'string' ? router.query.invite : '';
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [inviteCode, setInviteCode] = useState(inviteFromQuery);
   const [password, setPassword] = useState('');
   const [dob, setDob] = useState('');
   const [age, setAge] = useState<number | null>(null);
@@ -21,43 +22,50 @@ export const RegisterForm = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // ################## ----- AGE CALCULATION AND CONSENT CHECK ----- ##################
-  // Effect to calculate user age and determine if guardian consent is needed
-  // Automatically handles the consent requirement workflow
-  // ##########################################################################
+  useEffect(() => {
+    if (inviteFromQuery) {
+      setInviteCode(inviteFromQuery);
+    }
+  }, [inviteFromQuery]);
+
   useEffect(() => {
     if (!dob) {
       setAge(null);
       return;
     }
+
     const birth = new Date(dob);
     const diffMs = Date.now() - birth.getTime();
     const computed = Math.abs(new Date(diffMs).getUTCFullYear() - 1970);
+
     setAge(computed);
     setNeedsConsent(computed < 18);
+
     if (computed >= 18) {
       setConsentGiven(false);
       setGuardianEmail('');
     }
   }, [dob]);
 
-  // ################## ----- FORM SUBMISSION HANDLER ----- ##################
-  // Handles registration form submission with validation
-  // Checks consent requirements and processes registration
-  // ####################################################################
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
     setError('');
     setLoading(true);
 
-    // Validate consent requirements for minors
+    if (!inviteCode.trim()) {
+      setLoading(false);
+      return setError('CreatorLaunch is invite-only. Please enter your invite code.');
+    }
+
     if (needsConsent && !consentGiven) {
       setLoading(false);
       return setError('Guardian consent is required for users under 18.');
     }
+
     if (needsConsent && !guardianEmail) {
       setLoading(false);
-      return setError('Please provide your guardian\'s email.');
+      return setError("Please provide your guardian's email.");
     }
 
     try {
@@ -66,11 +74,10 @@ export const RegisterForm = () => {
         email,
         password,
         dob,
-        guardianEmail: needsConsent ? guardianEmail : undefined
+        guardianEmail: needsConsent ? guardianEmail : undefined,
+        inviteCode: inviteCode.trim(),
       });
-      
-      // Registration successful - show success message instead of redirect
-      // User needs to verify email before they can log in
+
       alert('Registration successful! Please check your email to verify your account before logging in.');
       router.push('/auth/login');
     } catch (error: any) {
@@ -89,73 +96,113 @@ export const RegisterForm = () => {
         </div>
       )}
 
+      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <p className="text-sm text-blue-800">
+          <strong>Invite-only access:</strong> CreatorLaunch accounts are currently limited to
+          invited students, team members, and approved creators.
+        </p>
+      </div>
+
       <div>
-        <label htmlFor="name" className="block text-left font-bold mb-2" style={{ color: '#333' }}>Full Name</label>
-        <input 
-          id="name" 
-          type="text" 
-          value={name} 
-          onChange={e => setName(e.target.value)} 
-          placeholder="Your full name" 
-          required 
+        <label htmlFor="inviteCode" className="block text-left font-bold mb-2" style={{ color: '#333' }}>
+          Invite Code
+        </label>
+        <input
+          id="inviteCode"
+          type="text"
+          value={inviteCode}
+          onChange={(event) => setInviteCode(event.target.value.toUpperCase())}
+          placeholder="ENTER-CODE"
+          required
           className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2"
-          style={{ 
-            backgroundColor: '#f8f9fa', 
+          style={{
+            backgroundColor: '#f8f9fa',
             color: '#333',
-            fontSize: '16px'
+            fontSize: '16px',
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
           }}
         />
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-left font-bold mb-2" style={{ color: '#333' }}>Email Address</label>
-        <input 
-          id="email" 
-          type="email" 
-          value={email} 
-          onChange={e => setEmail(e.target.value)} 
-          placeholder="you@example.com" 
-          required 
+        <label htmlFor="name" className="block text-left font-bold mb-2" style={{ color: '#333' }}>
+          Full Name
+        </label>
+        <input
+          id="name"
+          type="text"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          placeholder="Your full name"
+          required
           className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2"
-          style={{ 
-            backgroundColor: '#f8f9fa', 
+          style={{
+            backgroundColor: '#f8f9fa',
             color: '#333',
-            fontSize: '16px'
+            fontSize: '16px',
           }}
         />
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-left font-bold mb-2" style={{ color: '#333' }}>Password</label>
-        <input 
-          id="password" 
-          type="password" 
-          value={password} 
-          onChange={e => setPassword(e.target.value)} 
-          placeholder="••••••••" 
-          required 
+        <label htmlFor="email" className="block text-left font-bold mb-2" style={{ color: '#333' }}>
+          Email Address
+        </label>
+        <input
+          id="email"
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="you@example.com"
+          required
           className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2"
-          style={{ 
-            backgroundColor: '#f8f9fa', 
+          style={{
+            backgroundColor: '#f8f9fa',
             color: '#333',
-            fontSize: '16px'
+            fontSize: '16px',
           }}
         />
       </div>
 
       <div>
-        <label htmlFor="dob" className="block text-left font-bold mb-2" style={{ color: '#333' }}>Date of Birth</label>
-        <input 
-          id="dob" 
-          type="date" 
-          value={dob} 
-          onChange={e => setDob(e.target.value)} 
-          required 
+        <label htmlFor="password" className="block text-left font-bold mb-2" style={{ color: '#333' }}>
+          Password
+        </label>
+        <input
+          id="password"
+          type="password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          placeholder="••••••••"
+          required
           className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2"
-          style={{ 
-            backgroundColor: '#f8f9fa', 
+          style={{
+            backgroundColor: '#f8f9fa',
             color: '#333',
-            fontSize: '16px'
+            fontSize: '16px',
+          }}
+        />
+        <p className="text-xs mt-1" style={{ color: '#666' }}>
+          Password must be at least 8 characters and include a number and symbol.
+        </p>
+      </div>
+
+      <div>
+        <label htmlFor="dob" className="block text-left font-bold mb-2" style={{ color: '#333' }}>
+          Date of Birth
+        </label>
+        <input
+          id="dob"
+          type="date"
+          value={dob}
+          onChange={(event) => setDob(event.target.value)}
+          required
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2"
+          style={{
+            backgroundColor: '#f8f9fa',
+            color: '#333',
+            fontSize: '16px',
           }}
         />
       </div>
@@ -166,41 +213,46 @@ export const RegisterForm = () => {
         </p>
       )}
 
-      {/* Guardian consent section - only shows when needed */}
       {needsConsent && (
         <div>
           <p className="text-center text-sm mb-4" style={{ color: '#666' }}>
-            You are <strong>{age}</strong> years old - guardian consent is required below.
+            You are <strong>{age}</strong> years old. Guardian consent is required below.
           </p>
+
           <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
             <div className="flex items-center">
               <input
                 id="guardianConsent"
                 type="checkbox"
                 checked={consentGiven}
-                onChange={e => setConsentGiven(e.target.checked)}
+                onChange={(event) => setConsentGiven(event.target.checked)}
                 className="h-4 w-4 border-gray-300 rounded"
                 style={{ accentColor: '#007bff' }}
               />
+
               <label htmlFor="guardianConsent" className="ml-3 block text-sm font-medium" style={{ color: '#333' }}>
-                I confirm I have my parent's or guardian's permission to sign up.
+                I confirm I have my parent&apos;s or guardian&apos;s permission to sign up.
               </label>
             </div>
+
             {consentGiven && (
               <div className="mt-4">
-                <label htmlFor="guardianEmail" className="block text-left font-bold mb-2 text-sm" style={{ color: '#333' }}>Guardian's Email</label>
-                <input 
-                  id="guardianEmail" 
-                  type="email" 
-                  value={guardianEmail} 
-                  onChange={e => setGuardianEmail(e.target.value)} 
-                  placeholder="parent@example.com" 
-                  required={needsConsent} 
+                <label htmlFor="guardianEmail" className="block text-left font-bold mb-2 text-sm" style={{ color: '#333' }}>
+                  Guardian&apos;s Email
+                </label>
+
+                <input
+                  id="guardianEmail"
+                  type="email"
+                  value={guardianEmail}
+                  onChange={(event) => setGuardianEmail(event.target.value)}
+                  placeholder="parent@example.com"
+                  required={needsConsent}
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2"
-                  style={{ 
-                    backgroundColor: '#f8f9fa', 
+                  style={{
+                    backgroundColor: '#f8f9fa',
                     color: '#333',
-                    fontSize: '16px'
+                    fontSize: '16px',
                   }}
                 />
               </div>
@@ -213,8 +265,8 @@ export const RegisterForm = () => {
         <button
           type="submit"
           className={`w-full px-12 py-4 rounded-lg text-white font-bold text-lg transition-opacity ${
-            loading || (needsConsent && !consentGiven) 
-              ? 'opacity-50 cursor-not-allowed' 
+            loading || (needsConsent && !consentGiven)
+              ? 'opacity-50 cursor-not-allowed'
               : 'hover:opacity-90'
           }`}
           style={{ backgroundColor: '#007bff' }}
