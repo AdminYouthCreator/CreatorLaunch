@@ -3,6 +3,10 @@ const Brand = require('../models/Brand');
 const Product = require('../models/Product');
 const Service = require('../models/Service');
 
+const PUBLIC_STORE_STATUSES = ['active'];
+const PUBLIC_PRODUCT_STATUSES = ['published', 'active'];
+const PUBLIC_SERVICE_STATUSES = ['published'];
+
 const normalizeProduct = (product) => {
   const productObject = product.toObject ? product.toObject() : product;
   const firstVariant = productObject.variants?.[0] || {};
@@ -35,26 +39,33 @@ const normalizeProduct = (product) => {
   };
 };
 
+const getPublicBrandBySubdomain = async (subdomain) => {
+  return Brand.findOne({
+    subdomain,
+    status: { $in: PUBLIC_STORE_STATUSES },
+  }).populate('user', 'username email');
+};
+
 // @desc    Get public store by subdomain
 // @route   GET /api/store/:subdomain
 // @access  Public
 exports.getStore = asyncHandler(async (req, res) => {
   const { subdomain } = req.params;
 
-  const brand = await Brand.findOne({ subdomain }).populate('user', 'username email');
+  const brand = await getPublicBrandBySubdomain(subdomain);
 
   if (!brand) {
-    return res.status(404).json({ message: 'Store not found' });
+    return res.status(404).json({ message: 'Store not found or unavailable.' });
   }
 
   const products = await Product.find({
     brand: brand._id,
-    status: { $in: ['published', 'active'] },
+    status: { $in: PUBLIC_PRODUCT_STATUSES },
   }).sort({ createdAt: -1 });
 
   const services = await Service.find({
     brand: brand._id,
-    status: 'published',
+    status: { $in: PUBLIC_SERVICE_STATUSES },
   }).sort({ createdAt: -1 });
 
   res.status(200).json({
@@ -77,20 +88,20 @@ exports.getStore = asyncHandler(async (req, res) => {
 exports.getStoreProduct = asyncHandler(async (req, res) => {
   const { subdomain, productId } = req.params;
 
-  const brand = await Brand.findOne({ subdomain }).populate('user', 'username email');
+  const brand = await getPublicBrandBySubdomain(subdomain);
 
   if (!brand) {
-    return res.status(404).json({ message: 'Store not found' });
+    return res.status(404).json({ message: 'Store not found or unavailable.' });
   }
 
   const product = await Product.findOne({
     _id: productId,
     brand: brand._id,
-    status: { $in: ['published', 'active'] },
+    status: { $in: PUBLIC_PRODUCT_STATUSES },
   });
 
   if (!product) {
-    return res.status(404).json({ message: 'Product not found' });
+    return res.status(404).json({ message: 'Product not found or unavailable.' });
   }
 
   const normalizedProduct = normalizeProduct(product);
@@ -139,20 +150,20 @@ exports.getStoreProduct = asyncHandler(async (req, res) => {
 exports.getStoreService = asyncHandler(async (req, res) => {
   const { subdomain, serviceId } = req.params;
 
-  const brand = await Brand.findOne({ subdomain }).populate('user', 'username email');
+  const brand = await getPublicBrandBySubdomain(subdomain);
 
   if (!brand) {
-    return res.status(404).json({ message: 'Store not found' });
+    return res.status(404).json({ message: 'Store not found or unavailable.' });
   }
 
   const service = await Service.findOne({
     _id: serviceId,
     brand: brand._id,
-    status: 'published',
+    status: { $in: PUBLIC_SERVICE_STATUSES },
   });
 
   if (!service) {
-    return res.status(404).json({ message: 'Service not found' });
+    return res.status(404).json({ message: 'Service not found or unavailable.' });
   }
 
   res.status(200).json({
