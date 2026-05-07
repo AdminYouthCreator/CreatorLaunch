@@ -1,168 +1,128 @@
 import React, { useState } from 'react';
 import Layout from '@/components/common/Layout';
 
-// ################## ----- CONTACT PAGE COMPONENT ----- ##################
-// Contact form page for user inquiries and support
-// Handles form submission and message processing
-// ############################################################
-const ContactPage: React.FC = () => {
-  const [formData, setFormData] = useState({
+const ContactPage = () => {
+  const [form, setForm] = useState({
     name: '',
     email: '',
-    subject: '',
-    message: ''
+    interest: 'Interested in Applying',
+    message: '',
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
-  // ################## ----- FORM INPUT HANDLER ----- ##################
-  // Handles changes to form inputs and updates state
-  // Manages all form field updates dynamically
-  // ################################################################
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    setForm((prev) => ({
       ...prev,
-      [name]: value
+      [event.target.name]: event.target.value,
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      const response = await fetch('https://formspree.io/f/mzzgwzqd', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '', subject: '', message: '' });
-      } else {
-        setSubmitStatus('error');
-      }
-    } catch (error) {
-      setSubmitStatus('error');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const mailtoHref = `mailto:contact@youthcreatorlaunch.org?subject=${encodeURIComponent(
+    `CreatorLaunch Contact: ${form.interest}`
+  )}&body=${encodeURIComponent(
+    `Name: ${form.name}\nEmail: ${form.email}\nInterest: ${form.interest}\n\nMessage:\n${form.message}`
+  )}`;
 
   return (
-    <Layout
-      title="Contact Us | CreatorLaunch"
-      description="Have a question or want to partner with us? Get in touch with the CreatorLaunch team. We're based in St. Louis and dedicated to empowering young entrepreneurs."
-    >
-      {/* Hero Section */}
-      <section className="bg-light py-20 sm:py-28">
-        <div className="container mx-auto px-6 text-center" data-aos="fade-up">
-          <h1 className="text-5xl sm:text-6xl font-black">Get in Touch</h1>
-          <p className="text-lg text-medium mt-4 max-w-2xl mx-auto">
-            Have a question, an idea, or want to partner with us? We'd love to hear from you.
-          </p>
-        </div>
-      </section>
-
-      {/* Contact Form */}
-      <section className="py-20 sm:py-28">
-        <div className="container mx-auto px-6 max-w-4xl">
-          <div className="bg-white p-8 sm:p-12 rounded-2xl shadow-lg" data-aos="fade-up">
-            {submitStatus === 'success' && (
-              <div className="mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
-                Thank you for your message! We'll get back to you soon.
-              </div>
-            )}
-
-            {submitStatus === 'error' && (
-              <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-                There was an error sending your message. Please try again.
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label htmlFor="name" className="block text-left font-bold mb-2">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    id="name"
-                    required
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="form-input-light"
-                    disabled={isSubmitting}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-left font-bold mb-2">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    id="email"
-                    required
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="form-input-light"
-                    disabled={isSubmitting}
-                  />
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <label htmlFor="subject" className="block text-left font-bold mb-2">
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  name="subject"
-                  id="subject"
-                  required
-                  value={formData.subject}
-                  onChange={handleInputChange}
-                  className="form-input-light"
-                  disabled={isSubmitting}
-                />
-              </div>
-
-              <div className="mb-8">
-                <label htmlFor="message" className="block text-left font-bold mb-2">
-                  Message
-                </label>
-                <textarea
-                  name="message"
-                  id="message"
-                  rows={6}
-                  required
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  className="form-input-light"
-                  disabled={isSubmitting}
-                />
-              </div>
-
-              <div className="text-center">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-12 py-4 rounded-lg btn-submit-form font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? 'Sending...' : 'Send Message'}
-                </button>
-              </div>
-            </form>
+    <Layout title="Contact | CreatorLaunch">
+      <main className="min-h-screen bg-light">
+        {/* Hero */}
+        <section className="bg-gradient-to-br from-white via-red-50 to-orange-50 py-20">
+          <div className="container mx-auto px-4 text-center">
+            <p className="text-primary font-semibold mb-3">
+              Let’s build something.
+            </p>
+            <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
+              Get In Touch
+            </h1>
+            <p className="text-lg md:text-xl text-medium max-w-3xl mx-auto">
+              Interested in applying, partnering, donating, volunteering, or learning more?
+              Send us a message.
+            </p>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* Contact Form */}
+        <section className="py-20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-semibold text-dark mb-2">
+                    Name
+                  </label>
+                  <input
+                    name="name"
+                    type="text"
+                    value={form.name}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-primary focus:outline-none"
+                    placeholder="Your name"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-dark mb-2">
+                    Email
+                  </label>
+                  <input
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-primary focus:outline-none"
+                    placeholder="you@example.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-dark mb-2">
+                    How can we help?
+                  </label>
+                  <select
+                    name="interest"
+                    value={form.interest}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-primary focus:outline-none"
+                  >
+                    <option>Interested in Applying</option>
+                    <option>Interested in Donating</option>
+                    <option>Interested in Partnering</option>
+                    <option>Interested in Volunteering</option>
+                    <option>Media / General Question</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-dark mb-2">
+                    Message
+                  </label>
+                  <textarea
+                    name="message"
+                    value={form.message}
+                    onChange={handleChange}
+                    rows={6}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-primary focus:outline-none resize-none"
+                    placeholder="Tell us a little more..."
+                  />
+                </div>
+
+                <a
+                  href={mailtoHref}
+                  className="block w-full text-center bg-primary text-white py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors"
+                >
+                  Send Message
+                </a>
+
+                <p className="text-sm text-medium text-center">
+                  This will open your email app with your message filled in.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
     </Layout>
   );
 };
