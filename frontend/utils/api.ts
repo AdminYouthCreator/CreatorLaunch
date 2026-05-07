@@ -276,16 +276,28 @@ export const printfulAPI = {
     return response.data;
   },
 
-  // Upload design file and generate mockups
+  // Get valid placements + mockup styles for a product
+  getMockupOptions: async (productId: number) => {
+    const response = await api.get(`/api/products/printful/catalog/${productId}/mockup-options`);
+    return response.data;
+  },
+
+  // Upload design file and generate a mockup task
   generateMockup: async (mockupRequest: {
     productId: number;
     variantIds: number[];
     artwork: File;
     placementData: {
       placement: string;
+      displayName?: string;
+      technique: string;
+      printAreaWidth?: number;
+      printAreaHeight?: number;
+      printAreaType?: string;
+      dpi?: number;
+      mockupStyleId: number;
+      mockupStyleLabel?: string;
       position?: {
-        area_width: number;
-        area_height: number;
         width: number;
         height: number;
         top: number;
@@ -300,19 +312,19 @@ export const printfulAPI = {
     formData.append('placementData', JSON.stringify(mockupRequest.placementData));
 
     const response = await api.post('/api/products/generate-mockup', formData, {
-      timeout: 60000,
       headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+        'Content-Type': 'multipart/form-data'
+      }
     });
+
     return response.data;
   },
 
-  // Get mockup generation status
+  // Poll mockup status
   getMockupStatus: async (taskKey: string) => {
     const response = await api.get(`/api/products/mockup-status/${taskKey}`);
     return response.data;
-  },
+  }
 };
 
 // ################## ----- PRODUCT API FUNCTIONS ----- ##################
