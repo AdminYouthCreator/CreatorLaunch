@@ -393,7 +393,14 @@ export const productAPI = {
     const response = await api.get(`/api/products/${productId}/mockup-status`);
     return response.data;
   },
+
+  updateStatus: async (productId: string, data: { status?: string; isActive?: boolean }) => {
+  const response = await api.patch(`/api/products/${productId}/status`, data);
+  return response.data;
+},
+  
 };
+
 
 // ################## ----- STORE API FUNCTIONS ----- ##################
 // Public store access related API calls
