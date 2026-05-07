@@ -40,28 +40,17 @@ export function middleware(request: NextRequest) {
     hostname === '127.0.0.1' ||
     hostname.endsWith('.localhost');
 
+  // Allow /admin on the main domain.
+  if (pathname.startsWith('/admin')) {
+    return NextResponse.next();
+  }
+
   const isAdminSubdomain = hostname.startsWith('admin.');
-  const isAdminPath = pathname.startsWith('/admin');
 
-  // Allow local admin development.
-  if (isAdminPath && isLocalhost) {
-    return NextResponse.next();
-  }
-
-  // Admin paths must use admin subdomain in production.
-  if (isAdminPath && !isAdminSubdomain && !isLocalhost) {
-    url.pathname = '/';
-    return NextResponse.redirect(url);
-  }
-
-  // admin.youthcreatorlaunch.org -> /admin
-  if (isAdminSubdomain && !isAdminPath) {
-    url.pathname = '/admin';
+  // If admin subdomain is ever used, rewrite it to /admin.
+  if (isAdminSubdomain) {
+    url.pathname = `/admin${pathname === '/' ? '' : pathname}`;
     return NextResponse.rewrite(url);
-  }
-
-  if (isAdminSubdomain && isAdminPath) {
-    return NextResponse.next();
   }
 
   // Main/root domains behave normally.
@@ -78,7 +67,6 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Do not rewrite if already on /store.
   if (pathname.startsWith('/store')) {
     return NextResponse.next();
   }
