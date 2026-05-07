@@ -15,10 +15,14 @@ exports.getStore = asyncHandler(async (req, res) => {
   }
 
   const products = await Product.find({
-  brand: brand._id,
-  status: { $in: ['published', 'active'] }
-});
-  const services = await Service.find({ brand: brand._id, status: 'published' });
+    brand: brand._id,
+    status: { $in: ['published', 'active'] },
+  }).sort({ createdAt: -1 });
+
+  const services = await Service.find({
+    brand: brand._id,
+    status: 'published',
+  }).sort({ createdAt: -1 });
 
   res.status(200).json({
     store: {
@@ -26,10 +30,10 @@ exports.getStore = asyncHandler(async (req, res) => {
       subdomain: brand.subdomain,
       description: brand.description,
       logoUrl: brand.logoUrl,
-      owner: brand.user?.username
+      owner: brand.user?.username,
     },
     products,
-    services
+    services,
   });
 });
 
@@ -44,10 +48,24 @@ exports.getStoreProduct = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: 'Store not found' });
   }
 
-const product = await Product.findOne({
-  _id: productId,
-  brand: brand._id,
-  status: { $in: ['published', 'active'] }
+  const product = await Product.findOne({
+    _id: productId,
+    brand: brand._id,
+    status: { $in: ['published', 'active'] },
+  });
+
+  if (!product) {
+    return res.status(404).json({ message: 'Product not found' });
+  }
+
+  res.status(200).json({
+    product,
+    store: {
+      brandName: brand.brandName,
+      subdomain: brand.subdomain,
+      logoUrl: brand.logoUrl,
+    },
+  });
 });
 
 // @desc    Get single service from a public store
@@ -61,10 +79,22 @@ exports.getStoreService = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: 'Store not found' });
   }
 
-  const service = await Service.findOne({ _id: serviceId, brand: brand._id, status: 'published' });
+  const service = await Service.findOne({
+    _id: serviceId,
+    brand: brand._id,
+    status: 'published',
+  });
+
   if (!service) {
     return res.status(404).json({ message: 'Service not found' });
   }
 
-  res.status(200).json({ service, store: { brandName: brand.brandName, subdomain: brand.subdomain, logoUrl: brand.logoUrl } });
+  res.status(200).json({
+    service,
+    store: {
+      brandName: brand.brandName,
+      subdomain: brand.subdomain,
+      logoUrl: brand.logoUrl,
+    },
+  });
 });
