@@ -1,115 +1,111 @@
 import React, { ReactNode, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
-import { 
-  FiUsers, 
-  FiShoppingBag, 
-  FiBarChart, 
-  FiSettings, 
-  FiLogOut, 
-  FiMenu, 
+import {
+  FiUsers,
+  FiShoppingBag,
+  FiBarChart,
+  FiLogOut,
+  FiMenu,
   FiX,
   FiHome,
-  FiKey,
-  FiShield,
-  FiEdit3
 } from 'react-icons/fi';
 
-// ################## ----- ADMIN LAYOUT PROPS ----- ##################
-// Props interface for the admin layout component
-// ################################################################
 interface AdminLayoutProps {
   children: ReactNode;
 }
 
-// ################## ----- SIDEBAR MENU ITEMS ----- ##################
-// Navigation menu items for the admin sidebar
-// ################################################################
 const menuItems = [
-  { 
-    href: '/admin', 
-    icon: FiHome, 
+  {
+    href: '/admin',
+    icon: FiHome,
     label: 'Dashboard',
-    permission: null 
+    permission: null,
   },
-  { 
-    href: '/admin/users', 
-    icon: FiUsers, 
-    label: 'Users Management',
-    permission: 'users.read' 
+  {
+    href: '/admin/users',
+    icon: FiUsers,
+    label: 'Users & Invites',
+    permission: 'users.read',
   },
-  { 
-    href: '/admin/stores', 
-    icon: FiShoppingBag, 
-    label: 'Store Management',
-    permission: 'stores.read' 
+  {
+    href: '/admin/stores',
+    icon: FiShoppingBag,
+    label: 'Stores',
+    permission: 'stores.read',
   },
-  { 
-    href: '/admin/blog', 
-    icon: FiEdit3, 
-    label: 'Blog Management',
-    permission: null 
-  },
-  { 
-    href: '/admin/analytics', 
-    icon: FiBarChart, 
+  {
+    href: '/admin/analytics',
+    icon: FiBarChart,
     label: 'Analytics',
-    permission: 'analytics.read' 
+    permission: 'analytics.read',
   },
-  { 
-    href: '/admin/passwords', 
-    icon: FiKey, 
-    label: 'Password Management',
-    permission: 'users.write' 
-  },
-  { 
-    href: '/admin/permissions', 
-    icon: FiShield, 
-    label: 'Permissions',
-    permission: 'users.write' 
-  },
-  { 
-    href: '/admin/settings', 
-    icon: FiSettings, 
-    label: 'Settings',
-    permission: 'settings.read' 
-  }
 ];
 
-// ################## ----- ADMIN LAYOUT COMPONENT ----- ##################
-// Main layout component for admin pages
-// Provides sidebar navigation and header
-// ####################################################################
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const { admin, logout, hasPermission } = useAdminAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const router = useRouter();
 
   const handleLogout = () => {
     logout();
+    router.push('/admin');
   };
 
   return (
     <div className="admin-layout">
-      {/* Sidebar */}
+      <button
+        className="admin-mobile-menu-btn"
+        onClick={() => setSidebarOpen(true)}
+        aria-label="Open admin menu"
+      >
+        <FiMenu />
+      </button>
+
+      {sidebarOpen && (
+        <button
+          className="admin-mobile-overlay"
+          onClick={() => setSidebarOpen(false)}
+          aria-label="Close admin menu"
+        />
+      )}
+
       <div className={`admin-sidebar ${sidebarOpen ? 'mobile-open' : ''}`}>
         <div className="admin-sidebar-header">
-          <img src="/assets/logo.png" alt="YouthCreator" className="admin-logo" />
-          <h2>Creator Launch</h2>
+          <img src="/assets/header-logo.png" alt="CreatorLaunch" className="admin-logo" />
+          <div>
+            <h2>CreatorLaunch</h2>
+            <p style={{ color: '#9ca3af', fontSize: '0.8rem' }}>Admin Panel</p>
+          </div>
+
+          <button
+            className="admin-mobile-close"
+            onClick={() => setSidebarOpen(false)}
+            aria-label="Close admin menu"
+          >
+            <FiX />
+          </button>
         </div>
-        
+
         <nav className="admin-nav">
           <ul>
             {menuItems.map((item) => {
-              // Check if user has permission for this menu item
               if (item.permission && !hasPermission(item.permission)) {
                 return null;
               }
-              
+
+              const active =
+                item.href === '/admin'
+                  ? router.pathname === '/admin'
+                  : router.pathname.startsWith(item.href);
+
               return (
                 <li key={item.href}>
                   <Link
                     href={item.href}
                     onClick={() => setSidebarOpen(false)}
+                    className={active ? 'active' : ''}
                   >
                     <item.icon />
                     {item.label}
@@ -120,7 +116,6 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           </ul>
         </nav>
 
-        {/* Logout Button */}
         <div className="admin-sidebar-footer">
           <button onClick={handleLogout} className="admin-sidebar-logout">
             <FiLogOut />
@@ -129,26 +124,20 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         </div>
       </div>
 
-      {/* Main content */}
       <div className="admin-main">
-        {/* Header */}
         <header className="admin-header">
-          {/* Welcome Section */}
           <div className="admin-welcome">
-            <h2>Welcome to Admin Dashboard</h2>
-            <p>Overview of YouthCreator platform</p>
+            <h2>Admin Dashboard</h2>
+            <p>Real-time CreatorLaunch platform management</p>
           </div>
-          
+
           <div className="admin-user-info">
-            <span>Welcome, {admin?.name}</span>
-            <span className="admin-role-badge">{admin?.role}</span>
+            <span>Welcome, {admin?.name || admin?.email || 'Admin'}</span>
+            <span className="admin-role-badge">{admin?.role || 'Admin'}</span>
           </div>
         </header>
 
-        {/* Page content */}
-        <div>
-          {children}
-        </div>
+        <div>{children}</div>
       </div>
     </div>
   );
