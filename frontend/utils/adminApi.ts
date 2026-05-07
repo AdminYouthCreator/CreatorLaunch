@@ -44,6 +44,17 @@ const refreshAdminToken = async () => {
   }
 };
 
+const readResponseBody = async (response: Response) => {
+  const contentType = response.headers.get('content-type') || '';
+
+  if (contentType.includes('application/json')) {
+    return response.json().catch(() => ({}));
+  }
+
+  const text = await response.text().catch(() => '');
+  return { message: text || '' };
+};
+
 const adminRequest = async (path: string, options: RequestInit = {}) => {
   let token = getAdminToken();
 
@@ -61,7 +72,6 @@ const adminRequest = async (path: string, options: RequestInit = {}) => {
 
   let response = await runRequest(token);
 
-  // If the access token expired, refresh once and retry.
   if (response.status === 401 || response.status === 403) {
     token = await refreshAdminToken();
 
@@ -70,18 +80,28 @@ const adminRequest = async (path: string, options: RequestInit = {}) => {
     }
   }
 
-  const data = await response.json().catch(() => ({}));
+  const data = await readResponseBody(response);
 
   if (!response.ok) {
-    throw new Error(data.message || 'Admin request failed.');
+    const message =
+      data.message ||
+      data.error ||
+      `Admin request failed: ${response.status} ${response.statusText} at ${path}`;
+
+    console.error('Admin API error:', {
+      path,
+      status: response.status,
+      statusText: response.statusText,
+      data,
+    });
+
+    throw new Error(message);
   }
 
   return data;
 };
 
 export const adminAPI = {
-  // ################## ----- OVERVIEW / DATA ----- ##################
-
   getOverview: async () => {
     return adminRequest('/api/admin/overview');
   },
@@ -97,8 +117,6 @@ export const adminAPI = {
   getAnalytics: async (range = '30d') => {
     return adminRequest(`/api/admin/analytics?range=${encodeURIComponent(range)}`);
   },
-
-  // ################## ----- INVITES ----- ##################
 
   getInvites: async () => {
     return adminRequest('/api/invites');
@@ -121,8 +139,6 @@ export const adminAPI = {
       method: 'PATCH',
     });
   },
-
-  // ################## ----- USER MODERATION ----- ##################
 
   updateUserStatus: async (
     userId: string,
@@ -161,8 +177,6 @@ export const adminAPI = {
     });
   },
 
-  // ################## ----- STORE MODERATION ----- ##################
-
   updateStoreStatus: async (
     brandId: string,
     payload: {
@@ -187,8 +201,6 @@ export const adminAPI = {
       body: JSON.stringify(payload),
     });
   },
-
-  // ################## ----- PRODUCT / SERVICE MODERATION ----- ##################
 
   adminUpdateProduct: async (
     productId: string,
@@ -226,8 +238,6 @@ export const adminAPI = {
       body: JSON.stringify(payload),
     });
   },
-
-  // ################## ----- AUDIT LOGS ----- ##################
 
   getAuditLogs: async (limit = 100) => {
     return adminRequest(`/api/admin/moderation/audit-logs?limit=${encodeURIComponent(limit)}`);
