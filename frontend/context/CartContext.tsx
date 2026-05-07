@@ -3,8 +3,10 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 // ################## ----- CART ITEM INTERFACE ----- ##################
 interface CartItem {
   id: string;
-  brandId: string;
+  brandId: string; // MongoDB Brand _id, NOT the subdomain
   brandSubdomain: string;
+  brandName?: string;
+  brandLogoUrl?: string | null;
   name: string;
   unitPrice: number;
   quantity: number;
@@ -31,6 +33,12 @@ interface CartContextType {
   updateQuantity: (id: string, quantity: number, variantSize?: string) => void;
   clearCart: () => void;
   getCartBrandId: () => string | null;
+  getCartStore: () => {
+    brandId: string;
+    brandSubdomain: string;
+    brandName?: string;
+    brandLogoUrl?: string | null;
+  } | null;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -47,10 +55,13 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     try {
       const stored = localStorage.getItem(CART_STORAGE_KEY);
       if (stored) {
-        setItems(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          setItems(parsed);
+        }
       }
-    } catch (e) {
-      console.error('Failed to load cart:', e);
+    } catch (error) {
+      console.error('Failed to load cart:', error);
     }
   }, []);
 
@@ -64,39 +75,46 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const openCart = () => setIsOpen(true);
   const closeCart = () => setIsOpen(false);
-  const toggleCart = () => setIsOpen(prev => !prev);
+  const toggleCart = () => setIsOpen((prev) => !prev);
 
   const addItem = (newItem: Omit<CartItem, 'quantity'>, quantity = 1) => {
-    setItems(prev => {
-      // Cart items must all be from the same store
+    setItems((prev) => {
+      // Cart items must all be from the same store.
+      // brandId MUST be the Mongo Brand _id, not the subdomain.
       if (prev.length > 0 && prev[0].brandId !== newItem.brandId) {
-        if (!window.confirm('Your cart has items from a different store. Clear cart and add this item?')) {
+        const confirmed = window.confirm(
+          'Your cart has items from a different store. Clear cart and add this item?'
+        );
+
+        if (!confirmed) {
           return prev;
         }
+
         return [{ ...newItem, quantity }];
       }
 
-      const key = `${newItem.id}-${newItem.variant?.size || ''}`;
+      const key = `${newItem.id}-${newItem.variant?.size || ''}-${newItem.variant?.color || ''}`;
       const existing = prev.find(
-        i => `${i.id}-${i.variant?.size || ''}` === key
+        (item) => `${item.id}-${item.variant?.size || ''}-${item.variant?.color || ''}` === key
       );
 
       if (existing) {
-        return prev.map(i =>
-          `${i.id}-${i.variant?.size || ''}` === key
-            ? { ...i, quantity: i.quantity + quantity }
-            : i
+        return prev.map((item) =>
+          `${item.id}-${item.variant?.size || ''}-${item.variant?.color || ''}` === key
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
         );
       }
 
       return [...prev, { ...newItem, quantity }];
     });
+
     setIsOpen(true);
   };
 
   const removeItem = (id: string, variantSize?: string) => {
-    setItems(prev =>
-      prev.filter(i => !(i.id === id && (i.variant?.size || '') === (variantSize || '')))
+    setItems((prev) =>
+      prev.filter((item) => !(item.id === id && (item.variant?.size || '') === (variantSize || '')))
     );
   };
 
@@ -105,11 +123,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       removeItem(id, variantSize);
       return;
     }
-    setItems(prev =>
-      prev.map(i =>
-        i.id === id && (i.variant?.size || '') === (variantSize || '')
-          ? { ...i, quantity }
-          : i
+
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === id && (item.variant?.size || '') === (variantSize || '')
+          ? { ...item, quantity }
+          : item
       )
     );
   };
@@ -121,6 +140,19 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const getCartBrandId = () => {
     return items.length > 0 ? items[0].brandId : null;
+  };
+
+  const getCartStore = () => {
+    if (items.length === 0) return null;
+
+    const firstItem = items[0];
+
+    return {
+      brandId: firstItem.brandId,
+      brandSubdomain: firstItem.brandSubdomain,
+      brandName: firstItem.brandName,
+      brandLogoUrl: firstItem.brandLogoUrl,
+    };
   };
 
   return (
@@ -138,6 +170,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         updateQuantity,
         clearCart,
         getCartBrandId,
+        getCartStore,
       }}
     >
       {children}
@@ -147,8 +180,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
 export const useCartContext = (): CartContextType => {
   const ctx = useContext(CartContext);
+
   if (!ctx) {
     throw new Error('useCartContext must be used within CartProvider');
   }
+
   return ctx;
 };
