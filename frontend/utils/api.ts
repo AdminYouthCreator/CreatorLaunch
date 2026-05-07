@@ -10,7 +10,8 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
 // Create axios instance with default configuration
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  // Printful mockup generation can take longer than 10 seconds, especially on Render free tier.
+  timeout: 60000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -300,6 +301,7 @@ export const printfulAPI = {
     formData.append('placementData', JSON.stringify(mockupRequest.placementData));
     
     const response = await api.post('/api/products/generate-mockup', formData, {
+      timeout: 60000,
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -319,90 +321,31 @@ export const printfulAPI = {
 // ################################################################
 
 export const productAPI = {
-  // Get all products for authenticated user
+  // Get all products for current user/brand
   getAll: async () => {
     const response = await api.get('/api/products');
     return response.data;
   },
 
-  // Get specific product by ID
+  // Create new Printful product
+  createPrintfulProduct: async (productData: any) => {
+    const response = await api.post('/api/products', productData);
+    return response.data;
+  },
+
+  // Get product by ID - Note: Backend doesn't have this endpoint yet
   getById: async (productId: string) => {
-    const response = await api.get(`/api/products/${productId}`);
-    return response.data;
+    throw new Error('Get product by ID endpoint not implemented in backend yet');
   },
 
-  // Create new product
-  create: async (productData: {
-    name: string;
-    description: string;
-    price: number;
-    brandId: string;
-    printfulProductId?: number;
-    printfulVariantId?: number;
-    designFileId?: number;
-    mockupImages?: string[];
-  }) => {
-    const response = await api.post('/api/products', productData);
-    return response.data;
-  },
-
-  // Create product with Printful integration
-  createPrintfulProduct: async (productData: {
-    brandId: string;
-    printfulProductId: number;
-    name: string;
-    description: string;
-    variants: Array<{
-      printfulVariantId: number;
-      retailPrice: string;
-      baseCost: string;
-      mockupUrl: string;
-    }>;
-  }) => {
-    const response = await api.post('/api/products', productData);
-    return response.data;
-  },
-
-  // Update existing product
+  // Update product - Note: Backend doesn't have this endpoint yet
   update: async (productId: string, productData: any) => {
-    const response = await api.put(`/api/products/${productId}`, productData);
-    return response.data;
+    throw new Error('Update product endpoint not implemented in backend yet');
   },
 
-  // Delete product
+  // Delete product - Note: Backend doesn't have this endpoint yet
   delete: async (productId: string) => {
-    const response = await api.delete(`/api/products/${productId}`);
-    return response.data;
-  },
-
-  // Check mockup generation status
-  checkMockupStatus: async (productId: string) => {
-    const response = await api.get(`/api/products/${productId}/mockup-status`);
-    return response.data;
-  },
-};
-
-// ################## ----- STORE API FUNCTIONS ----- ##################
-// Public store access related API calls
-// ################################################################
-
-export const storeAPI = {
-  // Get public store information (products + services)
-  getStore: async (storeUrl: string) => {
-    const response = await api.get(`/api/store/${storeUrl}`);
-    return response.data;
-  },
-
-  // Get specific product from a store
-  getStoreProduct: async (storeUrl: string, productId: string) => {
-    const response = await api.get(`/api/store/${storeUrl}/products/${productId}`);
-    return response.data;
-  },
-
-  // Get specific service from a store
-  getStoreService: async (storeUrl: string, serviceId: string) => {
-    const response = await api.get(`/api/store/${storeUrl}/services/${serviceId}`);
-    return response.data;
+    throw new Error('Delete product endpoint not implemented in backend yet');
   },
 };
 
@@ -411,109 +354,36 @@ export const storeAPI = {
 // ################################################################
 
 export const serviceAPI = {
-  // Get all services for authenticated user's brand
+  // Get all services
   getAll: async () => {
     const response = await api.get('/api/services');
     return response.data;
   },
 
-  // Get single service
-  getById: async (id: string) => {
-    const response = await api.get(`/api/services/${id}`);
-    return response.data;
-  },
-
-  // Create a new service
-  create: async (serviceData: {
-    title: string;
-    description: string;
-    category: string;
-    price: number;
-    deliveryTime: string;
-    revisions?: number;
-    requirements?: string;
-  }) => {
+  // Create new service
+  create: async (serviceData: any) => {
     const response = await api.post('/api/services', serviceData);
     return response.data;
   },
 
-  // Update a service
-  update: async (id: string, serviceData: any) => {
-    const response = await api.put(`/api/services/${id}`, serviceData);
+  // Get service by ID
+  getById: async (serviceId: string) => {
+    const response = await api.get(`/api/services/${serviceId}`);
     return response.data;
   },
 
-  // Delete a service
-  delete: async (id: string) => {
-    const response = await api.delete(`/api/services/${id}`);
-    return response.data;
-  },
-};
-
-// ################## ----- ORDER API FUNCTIONS ----- ##################
-// Order management related API calls
-// ################################################################
-
-export const orderAPI = {
-  // Get all orders for authenticated user's brand
-  getAll: async (page?: number, status?: string) => {
-    const params = new URLSearchParams();
-    if (page) params.append('page', page.toString());
-    if (status) params.append('status', status);
-    const response = await api.get(`/api/orders?${params.toString()}`);
+  // Update service
+  update: async (serviceId: string, serviceData: any) => {
+    const response = await api.put(`/api/services/${serviceId}`, serviceData);
     return response.data;
   },
 
-  // Get single order
-  getById: async (orderId: string) => {
-    const response = await api.get(`/api/orders/${orderId}`);
-    return response.data;
-  },
-
-  // Update order fulfillment
-  updateFulfillment: async (orderId: string, data: {
-    fulfillmentStatus?: string;
-    trackingNumber?: string;
-    trackingUrl?: string;
-  }) => {
-    const response = await api.patch(`/api/orders/${orderId}/fulfillment`, data);
-    return response.data;
-  },
-
-  // Get revenue metrics
-  getMetrics: async () => {
-    const response = await api.get('/api/orders/metrics');
+  // Delete service
+  delete: async (serviceId: string) => {
+    const response = await api.delete(`/api/services/${serviceId}`);
     return response.data;
   },
 };
 
-// ################## ----- CHECKOUT API FUNCTIONS ----- ##################
-// Checkout and payment related API calls
-// ################################################################
-
-export const checkoutAPI = {
-  // Create a Stripe checkout session
-  createSession: async (data: {
-    items: Array<{
-      name: string;
-      unitPrice: number;
-      quantity: number;
-      variant?: { size?: string; color?: string };
-      mockupUrl?: string;
-      itemType: 'product' | 'service';
-    }>;
-    brandId: string;
-    buyer: { name: string; email: string };
-  }) => {
-    const response = await api.post('/api/checkout/create-session', data);
-    return response.data;
-  },
-
-  // Get checkout session status
-  getSessionStatus: async (sessionId: string) => {
-    const response = await api.get(`/api/checkout/session/${sessionId}`);
-    return response.data;
-  },
-};
-
+// Export the main api instance for custom calls
 export default api;
