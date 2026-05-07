@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import StoreLayout from '@/components/store/StoreLayout';
 import { useCartContext } from '@/context/CartContext';
-import { checkoutAPI } from '@/utils/api';
+import { checkoutAPI, storeAPI } from '@/utils/api';
+
+const isMongoObjectId = (value?: string | null) => {
+  return typeof value === 'string' && /^[a-f\d]{24}$/i.test(value);
+};
 
 const CheckoutPage: React.FC = () => {
   const router = useRouter();
@@ -44,22 +48,45 @@ const CheckoutPage: React.FC = () => {
     }));
   };
 
+  const resolveBrandId = async () => {
+    const cartItem = items[0];
+
+    if (!cartItem) return null;
+
+    if (isMongoObjectId(cartItem.brandId)) {
+      return cartItem.brandId;
+    }
+
+    const subdomain = cartItem.brandSubdomain || cartItem.brandId;
+
+    if (!subdomain) {
+      return null;
+    }
+
+    const storeResponse = await storeAPI.getStore(subdomain);
+    const resolvedId = storeResponse?.store?._id;
+
+    return isMongoObjectId(resolvedId) ? resolvedId : null;
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (items.length === 0) return;
 
-    const brandId = items[0]?.brandId;
-
-    if (!brandId || brandId === items[0]?.brandSubdomain) {
-      setError('Checkout is missing a valid store ID. Please return to the store and add the item again.');
-      return;
-    }
-
     setLoading(true);
     setError('');
 
     try {
+      const brandId = await resolveBrandId();
+
+      if (!brandId) {
+        setError(
+          'Checkout could not find a valid store ID. Please clear your cart, return to the store, and add the item again.'
+        );
+        return;
+      }
+
       const checkoutItems = items.map((item) => ({
         id: item.id,
         name: item.name,
@@ -295,6 +322,17 @@ const CheckoutPage: React.FC = () => {
                     <span className="text-primary">${total.toFixed(2)}</span>
                   </div>
                 </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    clearCart();
+                    router.push('/');
+                  }}
+                  className="w-full mt-4 text-sm text-red-600 hover:text-red-700"
+                >
+                  Clear cart
+                </button>
               </div>
             </div>
           </div>
