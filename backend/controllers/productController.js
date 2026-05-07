@@ -71,12 +71,12 @@ exports.generateMockup = asyncHandler(async (req, res) => {
     });
 
     const filesPayload = [
-      {
-        file_id: uploadedFile.id,
-        placement: parsedPlacement?.placement || 'front',
-        position: parsedPlacement?.position,
-      },
-    ];
+  {
+    placement: parsedPlacement?.placement || 'front',
+    image_url: uploadedFile.url,
+    position: parsedPlacement?.position,
+  },
+];
 
     const task = await printfulService.createMockupTask(
       Number(productId),
