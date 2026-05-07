@@ -3,13 +3,43 @@ const Brand = require('../models/Brand');
 const Product = require('../models/Product');
 const Service = require('../models/Service');
 
+const normalizeProduct = (product) => {
+  const productObject = product.toObject ? product.toObject() : product;
+  const firstVariant = productObject.variants?.[0] || {};
+
+  const imageUrl =
+    productObject.imageUrl ||
+    productObject.image ||
+    productObject.thumbnail ||
+    productObject.mockupUrl ||
+    firstVariant.mockupUrl ||
+    firstVariant.imageUrl ||
+    '';
+
+  const price =
+    Number(productObject.price) ||
+    Number(productObject.retailPrice) ||
+    Number(firstVariant.retailPrice) ||
+    Number(firstVariant.price) ||
+    0;
+
+  return {
+    ...productObject,
+    id: productObject._id?.toString?.() || productObject.id,
+    imageUrl,
+    mockupUrl: imageUrl,
+    price,
+    retailPrice: price,
+  };
+};
+
 // @desc    Get public store by subdomain
 // @route   GET /api/store/:subdomain
 // @access  Public
 exports.getStore = asyncHandler(async (req, res) => {
   const { subdomain } = req.params;
 
-  const brand = await Brand.findOne({ subdomain }).populate('user', 'username');
+  const brand = await Brand.findOne({ subdomain }).populate('user', 'username email');
   if (!brand) {
     return res.status(404).json({ message: 'Store not found' });
   }
@@ -26,13 +56,14 @@ exports.getStore = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     store: {
+      _id: brand._id,
       brandName: brand.brandName,
       subdomain: brand.subdomain,
       description: brand.description,
       logoUrl: brand.logoUrl,
-      owner: brand.user?.username,
+      owner: brand.user?.username || brand.user?.email || 'Creator',
     },
-    products,
+    products: products.map(normalizeProduct),
     services,
   });
 });
@@ -43,7 +74,7 @@ exports.getStore = asyncHandler(async (req, res) => {
 exports.getStoreProduct = asyncHandler(async (req, res) => {
   const { subdomain, productId } = req.params;
 
-  const brand = await Brand.findOne({ subdomain });
+  const brand = await Brand.findOne({ subdomain }).populate('user', 'username email');
   if (!brand) {
     return res.status(404).json({ message: 'Store not found' });
   }
@@ -58,12 +89,42 @@ exports.getStoreProduct = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: 'Product not found' });
   }
 
+  const normalizedProduct = normalizeProduct(product);
+
   res.status(200).json({
-    product,
+    product: normalizedProduct,
+    data: {
+      id: normalizedProduct.id,
+      _id: normalizedProduct._id,
+      name: normalizedProduct.name,
+      description: normalizedProduct.description,
+      price: normalizedProduct.price,
+      retailPrice: normalizedProduct.retailPrice,
+      images: [normalizedProduct.imageUrl].filter(Boolean),
+      imageUrl: normalizedProduct.imageUrl,
+      mockupUrl: normalizedProduct.mockupUrl,
+      variants: normalizedProduct.variants || [],
+      storeOwner: {
+        name: brand.user?.username || brand.user?.email || 'Creator',
+        storeName: brand.brandName,
+        storeUrl: brand.subdomain,
+      },
+      printfulProduct: {
+        title: normalizedProduct.name,
+        brand: brand.brandName,
+        model: '',
+        description: normalizedProduct.description || '',
+        features: [],
+        materials: [],
+        careInstructions: [],
+      },
+    },
     store: {
+      _id: brand._id,
       brandName: brand.brandName,
       subdomain: brand.subdomain,
       logoUrl: brand.logoUrl,
+      owner: brand.user?.username || brand.user?.email || 'Creator',
     },
   });
 });
@@ -74,7 +135,7 @@ exports.getStoreProduct = asyncHandler(async (req, res) => {
 exports.getStoreService = asyncHandler(async (req, res) => {
   const { subdomain, serviceId } = req.params;
 
-  const brand = await Brand.findOne({ subdomain });
+  const brand = await Brand.findOne({ subdomain }).populate('user', 'username email');
   if (!brand) {
     return res.status(404).json({ message: 'Store not found' });
   }
@@ -92,9 +153,11 @@ exports.getStoreService = asyncHandler(async (req, res) => {
   res.status(200).json({
     service,
     store: {
+      _id: brand._id,
       brandName: brand.brandName,
       subdomain: brand.subdomain,
       logoUrl: brand.logoUrl,
+      owner: brand.user?.username || brand.user?.email || 'Creator',
     },
   });
 });
