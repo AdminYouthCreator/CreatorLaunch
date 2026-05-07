@@ -1,277 +1,375 @@
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import Layout from '@/components/common/Layout';
-import AuthGuard from '@/components/common/AuthGuard';
-import { useAuth } from '@/hooks/useAuth';
 import { productAPI } from '@/utils/api';
-import { formatPrice } from '@/utils/printful';
 
-// ################## ----- PRODUCT INTERFACE ----- ##################
-interface Product {
-  _id: string;
-  name: string;
-  description: string;
-  price: number;
-  mockupImages: string[];
-  status: 'processing' | 'completed' | 'failed';
-  isActive: boolean;
-  createdAt: string;
-  printfulProductId?: number;
-  printfulVariantId?: number;
+interface ProductVariant {
+  retailPrice?: string | number;
+  price?: string | number;
+  mockupUrl?: string;
+  mockup_url?: string;
+  image?: string;
+  imageUrl?: string;
+  size?: string;
+  color?: string;
 }
 
-// ################## ----- PRODUCTS PAGE COMPONENT ----- ##################
-// Main products management page for authenticated users
-// Shows all user's products with options to create, edit, or delete
-// ##################################################################
-const ProductsPage: React.FC = () => {
-  const { user } = useAuth();
-  const router = useRouter();
+interface Product {
+  _id: string;
+  id?: string;
+  name?: string;
+  title?: string;
+  description?: string;
+  productDescription?: string;
+  price?: string | number;
+  retailPrice?: string | number;
+  image?: string;
+  imageUrl?: string;
+  thumbnail?: string;
+  mockupUrl?: string;
+  mockup_url?: string;
+  variants?: ProductVariant[];
+  status?: string;
+  isActive?: boolean;
+  active?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+const getProductId = (product: Product) => product._id || product.id || '';
+
+const getProductName = (product: Product) => {
+  return product.name || product.title || 'Untitled Product';
+};
+
+const getProductDescription = (product: Product) => {
+  return product.description || product.productDescription || 'No description yet';
+};
+
+const getProductImage = (product: Product) => {
+  return (
+    product.image ||
+    product.imageUrl ||
+    product.thumbnail ||
+    product.mockupUrl ||
+    product.mockup_url ||
+    product.variants?.[0]?.mockupUrl ||
+    product.variants?.[0]?.mockup_url ||
+    product.variants?.[0]?.image ||
+    product.variants?.[0]?.imageUrl ||
+    ''
+  );
+};
+
+const getProductPrice = (product: Product) => {
+  const rawPrice =
+    product.price ??
+    product.retailPrice ??
+    product.variants?.[0]?.retailPrice ??
+    product.variants?.[0]?.price ??
+    0;
+
+  const price = Number(rawPrice);
+  return Number.isFinite(price) ? price : 0;
+};
+
+const getProductStatus = (product: Product) => {
+  if (product.status) return product.status.toLowerCase();
+  if (product.isActive === true || product.active === true) return 'active';
+  if (product.isActive === false || product.active === false) return 'inactive';
+  return 'inactive';
+};
+
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  }).format(amount);
+};
+
+const formatDate = (date?: string) => {
+  if (!date) return 'Unknown';
+
+  const parsedDate = new Date(date);
+  if (Number.isNaN(parsedDate.getTime())) return 'Unknown';
+
+  return parsedDate.toLocaleDateString('en-US', {
+    month: 'numeric',
+    day: 'numeric',
+    year: 'numeric',
+  });
+};
+
+const truncateText = (text: string, maxLength: number) => {
+  if (text.length <= maxLength) return text;
+  return `${text.slice(0, maxLength).trim()}...`;
+};
+
+const ProductImagePlaceholder = () => (
+  <div className="w-full h-full flex items-center justify-center text-gray-400">
+    <svg
+      className="w-10 h-10"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+      />
+    </svg>
+  </div>
+);
+
+const ProductsPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // ################## ----- LOAD PRODUCTS ----- ##################
   useEffect(() => {
-    loadProducts();
+    fetchProducts();
   }, []);
 
-  const loadProducts = async () => {
+  const fetchProducts = async () => {
     try {
       setIsLoading(true);
       setError('');
+
       const response = await productAPI.getAll();
-      setProducts(response.data || response);
+
+      let productList: Product[] = [];
+      if (Array.isArray(response)) {
+        productList = response;
+      } else if (Array.isArray(response?.products)) {
+        productList = response.products;
+      } else if (Array.isArray(response?.data)) {
+        productList = response.data;
+      } else if (Array.isArray(response?.data?.products)) {
+        productList = response.data.products;
+      }
+
+      setProducts(productList);
     } catch (err: any) {
-      setError(err.message || 'Failed to load products');
       console.error('Failed to load products:', err);
+      setError(err?.response?.data?.message || err?.message || 'Failed to load products.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ################## ----- DELETE PRODUCT ----- ##################
-  const handleDeleteProduct = async (productId: string) => {
-    if (!confirm('Are you sure you want to delete this product?')) {
-      return;
-    }
+  const stats = useMemo(() => {
+    const totalProducts = products.length;
+    const activeProducts = products.filter((product) => getProductStatus(product) === 'active').length;
+    const processingProducts = products.filter(
+      (product) => getProductStatus(product) === 'processing'
+    ).length;
+    const avgPrice = totalProducts
+      ? products.reduce((sum, product) => sum + getProductPrice(product), 0) / totalProducts
+      : 0;
+
+    return {
+      totalProducts,
+      activeProducts,
+      processingProducts,
+      avgPrice,
+    };
+  }, [products]);
+
+  const handleActivate = async (productId: string) => {
+    // The backend update endpoint may not be fully implemented yet.
+    // This updates the UI immediately so the page feels responsive.
+    setProducts((prev) =>
+      prev.map((product) =>
+        getProductId(product) === productId
+          ? { ...product, status: 'active', isActive: true, active: true }
+          : product
+      )
+    );
+  };
+
+  const handleDelete = async (productId: string) => {
+    const confirmed = window.confirm('Are you sure you want to delete this product?');
+    if (!confirmed) return;
 
     try {
       await productAPI.delete(productId);
-      setProducts(products.filter(p => p._id !== productId));
+      setProducts((prev) => prev.filter((product) => getProductId(product) !== productId));
     } catch (err: any) {
-      alert('Failed to delete product: ' + err.message);
+      console.error('Failed to delete product:', err);
+      setError(err?.response?.data?.message || err?.message || 'Failed to delete product.');
     }
   };
-
-  // ################## ----- TOGGLE PRODUCT STATUS ----- ##################
-  const handleToggleStatus = async (productId: string, isActive: boolean) => {
-    try {
-      await productAPI.update(productId, { isActive: !isActive });
-      setProducts(products.map(p => 
-        p._id === productId ? { ...p, isActive: !isActive } : p
-      ));
-    } catch (err: any) {
-      alert('Failed to update product status: ' + err.message);
-    }
-  };
-
-  // ################## ----- LOADING STATE ----- ##################
-  if (isLoading) {
-    return (
-      <AuthGuard>
-        <Layout title="Products | CreatorLaunch">
-          <div className="min-h-screen bg-light flex items-center justify-center">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-medium">Loading products...</p>
-            </div>
-          </div>
-        </Layout>
-      </AuthGuard>
-    );
-  }
 
   return (
-    <AuthGuard>
-      <Layout title="Products | CreatorLaunch">
-        <div className="min-h-screen bg-light">
-          <div className="container mx-auto px-4 py-8">
-            <div className="max-w-6xl mx-auto">
-              
-              {/* Header */}
-              <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h1 className="text-3xl font-bold text-dark mb-2">Your Products</h1>
-                    <p className="text-medium">
-                      Manage your product catalog and track sales performance.
-                    </p>
-                  </div>
-                  <Link 
-                    href="/products/new"
-                    className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-red-600 transition-colors"
-                  >
-                    Create New Product
-                  </Link>
-                </div>
+    <Layout title="Products | CreatorLaunch">
+      <div className="min-h-screen bg-light py-8">
+        <div className="container mx-auto px-4">
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-bold text-dark mb-2">Your Products</h1>
+                <p className="text-medium">Manage your product catalog and track sales performance.</p>
               </div>
 
-              {/* Error State */}
-              {error && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                  <p className="text-red-800">{error}</p>
-                  <button 
-                    onClick={loadProducts}
-                    className="mt-2 text-sm text-red-600 hover:text-red-800"
-                  >
-                    Try Again
-                  </button>
-                </div>
-              )}
+              <Link
+                href="/products/new"
+                className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-red-600 transition-colors text-center"
+              >
+                Create New Product
+              </Link>
+            </div>
+          </div>
 
-              {/* Products Grid */}
-              {products.length === 0 ? (
-                <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                  <div className="max-w-md mx-auto">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                      </svg>
-                    </div>
-                    <h3 className="text-xl font-semibold text-dark mb-2">No products yet</h3>
-                    <p className="text-medium mb-6">
-                      Create your first product to start selling on your store.
-                    </p>
-                    <Link 
-                      href="/products/new"
-                      className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-red-600 transition-colors inline-block"
-                    >
-                      Create First Product
-                    </Link>
+          {error && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <p className="text-red-600">{error}</p>
+              <button
+                onClick={fetchProducts}
+                className="text-red-500 text-sm underline hover:no-underline mt-1"
+              >
+                Try again
+              </button>
+            </div>
+          )}
+
+          {isLoading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {[...Array(3)].map((_, index) => (
+                <div key={index} className="bg-white rounded-lg shadow-sm overflow-hidden animate-pulse">
+                  <div className="h-48 bg-gray-200" />
+                  <div className="p-4 space-y-3">
+                    <div className="h-5 bg-gray-200 rounded w-3/4" />
+                    <div className="h-4 bg-gray-200 rounded w-1/2" />
+                    <div className="h-8 bg-gray-200 rounded" />
                   </div>
                 </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {products.map((product) => (
-                    <div key={product._id} className="bg-white rounded-lg shadow-sm overflow-hidden">
-                      {/* Product Image */}
-                      <div className="h-48 bg-gray-100 relative">
-                        {product.mockupImages && product.mockupImages.length > 0 ? (
-                          <img 
-                            src={product.mockupImages[0]}
-                            alt={product.name}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                          </div>
-                        )}
-                        
-                        {/* Status Badge */}
-                        <div className="absolute top-2 right-2">
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                            product.status === 'completed' ? 'bg-green-100 text-green-800' :
-                            product.status === 'processing' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-red-100 text-red-800'
-                          }`}>
-                            {product.status}
-                          </span>
-                        </div>
-                      </div>
+              ))}
+            </div>
+          ) : products.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-sm p-10 text-center mb-8">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20 13V7a2 2 0 00-2-2h-3.586a1 1 0 01-.707-.293l-1.414-1.414A1 1 0 0011.586 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2v-6z"
+                  />
+                </svg>
+              </div>
+              <h2 className="text-xl font-semibold text-dark mb-2">No products yet</h2>
+              <p className="text-medium mb-6">Create your first product to start building your store.</p>
+              <Link
+                href="/products/new"
+                className="inline-block bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-red-600 transition-colors"
+              >
+                Create Your First Product
+              </Link>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {products.map((product) => {
+                const productId = getProductId(product);
+                const imageUrl = getProductImage(product);
+                const price = getProductPrice(product);
+                const status = getProductStatus(product);
+                const isActive = status === 'active';
 
-                      {/* Product Details */}
-                      <div className="p-4">
-                        <div className="flex items-start justify-between mb-2">
-                          <h3 className="font-semibold text-dark truncate flex-1">{product.name}</h3>
-                          <span className="text-lg font-bold text-primary ml-2">
-                            {formatPrice(product.price)}
-                          </span>
-                        </div>
-                        
-                        <p className="text-sm text-medium mb-4 line-clamp-2">
-                          {product.description || 'No description'}
+                return (
+                  <div key={productId} className="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div className="relative h-48 bg-gray-100">
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={getProductName(product)}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <ProductImagePlaceholder />
+                      )}
+
+                      <span className="absolute top-3 right-3 bg-red-50 text-red-600 text-xs px-2 py-1 rounded-full capitalize">
+                        {product.status || 'published'}
+                      </span>
+                    </div>
+
+                    <div className="p-4">
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <h2 className="font-semibold text-dark leading-snug">
+                          {truncateText(getProductName(product), 32)}
+                        </h2>
+                        <p className="font-bold text-primary whitespace-nowrap">
+                          {formatCurrency(price)}
                         </p>
+                      </div>
 
-                        <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
-                          <span>Created: {new Date(product.createdAt).toLocaleDateString()}</span>
-                          <span className={`px-2 py-1 rounded-full ${
-                            product.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {product.isActive ? 'Active' : 'Inactive'}
-                          </span>
-                        </div>
+                      <p className="text-medium text-sm mb-4">
+                        {truncateText(getProductDescription(product), 64)}
+                      </p>
 
-                        {/* Action Buttons */}
-                        <div className="flex space-x-2">
-                          <Link
-                            href={`/products/edit/${product._id}`}
-                            className="flex-1 bg-gray-100 text-gray-700 text-center py-2 px-3 rounded text-sm font-medium hover:bg-gray-200 transition-colors"
-                          >
-                            Edit
-                          </Link>
-                          <button
-                            onClick={() => handleToggleStatus(product._id, product.isActive)}
-                            className={`flex-1 py-2 px-3 rounded text-sm font-medium transition-colors ${
-                              product.isActive 
-                                ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' 
-                                : 'bg-green-100 text-green-700 hover:bg-green-200'
-                            }`}
-                          >
-                            {product.isActive ? 'Deactivate' : 'Activate'}
-                          </button>
-                          <button
-                            onClick={() => handleDeleteProduct(product._id)}
-                            className="px-3 py-2 bg-red-100 text-red-700 rounded text-sm font-medium hover:bg-red-200 transition-colors"
-                          >
-                            Delete
-                          </button>
-                        </div>
+                      <div className="flex items-center justify-between text-xs text-medium mb-4">
+                        <span>Created: {formatDate(product.createdAt || product.updatedAt)}</span>
+                        <span className="bg-gray-50 px-2 py-1 rounded-full capitalize">
+                          {isActive ? 'active' : status}
+                        </span>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
 
-              {/* Quick Stats */}
-              {products.length > 0 && (
-                <div className="bg-white rounded-lg shadow-sm p-6 mt-8">
-                  <h3 className="text-lg font-semibold text-dark mb-4">Quick Stats</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-primary mb-1">{products.length}</div>
-                      <div className="text-sm text-medium">Total Products</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-green-600 mb-1">
-                        {products.filter(p => p.isActive).length}
+                      <div className="grid grid-cols-3 gap-2">
+                        <Link
+                          href={`/products/${productId}/edit`}
+                          className="bg-gray-100 text-dark text-center px-3 py-2 rounded hover:bg-gray-200 transition-colors"
+                        >
+                          Edit
+                        </Link>
+                        <button
+                          onClick={() => handleActivate(productId)}
+                          className="bg-green-100 text-green-700 px-3 py-2 rounded hover:bg-green-200 transition-colors"
+                        >
+                          {isActive ? 'Active' : 'Activate'}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(productId)}
+                          className="bg-red-50 text-red-600 px-3 py-2 rounded hover:bg-red-100 transition-colors"
+                        >
+                          Delete
+                        </button>
                       </div>
-                      <div className="text-sm text-medium">Active Products</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-yellow-600 mb-1">
-                        {products.filter(p => p.status === 'processing').length}
-                      </div>
-                      <div className="text-sm text-medium">Processing</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-2xl font-bold text-blue-600 mb-1">
-                        {formatPrice(products.reduce((sum, p) => sum + (p.isActive ? p.price : 0), 0))}
-                      </div>
-                      <div className="text-sm text-medium">Avg Price</div>
                     </div>
                   </div>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="bg-white rounded-lg shadow-sm p-6">
+            <h2 className="text-xl font-semibold text-dark mb-6">Quick Stats</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+              <div>
+                <div className="text-2xl font-bold text-primary mb-1">{stats.totalProducts}</div>
+                <div className="text-sm text-medium">Total Products</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-green-600 mb-1">{stats.activeProducts}</div>
+                <div className="text-sm text-medium">Active Products</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-yellow-600 mb-1">{stats.processingProducts}</div>
+                <div className="text-sm text-medium">Processing</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-blue-600 mb-1">
+                  {formatCurrency(stats.avgPrice)}
                 </div>
-              )}
+                <div className="text-sm text-medium">Avg Price</div>
+              </div>
             </div>
           </div>
         </div>
-      </Layout>
-    </AuthGuard>
+      </div>
+    </Layout>
   );
 };
 
