@@ -16,13 +16,14 @@ interface HeaderProps {
 // Main navigation header with announcement banner
 // Handles mobile menu toggle and active link highlighting
 // ##########################################################
-const Header: React.FC<HeaderProps> = ({ 
-  showAnnouncement = true, 
-  announcementText = "Welcome to our new website!" 
+const Header: React.FC<HeaderProps> = ({
+  showAnnouncement = true,
+  announcementText = 'CreatorLaunch is building the next generation of founders.'
 }) => {
   const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(showAnnouncement);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+
   const router = useRouter();
   const { user, logout, loading } = useAuthContext();
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -47,11 +48,8 @@ const Header: React.FC<HeaderProps> = ({
   // Handle logout
   const handleLogout = async () => {
     try {
-      console.log('Logout button clicked');
       setShowUserMenu(false);
-      console.log('Calling logout function...');
       await logout();
-      console.log('Logout successful, redirecting...');
       router.push('/');
     } catch (error) {
       console.error('Logout failed:', error);
@@ -60,21 +58,17 @@ const Header: React.FC<HeaderProps> = ({
 
   // ################## ----- NAVIGATION ITEMS ----- ##################
   // Main navigation menu items
-  // Defines all the primary navigation links
-  // ##########################################################
+  // ################################################################
   const navigation = [
     { name: 'Home', href: '/' },
-    { name: 'Workshops', href: '/workshops' },
-    { name: 'About Us', href: '/about' },
-    { name: 'Our Team', href: '/about/team' },
+    { name: 'About', href: '/about' },
+    { name: 'Team', href: '/about/team' },
+    { name: 'Partners', href: '/partners' },
     { name: 'Blog', href: '/blog' },
-    { name: 'Get Involved', href: '/get-involved' }
+    { name: 'Contact', href: '/contact' }
   ];
 
   // ################## ----- ACTIVE LINK CHECKER ----- ##################
-  // Function to determine if a navigation link is currently active
-  // Used for styling the active navigation item
-  // ################################################################
   const isActiveLink = (href: string) => {
     if (href === '/' && router.pathname === '/') return true;
     if (href !== '/' && router.pathname.startsWith(href)) return true;
@@ -101,10 +95,10 @@ const Header: React.FC<HeaderProps> = ({
       <header className="p-4 glass-nav shadow-sm sticky top-0 z-50">
         <nav className="container mx-auto flex items-center">
           {/* Logo */}
-          <Link href="/">
-            <img 
-              src="/assets/header-logo.png" 
-              alt="CreatorLaunch Logo" 
+          <Link href="/" aria-label="CreatorLaunch home">
+            <img
+              src="/assets/header-logo.png"
+              alt="CreatorLaunch Logo"
               className="h-12"
             />
           </Link>
@@ -125,41 +119,38 @@ const Header: React.FC<HeaderProps> = ({
               ))}
             </div>
           </div>
-            
+
           {/* Right-aligned Button Group */}
           <div className="hidden md:flex items-center gap-2 ml-4">
             <Link
               href="/donate"
               className="px-3 py-2 rounded-lg font-bold text-sm whitespace-nowrap transition-colors"
-              style={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+              style={{
+                display: 'flex',
+                alignItems: 'center',
                 height: '40px',
                 backgroundColor: 'var(--color-primary)',
                 color: 'white'
               }}
             >
-              Support Us
+              Donate
             </Link>
+
             {/* Authentication Section */}
             {loading ? (
-              // Loading state
               <div className="flex items-center space-x-3">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
               </div>
             ) : user ? (
-              // Authenticated user
               <div className="relative" ref={userMenuRef}>
                 <button
-                  onClick={() => {
-                    console.log('Profile button clicked, showUserMenu was:', showUserMenu);
-                    setShowUserMenu(!showUserMenu);
-                    console.log('showUserMenu set to:', !showUserMenu);
-                  }}
+                  onClick={() => setShowUserMenu(!showUserMenu)}
                   className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                    {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
+                    {user.name
+                      ? user.name.charAt(0).toUpperCase()
+                      : user.email.charAt(0).toUpperCase()}
                   </div>
                   <span className="font-medium text-gray-700 hidden sm:block">
                     {user.name || user.email.split('@')[0]}
@@ -168,7 +159,7 @@ const Header: React.FC<HeaderProps> = ({
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                
+
                 {/* User dropdown menu */}
                 {showUserMenu && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
@@ -176,51 +167,42 @@ const Header: React.FC<HeaderProps> = ({
                       <p className="text-sm font-medium text-gray-700">{user.name || 'User'}</p>
                       <p className="text-sm text-gray-500">{user.email}</p>
                     </div>
+
                     <div className="py-1">
                       <Link
                         href="/dashboard"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                        onClick={() => {
-                          console.log('Dashboard clicked');
-                          setShowUserMenu(false);
-                        }}
+                        onClick={() => setShowUserMenu(false)}
                       >
                         Dashboard
                       </Link>
+
                       <Link
                         href="/products"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                        onClick={() => {
-                          setShowUserMenu(false);
-                        }}
+                        onClick={() => setShowUserMenu(false)}
                       >
                         Products
                       </Link>
+
                       <Link
                         href="/profile"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                        onClick={() => {
-                          console.log('Profile clicked');
-                          setShowUserMenu(false);
-                        }}
+                        onClick={() => setShowUserMenu(false)}
                       >
                         Profile
                       </Link>
+
                       <Link
                         href="/onboarding"
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                        onClick={() => {
-                          console.log('Onboarding clicked');
-                          setShowUserMenu(false);
-                        }}
+                        onClick={() => setShowUserMenu(false)}
                       >
                         Onboarding
                       </Link>
+
                       <button
-                        onClick={() => {
-                          console.log('Logout button clicked');
-                          handleLogout();
-                        }}
+                        onClick={handleLogout}
                         className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                       >
                         Logout
@@ -230,14 +212,13 @@ const Header: React.FC<HeaderProps> = ({
                 )}
               </div>
             ) : (
-              // Non-authenticated user
               <div className="flex items-center space-x-3">
                 <Link
                   href="/auth/login"
                   className="px-3 py-2 rounded-lg font-bold text-sm transition-colors whitespace-nowrap"
-                  style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
                     height: '40px',
                     border: '2px solid var(--color-accent)',
                     color: 'var(--color-accent)',
@@ -246,6 +227,7 @@ const Header: React.FC<HeaderProps> = ({
                 >
                   Login
                 </Link>
+
                 <Link
                   href="/auth/register"
                   className="px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-bold text-sm transition-colors whitespace-nowrap"
@@ -258,7 +240,7 @@ const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          <div className="md:hidden ml-auto">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="text-medium hover:text-primary transition-colors"
@@ -306,7 +288,7 @@ const Header: React.FC<HeaderProps> = ({
                   {item.name}
                 </Link>
               ))}
-              
+
               {/* Mobile Button Group */}
               <div className="flex flex-col space-y-3 pt-4 border-t border-gray-100">
                 <Link
@@ -314,21 +296,21 @@ const Header: React.FC<HeaderProps> = ({
                   className="px-5 py-2 rounded-lg btn-primary-solid font-bold text-center"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Support Us
+                  Donate
                 </Link>
-                
+
                 {/* Mobile Authentication Section */}
                 {loading ? (
                   <div className="flex justify-center py-4">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                   </div>
                 ) : user ? (
-                  // Authenticated user mobile menu
                   <div className="flex flex-col space-y-3">
                     <div className="px-5 py-3 bg-gray-50 rounded-lg">
                       <p className="font-medium text-gray-700">{user.name || 'User'}</p>
                       <p className="text-sm text-gray-500">{user.email}</p>
                     </div>
+
                     <Link
                       href="/dashboard"
                       className="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-bold text-center transition-colors"
@@ -336,6 +318,7 @@ const Header: React.FC<HeaderProps> = ({
                     >
                       Dashboard
                     </Link>
+
                     <Link
                       href="/products"
                       className="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-bold text-center transition-colors"
@@ -343,6 +326,7 @@ const Header: React.FC<HeaderProps> = ({
                     >
                       Products
                     </Link>
+
                     <Link
                       href="/onboarding"
                       className="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-bold text-center transition-colors"
@@ -350,6 +334,7 @@ const Header: React.FC<HeaderProps> = ({
                     >
                       Onboarding
                     </Link>
+
                     <button
                       onClick={() => {
                         setIsMobileMenuOpen(false);
@@ -361,7 +346,6 @@ const Header: React.FC<HeaderProps> = ({
                     </button>
                   </div>
                 ) : (
-                  // Non-authenticated user mobile menu
                   <div className="flex flex-col space-y-3">
                     <Link
                       href="/auth/login"
@@ -370,6 +354,7 @@ const Header: React.FC<HeaderProps> = ({
                     >
                       Login
                     </Link>
+
                     <Link
                       href="/auth/register"
                       className="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-bold text-center transition-colors"
