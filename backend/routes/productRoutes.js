@@ -43,6 +43,7 @@ router.post(
 
 router.get('/mockup-status/:taskKey', protect, productController.getMockupStatus);
 
+router.get('/', protect, productController.getProducts);
 // ################## ----- PRODUCT ROUTES ----- ##################
 router.post('/', protect, createProductValidator, productController.createProduct);
 
