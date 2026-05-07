@@ -2,12 +2,21 @@ const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 
+const getJwtSecret = () => {
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret) {
+    throw new Error('JWT_SECRET is missing from environment variables.');
+  }
+
+  return secret;
+};
+
 const getTokenFromRequest = (req) => {
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer ')
-  ) {
-    return req.headers.authorization.split(' ')[1];
+  const header = req.headers.authorization || '';
+
+  if (header.startsWith('Bearer ')) {
+    return header.split(' ')[1];
   }
 
   return null;
@@ -20,28 +29,46 @@ const protect = asyncHandler(async (req, res, next) => {
     return res.status(401).json({ message: 'Not authorized, no token provided.' });
   }
 
+  let decoded;
+
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    const user = await User.findById(decoded.userId || decoded.id).select('-password');
-
-    if (!user) {
-      return res.status(401).json({ message: 'Not authorized, user not found.' });
-    }
-
-    if (['suspended', 'banned', 'locked'].includes(user.accountStatus)) {
-      return res.status(403).json({
-        message: `Account access denied. Your account is currently ${user.accountStatus}.`,
-        accountStatus: user.accountStatus,
-        reason: user.accountStatusReason || '',
-      });
-    }
-
-    req.user = user;
-    next();
+    decoded = jwt.verify(token, getJwtSecret());
   } catch (error) {
-    return res.status(401).json({ message: 'Not authorized, token failed.' });
+    console.error('JWT verification failed:', {
+      message: error.message,
+      name: error.name,
+      hasJwtSecret: Boolean(process.env.JWT_SECRET),
+      tokenPrefix: token ? token.slice(0, 12) : '',
+    });
+
+    return res.status(401).json({
+      message: 'Not authorized, token failed.',
+      tokenError: error.message,
+    });
   }
+
+  const userId = decoded.userId || decoded.id;
+
+  if (!userId) {
+    return res.status(401).json({ message: 'Not authorized, token missing user id.' });
+  }
+
+  const user = await User.findById(userId).select('-password');
+
+  if (!user) {
+    return res.status(401).json({ message: 'Not authorized, user not found.' });
+  }
+
+  if (['suspended', 'banned', 'locked'].includes(user.accountStatus)) {
+    return res.status(403).json({
+      message: `Account access denied. Your account is currently ${user.accountStatus}.`,
+      accountStatus: user.accountStatus,
+      reason: user.accountStatusReason || '',
+    });
+  }
+
+  req.user = user;
+  next();
 });
 
 const authorizeRoles = (...roles) => {
