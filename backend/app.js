@@ -11,7 +11,21 @@ const storeRoutes = require('./routes/storeRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const checkoutRoutes = require('./routes/checkoutRoutes');
-const inviteRoutes = require('./routes/inviteRoutes');
+
+let inviteRoutes = null;
+let adminRoutes = null;
+
+try {
+  inviteRoutes = require('./routes/inviteRoutes');
+} catch (error) {
+  inviteRoutes = null;
+}
+
+try {
+  adminRoutes = require('./routes/adminRoutes');
+} catch (error) {
+  adminRoutes = null;
+}
 
 const errorHandler = require('./middlewares/errorHandler');
 
@@ -49,7 +63,14 @@ app.use('/api/store', storeRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/checkout', checkoutRoutes);
-app.use('/api/invites', inviteRoutes);
+
+if (inviteRoutes) {
+  app.use('/api/invites', inviteRoutes);
+}
+
+if (adminRoutes) {
+  app.use('/api/admin', adminRoutes);
+}
 
 app.use(errorHandler);
 
