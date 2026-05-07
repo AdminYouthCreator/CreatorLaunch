@@ -1,36 +1,36 @@
 {
   "site": {
-    "name": "",
+    "name": "CreatorLaunch",
     "logo": {
       "src": "/assets/header-logo.png",
       "alt": "CreatorLaunch Logo"
     },
     "announcementBar": {
-      "message": "Welcome to our new website!",
+      "message": "CreatorLaunch is building the next generation of founders.",
       "backgroundColor": "#3367d6",
       "textColor": "#ffffff",
       "closeIcon": true
     },
     "navigation": [
       { "label": "Home", "link": "/" },
-      { "label": "Workshops", "link": "/workshops" },
-      { "label": "About Us", "link": "/about" },
-      { "label": "Our Team", "link": "/team" },
+      { "label": "About", "link": "/about" },
+      { "label": "Team", "link": "/about/team" },
+      { "label": "Partners", "link": "/partners" },
       { "label": "Blog", "link": "/blog" },
-      { "label": "Get Involved", "link": "/get-involved" }
+      { "label": "Contact", "link": "/contact" }
     ],
     "primaryButton": {
-      "text": "Support Us",
-      "link": "/support",
+      "text": "Donate",
+      "link": "/donate",
       "style": "btn-primary-solid"
     }
   },
   "hero": {
-    "heading": "Build a Real Business. It Starts Here.",
-    "subheading": "CreatorLaunch offers free, hands-on workshops in St. Louis for teens ready to launch their first venture. No experience needed.",
+    "heading": "Building the Next Generation of Founders.",
+    "subheading": "CreatorLaunch is a youth-led nonprofit helping young entrepreneurs turn ideas into real ventures through workshops, pitch competitions, launch funding, and a digital platform built for youth creators.",
     "cta": {
-      "text": "Explore Our Workshops",
-      "link": "/workshops"
+      "text": "Join The Waitlist",
+      "link": "/contact"
     }
   },
   "footer": {
@@ -38,24 +38,24 @@
       "src": "/assets/footer-logo.png",
       "alt": "CreatorLaunch Logo"
     },
-    "description": "Empowering the next generation of St. Louis entrepreneurs through hands-on workshops.",
+    "description": "A St. Louis youth-led nonprofit helping young entrepreneurs build real ventures through workshops, launch capital, and digital tools.",
     "quickLinks": [
-      { "label": "About Us", "link": "/about" },
-      { "label": "Workshops", "link": "/workshops" },
-      { "label": "Our Team", "link": "/team" },
-      { "label": "Contact Us", "link": "/contact" }
+      { "label": "About", "link": "/about" },
+      { "label": "Team", "link": "/about/team" },
+      { "label": "Partners", "link": "/partners" },
+      { "label": "Contact", "link": "/contact" }
     ],
     "resources": [
-      { "label": "Get Involved", "link": "/get-involve" },
       { "label": "Blog", "link": "/blog" },
-      { "label": "FAQ", "link": "/faq" },
-      { "label": "Support Us", "link": "/support" }
+      { "label": "Donate", "link": "/donate" },
+      { "label": "Join Waitlist", "link": "/contact" },
+      { "label": "Launch App", "link": "/auth/login" }
     ],
     "social": [
       { "platform": "LinkedIn", "icon": "/assets/linkedin.svg", "link": "https://linkedin.com" },
       { "platform": "Instagram", "icon": "/assets/instagram.svg", "link": "https://instagram.com" },
       { "platform": "Facebook", "icon": "/assets/facebook.svg", "link": "https://facebook.com" }
     ],
-    "copyright": "© 2025, CreatorLaunch. Owned and operated by The Young CEO Launchpad."
+    "copyright": "© 2025 CreatorLaunch, NPO. Founded and run by youth."
   }
 }
