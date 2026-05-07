@@ -425,6 +425,11 @@ export const checkoutAPI = {
     const response = await api.post('/api/checkout/create-session', checkoutData);
     return response.data;
   },
+
+  getSessionStatus: async (sessionId: string) => {
+    const response = await api.get(`/api/checkout/session-status/${sessionId}`);
+    return response.data;
+  },
 };
 
 // ################## ----- STORE API FUNCTIONS ----- ##################
