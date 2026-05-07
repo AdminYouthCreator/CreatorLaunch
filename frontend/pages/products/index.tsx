@@ -178,17 +178,42 @@ const ProductsPage = () => {
     };
   }, [products]);
 
-  const handleActivate = async (productId: string) => {
-    // The backend update endpoint may not be fully implemented yet.
-    // This updates the UI immediately so the page feels responsive.
+const handleActivate = async (productId: string) => {
+  const product = products.find((item) => getProductId(item) === productId);
+  if (!product) return;
+
+  const currentStatus = getProductStatus(product);
+  const nextStatus = currentStatus === 'active' ? 'inactive' : 'active';
+
+  try {
+    const response = await productAPI.updateStatus(productId, {
+      status: nextStatus,
+      isActive: nextStatus === 'active',
+    });
+
+    const updatedProduct = response.product || response.data;
+
     setProducts((prev) =>
-      prev.map((product) =>
-        getProductId(product) === productId
-          ? { ...product, status: 'active', isActive: true, active: true }
-          : product
+      prev.map((item) =>
+        getProductId(item) === productId
+          ? {
+              ...item,
+              ...updatedProduct,
+              status: nextStatus,
+              isActive: nextStatus === 'active',
+            }
+          : item
       )
     );
-  };
+  } catch (err: any) {
+    console.error('Failed to update product status:', err);
+    setError(
+      err?.response?.data?.message ||
+        err?.message ||
+        'Failed to update product status.'
+    );
+  }
+};
 
   const handleDelete = async (productId: string) => {
     const confirmed = window.confirm('Are you sure you want to delete this product?');
