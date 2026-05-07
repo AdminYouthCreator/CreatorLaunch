@@ -390,8 +390,9 @@ export const serviceAPI = {
 // ################################################################
 
 export const orderAPI = {
-  getAll: async () => {
-    const response = await api.get('/api/orders');
+  getAll: async (page?: number) => {
+    const url = page ? `/api/orders?page=${page}` : '/api/orders';
+    const response = await api.get(url);
     return response.data;
   },
 
