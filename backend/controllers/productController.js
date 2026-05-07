@@ -425,6 +425,53 @@ await Todo.findOneAndUpdate(
   { upsert: true, new: true }
 );
 
+  exports.updateProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.productId).populate('brand');
+
+  if (!product) {
+    return res.status(404).json({ message: 'Product not found.' });
+  }
+
+  const brand = await Brand.findById(product.brand?._id || product.brand);
+
+  if (!brand || brand.user.toString() !== req.user.id) {
+    return res.status(403).json({ message: 'You are not authorized to update this product.' });
+  }
+
+  const { name, description, price, retailPrice, status, isActive } = req.body;
+
+  if (typeof name === 'string') product.name = name;
+  if (typeof description === 'string') product.description = description;
+
+  const nextPrice = Number(price ?? retailPrice);
+  if (Number.isFinite(nextPrice) && nextPrice >= 0) {
+    product.price = nextPrice;
+    product.retailPrice = nextPrice;
+
+    if (product.variants?.[0]) {
+      product.variants[0].retailPrice = nextPrice;
+      product.variants[0].price = nextPrice;
+    }
+  }
+
+  if (typeof status === 'string') {
+    product.status = status;
+    product.isActive = status === 'active';
+  } else if (typeof isActive === 'boolean') {
+    product.isActive = isActive;
+    product.status = isActive ? 'active' : 'inactive';
+  }
+
+  await product.save();
+
+  const normalizedProduct = normalizeProductForFrontend(product);
+
+  res.status(200).json({
+    product: normalizedProduct,
+    data: normalizedProduct,
+  });
+});
+  
   const normalizedProduct = normalizeProductForFrontend(newProduct);
 
   res.status(201).json({
