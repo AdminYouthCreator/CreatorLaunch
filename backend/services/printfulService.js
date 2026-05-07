@@ -75,17 +75,45 @@ const getProductDetails = async (productId) => {
     }
 };
 
-const uploadFile = async (file) => {
-  const form = new FormData();
-  form.append('file', file.buffer, { filename: file.originalname });
-  try {
-    const response = await http.post('/files', form, { headers: form.getHeaders() });
-    return response.data.result;
-  } catch (error) {
-    throw handleApiError(error);
-  }
-};
+const cloudinary = require('cloudinary').v2;
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const uploadFile = async (file) => {
+  if (
+    !process.env.CLOUDINARY_CLOUD_NAME ||
+    !process.env.CLOUDINARY_API_KEY ||
+    !process.env.CLOUDINARY_API_SECRET
+  ) {
+    throw new Error('Cloudinary environment variables are missing.');
+  }
+
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: 'creatorlaunch/designs',
+        resource_type: 'image',
+      },
+      (error, result) => {
+        if (error) {
+          console.error('Cloudinary upload error:', error);
+          return reject(new Error(error.message || 'Cloudinary upload failed.'));
+        }
+
+        return resolve({
+          url: result.secure_url,
+          public_id: result.public_id,
+        });
+      }
+    );
+
+    uploadStream.end(file.buffer);
+  });
+};
 const createMockupTask = async (productId, variantIds, filesPayload) => {
   const payload = { variant_ids: variantIds, format: 'jpg', files: filesPayload };
   try {
