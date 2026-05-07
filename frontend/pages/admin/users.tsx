@@ -1,7 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { useAdminAuth } from '@/hooks/useAdminAuth';
-import { FiUserPlus, FiCopy, FiRefreshCw, FiXCircle } from 'react-icons/fi';
+import { adminAPI } from '@/utils/adminApi';
+import {
+  FiUserPlus,
+  FiCopy,
+  FiRefreshCw,
+  FiXCircle,
+  FiUsers,
+  FiMail,
+  FiShield,
+  FiSearch,
+} from 'react-icons/fi';
+
+interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: 'Creator' | 'Admin';
+  status: 'active' | 'inactive';
+  registrationDate: string;
+  lastLogin?: string | null;
+  storeCount: number;
+  hasCompletedOnboarding: boolean;
+  guardianEmail?: string;
+  isMinor: boolean;
+  age?: number | null;
+  emailVerified: boolean;
+  invitedByCode?: string | null;
+}
 
 interface Invite {
   id: string;
@@ -19,59 +45,68 @@ interface Invite {
   createdAt?: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
-
 const AdminUsersPage: React.FC = () => {
-  const { getAdminToken } = useAdminAuth();
-
+  const [users, setUsers] = useState<AdminUser[]>([]);
   const [invites, setInvites] = useState<Invite[]>([]);
+
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<'Creator' | 'Admin'>('Creator');
   const [notes, setNotes] = useState('');
   const [expiresInDays, setExpiresInDays] = useState(30);
+
+  const [activeTab, setActiveTab] = useState<'users' | 'invites'>('users');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState<'all' | 'Creator' | 'Admin'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
+
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [copiedCode, setCopiedCode] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
-    loadInvites();
+    loadPageData();
   }, []);
 
-  const request = async (path: string, options: RequestInit = {}) => {
-    const token = getAdminToken();
-
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-        ...(options.headers || {}),
-      },
-    });
-
-    const data = await response.json().catch(() => ({}));
-
-    if (!response.ok) {
-      throw new Error(data.message || 'Request failed.');
-    }
-
-    return data;
-  };
-
-  const loadInvites = async () => {
+  const loadPageData = async () => {
     try {
       setLoading(true);
       setError('');
 
-      const data = await request('/api/invites');
-      setInvites(data.invites || []);
+      const [usersData, invitesData] = await Promise.all([
+        adminAPI.getUsers(),
+        adminAPI.getInvites(),
+      ]);
+
+      setUsers(usersData.users || []);
+      setInvites(invitesData.invites || []);
     } catch (err: any) {
-      setError(err.message || 'Failed to load invites.');
+      setError(err.message || 'Failed to load users and invites.');
     } finally {
       setLoading(false);
     }
   };
+
+  const filteredUsers = useMemo(() => {
+    return users.filter((user) => {
+      const search = searchTerm.toLowerCase();
+
+      const matchesSearch =
+        user.name?.toLowerCase().includes(search) ||
+        user.email?.toLowerCase().includes(search) ||
+        user.invitedByCode?.toLowerCase().includes(search);
+
+      const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+      const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
+
+      return matchesSearch && matchesRole && matchesStatus;
+    });
+  }, [users, searchTerm, roleFilter, statusFilter]);
+
+  const activeInvites = invites.filter((invite) => invite.status === 'active').length;
+  const usedInvites = invites.filter((invite) => invite.status === 'used').length;
+  const verifiedUsers = users.filter((user) => user.emailVerified).length;
+  const minorUsers = users.filter((user) => user.isMinor).length;
 
   const createInvite = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -80,14 +115,11 @@ const AdminUsersPage: React.FC = () => {
       setCreating(true);
       setError('');
 
-      await request('/api/invites', {
-        method: 'POST',
-        body: JSON.stringify({
-          email,
-          role,
-          notes,
-          expiresInDays,
-        }),
+      await adminAPI.createInvite({
+        email,
+        role,
+        notes,
+        expiresInDays,
       });
 
       setEmail('');
@@ -95,7 +127,9 @@ const AdminUsersPage: React.FC = () => {
       setNotes('');
       setExpiresInDays(30);
 
-      await loadInvites();
+      const invitesData = await adminAPI.getInvites();
+      setInvites(invitesData.invites || []);
+      setActiveTab('invites');
     } catch (err: any) {
       setError(err.message || 'Failed to create invite.');
     } finally {
@@ -111,11 +145,10 @@ const AdminUsersPage: React.FC = () => {
     try {
       setError('');
 
-      await request(`/api/invites/${inviteId}/revoke`, {
-        method: 'PATCH',
-      });
+      await adminAPI.revokeInvite(inviteId);
 
-      await loadInvites();
+      const invitesData = await adminAPI.getInvites();
+      setInvites(invitesData.invites || []);
     } catch (err: any) {
       setError(err.message || 'Failed to revoke invite.');
     }
@@ -135,9 +168,16 @@ const AdminUsersPage: React.FC = () => {
         return 'bg-blue-100 text-blue-700';
       case 'revoked':
         return 'bg-red-100 text-red-700';
-      default:
+      case 'inactive':
         return 'bg-gray-100 text-gray-700';
+      default:
+        return 'bg-yellow-100 text-yellow-700';
     }
+  };
+
+  const formatDate = (date?: string | null) => {
+    if (!date) return '—';
+    return new Date(date).toLocaleDateString();
   };
 
   return (
@@ -145,11 +185,11 @@ const AdminUsersPage: React.FC = () => {
       <div className="admin-page">
         <div className="admin-page-header">
           <div>
-            <h1>Invites & User Access</h1>
-            <p>CreatorLaunch is invite-only. Create invite codes for approved users.</p>
+            <h1>Users & Invites</h1>
+            <p>Manage real users and invite-only platform access.</p>
           </div>
 
-          <button onClick={loadInvites} className="admin-btn secondary">
+          <button onClick={loadPageData} className="admin-btn secondary">
             <FiRefreshCw />
             Refresh
           </button>
@@ -160,6 +200,41 @@ const AdminUsersPage: React.FC = () => {
             {error}
           </div>
         )}
+
+        <div className="admin-stats-grid mb-8">
+          <div className="admin-stat-card">
+            <div className="admin-stat-header">
+              <div className="admin-stat-icon users">
+                <FiUsers />
+              </div>
+            </div>
+            <h3 className="admin-stat-value">{users.length}</h3>
+            <p className="admin-stat-label">Total Users</p>
+            <p className="admin-stat-change positive">{verifiedUsers} verified</p>
+          </div>
+
+          <div className="admin-stat-card">
+            <div className="admin-stat-header">
+              <div className="admin-stat-icon stores">
+                <FiShield />
+              </div>
+            </div>
+            <h3 className="admin-stat-value">{activeInvites}</h3>
+            <p className="admin-stat-label">Active Invites</p>
+            <p className="admin-stat-change">{usedInvites} used</p>
+          </div>
+
+          <div className="admin-stat-card">
+            <div className="admin-stat-header">
+              <div className="admin-stat-icon alerts">
+                <FiUsers />
+              </div>
+            </div>
+            <h3 className="admin-stat-value">{minorUsers}</h3>
+            <p className="admin-stat-label">Minor Users</p>
+            <p className="admin-stat-change">Guardian info tracked</p>
+          </div>
+        </div>
 
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
           <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
@@ -229,9 +304,166 @@ const AdminUsersPage: React.FC = () => {
           </form>
         </div>
 
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex gap-2">
+              <button
+                onClick={() => setActiveTab('users')}
+                className={`px-4 py-2 rounded-lg font-medium ${
+                  activeTab === 'users'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700'
+                }`}
+              >
+                Users
+              </button>
+
+              <button
+                onClick={() => setActiveTab('invites')}
+                className={`px-4 py-2 rounded-lg font-medium ${
+                  activeTab === 'invites'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700'
+                }`}
+              >
+                Invites
+              </button>
+            </div>
+
+            {activeTab === 'users' && (
+              <div className="flex flex-col md:flex-row gap-3">
+                <div className="relative">
+                  <FiSearch className="absolute left-3 top-3 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={(event) => setSearchTerm(event.target.value)}
+                    placeholder="Search users..."
+                    className="pl-10 pr-4 py-2 border rounded-lg"
+                  />
+                </div>
+
+                <select
+                  value={roleFilter}
+                  onChange={(event) => setRoleFilter(event.target.value as any)}
+                  className="px-4 py-2 border rounded-lg"
+                >
+                  <option value="all">All Roles</option>
+                  <option value="Creator">Creators</option>
+                  <option value="Admin">Admins</option>
+                </select>
+
+                <select
+                  value={statusFilter}
+                  onChange={(event) => setStatusFilter(event.target.value as any)}
+                  className="px-4 py-2 border rounded-lg"
+                >
+                  <option value="all">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className="admin-table-container">
           {loading ? (
-            <div className="p-8 text-center">Loading invites...</div>
+            <div className="p-8 text-center">Loading...</div>
+          ) : activeTab === 'users' ? (
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Age</th>
+                  <th>Stores</th>
+                  <th>Onboarding</th>
+                  <th>Invite</th>
+                  <th>Joined</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {filteredUsers.map((user) => (
+                  <tr key={user.id}>
+                    <td>
+                      <div>
+                        <div className="font-semibold">{user.name}</div>
+                        <div className="text-sm text-gray-500 flex items-center gap-1">
+                          <FiMail />
+                          {user.email}
+                        </div>
+                        {user.guardianEmail && (
+                          <div className="text-xs text-gray-500">
+                            Guardian: {user.guardianEmail}
+                          </div>
+                        )}
+                      </div>
+                    </td>
+
+                    <td>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          user.role === 'Admin'
+                            ? 'bg-purple-100 text-purple-700'
+                            : 'bg-blue-100 text-blue-700'
+                        }`}
+                      >
+                        {user.role}
+                      </span>
+                    </td>
+
+                    <td>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusClass(
+                          user.status
+                        )}`}
+                      >
+                        {user.emailVerified ? 'verified' : 'unverified'}
+                      </span>
+                    </td>
+
+                    <td>
+                      {typeof user.age === 'number' ? (
+                        <span>{user.age}</span>
+                      ) : (
+                        <span>—</span>
+                      )}
+                    </td>
+
+                    <td>{user.storeCount}</td>
+
+                    <td>
+                      {user.hasCompletedOnboarding ? (
+                        <span className="text-green-600 font-medium">Complete</span>
+                      ) : (
+                        <span className="text-yellow-600 font-medium">Pending</span>
+                      )}
+                    </td>
+
+                    <td>
+                      {user.invitedByCode ? (
+                        <code>{user.invitedByCode}</code>
+                      ) : (
+                        <span>—</span>
+                      )}
+                    </td>
+
+                    <td>{formatDate(user.registrationDate)}</td>
+                  </tr>
+                ))}
+
+                {filteredUsers.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="text-center p-8">
+                      No users found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           ) : (
             <table className="admin-table">
               <thead>
@@ -258,7 +490,11 @@ const AdminUsersPage: React.FC = () => {
                     <td>{invite.role}</td>
 
                     <td>
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusClass(invite.status)}`}>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusClass(
+                          invite.status
+                        )}`}
+                      >
                         {invite.status}
                       </span>
                     </td>
@@ -269,11 +505,7 @@ const AdminUsersPage: React.FC = () => {
                         : '—'}
                     </td>
 
-                    <td>
-                      {invite.expiresAt
-                        ? new Date(invite.expiresAt).toLocaleDateString()
-                        : 'No expiration'}
-                    </td>
+                    <td>{formatDate(invite.expiresAt)}</td>
 
                     <td>
                       <div className="flex gap-2">
