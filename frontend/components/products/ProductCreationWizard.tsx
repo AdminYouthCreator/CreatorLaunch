@@ -1,20 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import Layout from '@/components/common/Layout';
 import { useAuth } from '@/hooks/useAuth';
 import { printfulAPI, productAPI, brandAPI } from '@/utils/api';
-import { 
-  PrintfulProduct, 
-  PrintfulVariant, 
+import {
+  PrintfulProduct,
+  PrintfulVariant,
   calculateEarnings,
   validateRetailPrice,
-  formatPrice 
+  formatPrice
 } from '@/utils/printful';
 import PrintfulVariantSelector from './PrintfulVariantSelector';
 import PrintfulCatalogBrowser from './PrintfulCatalogBrowser';
 
-// ################## ----- PRODUCT CREATION STEPS ----- ##################
-// Enum for the different steps in the product creation flow
 enum ProductCreationStep {
   SELECT_PRODUCT = 'select_product',
   CUSTOMIZE_DESIGN = 'customize_design',
@@ -23,10 +21,46 @@ enum ProductCreationStep {
   PUBLISH = 'publish'
 }
 
-// ################## ----- INTERFACES ----- ##################
+interface MockupStyleOption {
+  id: number;
+  categoryName: string;
+  viewName: string;
+  restrictedToVariants: number[] | null;
+}
+
+interface MockupPlacementOption {
+  placement: string;
+  displayName: string;
+  technique: string;
+  printAreaWidth: number;
+  printAreaHeight: number;
+  printAreaType: string;
+  dpi: number;
+  mockupStyles: MockupStyleOption[];
+}
+
+interface SelectedPlacementData {
+  placement: string;
+  displayName: string;
+  technique: string;
+  printAreaWidth: number;
+  printAreaHeight: number;
+  printAreaType: string;
+  dpi: number;
+  mockupStyleId: number;
+  mockupStyleLabel: string;
+  position: {
+    width: number;
+    height: number;
+    top: number;
+    left: number;
+  };
+}
+
 interface ProductCreationData {
   selectedProduct?: PrintfulProduct;
   selectedVariant?: PrintfulVariant;
+  selectedPlacement?: SelectedPlacementData;
   designFile?: File;
   designUrl?: string;
   mockupTaskKey?: string;
@@ -37,49 +71,45 @@ interface ProductCreationData {
   productDescription: string;
 }
 
-// ################## ----- PRODUCT CREATION WIZARD COMPONENT ----- ##################
-// Main component for the complete product creation and publishing flow
 const ProductCreationWizard: React.FC = () => {
   const router = useRouter();
   const { user } = useAuth();
-  const [currentStep, setCurrentStep] = useState<ProductCreationStep>(ProductCreationStep.SELECT_PRODUCT);
+
+  const [currentStep, setCurrentStep] = useState<ProductCreationStep>(
+    ProductCreationStep.SELECT_PRODUCT
+  );
+
   const [productData, setProductData] = useState<ProductCreationData>({
     baseCost: 0,
     retailPrice: 0,
     productName: '',
     productDescription: ''
   });
-  
-  // Loading and error states
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  // User brand data
   const [userBrand, setUserBrand] = useState<any>(null);
-  
-  // ################## ----- EFFECT: LOAD INITIAL DATA ----- ##################
+  const [mockupOptions, setMockupOptions] = useState<MockupPlacementOption[]>([]);
+
   useEffect(() => {
     if (user) {
       loadInitialData();
     }
   }, [user]);
 
-  // ################## ----- LOAD INITIAL DATA ----- ##################
   const loadInitialData = async () => {
     try {
       setIsLoading(true);
-      // Load user's brand
       const brandResponse = await brandAPI.getUserBrand();
-      setUserBrand(brandResponse.data);
+      setUserBrand(brandResponse.data || brandResponse);
     } catch (err) {
-      setError('Failed to load initial data');
-      console.error('Failed to load initial data:', err);
+      console.error(err);
+      setError('Failed to load your brand data.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ################## ----- STEP NAVIGATION ----- ##################
   const goToNextStep = () => {
     const steps = Object.values(ProductCreationStep);
     const currentIndex = steps.indexOf(currentStep);
@@ -96,173 +126,316 @@ const ProductCreationWizard: React.FC = () => {
     }
   };
 
-  // ################## ----- PRODUCT SELECTION HANDLERS ----- ##################
+  const getCompatibleStyles = (
+    option?: MockupPlacementOption,
+    variantId?: number
+  ): MockupStyleOption[] => {
+    if (!option) return [];
+    return option.mockupStyles.filter((style) => {
+      if (!style.restrictedToVariants || style.restrictedToVariants.length === 0) {
+        return true;
+      }
+      if (!variantId) return false;
+      return style.restrictedToVariants.includes(variantId);
+    });
+  };
+
+  const buildDefaultPosition = (option: MockupPlacementOption) => {
+    const width = Math.min(option.printAreaWidth, option.printAreaHeight) * 0.8;
+    const height = width;
+
+    return {
+      width,
+      height,
+      top: Math.max((option.printAreaHeight - height) / 2, 0),
+      left: Math.max((option.printAreaWidth - width) / 2, 0)
+    };
+  };
+
+  const buildSelectedPlacement = (
+    option: MockupPlacementOption,
+    variantId?: number,
+    preferredStyleId?: number
+  ): SelectedPlacementData | undefined => {
+    const compatibleStyles = getCompatibleStyles(option, variantId);
+    if (!compatibleStyles.length) return undefined;
+
+    const chosenStyle =
+      compatibleStyles.find((style) => style.id === preferredStyleId) || compatibleStyles[0];
+
+    return {
+      placement: option.placement,
+      displayName: option.displayName,
+      technique: option.technique,
+      printAreaWidth: option.printAreaWidth,
+      printAreaHeight: option.printAreaHeight,
+      printAreaType: option.printAreaType,
+      dpi: option.dpi,
+      mockupStyleId: chosenStyle.id,
+      mockupStyleLabel: `${chosenStyle.categoryName} - ${chosenStyle.viewName}`,
+      position: buildDefaultPosition(option)
+    };
+  };
+
+  const selectedPlacementOption = useMemo(
+    () =>
+      mockupOptions.find(
+        (option) => option.placement === productData.selectedPlacement?.placement
+      ),
+    [mockupOptions, productData.selectedPlacement]
+  );
+
+  const compatibleStyles = useMemo(
+    () => getCompatibleStyles(selectedPlacementOption, productData.selectedVariant?.id),
+    [selectedPlacementOption, productData.selectedVariant]
+  );
+
   const handleProductSelect = async (product: PrintfulProduct) => {
     try {
       setIsLoading(true);
       setError('');
-      
-      // Get detailed product information including variants
-      const productDetails = await printfulAPI.getProduct(product.id);
-      const productInfo = productDetails.result || productDetails;
-      
-      // Select the first available variant by default
+
+      const [productDetailsResponse, mockupOptionsResponse] = await Promise.all([
+        printfulAPI.getProduct(product.id),
+        printfulAPI.getMockupOptions(product.id)
+      ]);
+
+      const productInfo = productDetailsResponse.result || productDetailsResponse;
+      const placementOptions =
+        mockupOptionsResponse.data ||
+        mockupOptionsResponse.result ||
+        mockupOptionsResponse ||
+        [];
+
+      if (!placementOptions.length) {
+        throw new Error('This product has no supported printable mockup placements.');
+      }
+
       const firstVariant = productInfo.variants?.[0];
-      
-      setProductData(prev => ({
-        ...prev,
+      const defaultPlacement = buildSelectedPlacement(placementOptions[0], firstVariant?.id);
+
+      if (!defaultPlacement) {
+        throw new Error('No compatible mockup styles were found for this product.');
+      }
+
+      setMockupOptions(placementOptions);
+
+      setProductData({
         selectedProduct: product,
         selectedVariant: firstVariant,
+        selectedPlacement: defaultPlacement,
+        designFile: undefined,
+        designUrl: undefined,
+        mockupTaskKey: undefined,
+        mockupUrls: undefined,
         baseCost: firstVariant ? parseFloat(firstVariant.price) : 0,
-        retailPrice: firstVariant ? parseFloat(firstVariant.price) + 5 : 15, // Add $5 markup
+        retailPrice: firstVariant ? parseFloat(firstVariant.price) + 5 : 15,
         productName: `Custom ${product.title}`,
-      }));
-      
-      goToNextStep();
-    } catch (err) {
-      setError('Failed to load product details');
-      console.error('Failed to load product details:', err);
+        productDescription: ''
+      });
+
+      setCurrentStep(ProductCreationStep.CUSTOMIZE_DESIGN);
+    } catch (err: any) {
+      console.error(err);
+      setError(err?.message || 'Failed to load product details.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ################## ----- VARIANT SELECTION HANDLER ----- ##################
   const handleVariantSelect = (variant: PrintfulVariant) => {
-    setProductData(prev => ({
+    const nextOption =
+      mockupOptions.find(
+        (option) => option.placement === productData.selectedPlacement?.placement
+      ) || mockupOptions[0];
+
+    const nextPlacement = nextOption
+      ? buildSelectedPlacement(
+          nextOption,
+          variant.id,
+          productData.selectedPlacement?.mockupStyleId
+        )
+      : undefined;
+
+    setProductData((prev) => ({
       ...prev,
       selectedVariant: variant,
+      selectedPlacement: nextPlacement,
       baseCost: parseFloat(variant.price),
-      retailPrice: parseFloat(variant.price) + 5 // Maintain $5 markup
+      retailPrice: parseFloat(variant.price) + 5,
+      mockupTaskKey: undefined,
+      mockupUrls: undefined
     }));
   };
 
-  // ################## ----- DESIGN UPLOAD HANDLERS ----- ##################
+  const handlePlacementChange = (placementName: string) => {
+    const option = mockupOptions.find((item) => item.placement === placementName);
+    if (!option) return;
+
+    const nextPlacement = buildSelectedPlacement(option, productData.selectedVariant?.id);
+
+    setProductData((prev) => ({
+      ...prev,
+      selectedPlacement: nextPlacement,
+      mockupTaskKey: undefined,
+      mockupUrls: undefined
+    }));
+  };
+
+  const handleMockupStyleChange = (styleId: number) => {
+    if (!selectedPlacementOption) return;
+
+    const style = compatibleStyles.find((item) => item.id === styleId);
+    if (!style) return;
+
+    setProductData((prev) => ({
+      ...prev,
+      selectedPlacement: {
+        placement: selectedPlacementOption.placement,
+        displayName: selectedPlacementOption.displayName,
+        technique: selectedPlacementOption.technique,
+        printAreaWidth: selectedPlacementOption.printAreaWidth,
+        printAreaHeight: selectedPlacementOption.printAreaHeight,
+        printAreaType: selectedPlacementOption.printAreaType,
+        dpi: selectedPlacementOption.dpi,
+        mockupStyleId: style.id,
+        mockupStyleLabel: `${style.categoryName} - ${style.viewName}`,
+        position: buildDefaultPosition(selectedPlacementOption)
+      },
+      mockupTaskKey: undefined,
+      mockupUrls: undefined
+    }));
+  };
+
   const handleDesignUpload = async (file: File) => {
+    if (!productData.selectedProduct || !productData.selectedVariant) {
+      setError('Please select a product and variant first.');
+      return;
+    }
+
+    if (!productData.selectedPlacement) {
+      setError('Please select a valid print placement first.');
+      return;
+    }
+
     try {
       setIsLoading(true);
       setError('');
-      
-      // Generate mockups if we have a selected variant and product
-      if (productData.selectedVariant && productData.selectedProduct && file) {
-        const mockupRequest = {
-          productId: productData.selectedProduct.id,
-          variantIds: [productData.selectedVariant.id],
-          artwork: file,
-          placementData: {
-            placement: 'front',
-            position: {
-              area_width: 1800,
-              area_height: 2400,
-              width: 1800,
-              height: 1800,
-              top: 300,
-              left: 0
-            }
-          }
-        };
-        
-        const mockupResponse = await printfulAPI.generateMockup(mockupRequest);
-        const taskKey = mockupResponse.task_key;
-        
-        // Store the data and move to next step
-        setProductData(prev => ({
-          ...prev,
-          designFile: file,
-          designUrl: URL.createObjectURL(file),
-          mockupTaskKey: taskKey
-        }));
-        
-        // Start polling for mockup completion
-        pollMockupStatus(taskKey);
-      } else {
-        // Just store the file for now
-        setProductData(prev => ({
-          ...prev,
-          designFile: file,
-          designUrl: URL.createObjectURL(file)
-        }));
-      }
-      
+
+      setProductData((prev) => ({
+        ...prev,
+        designFile: file,
+        designUrl: URL.createObjectURL(file),
+        mockupTaskKey: undefined,
+        mockupUrls: undefined
+      }));
+
+      const response = await printfulAPI.generateMockup({
+        productId: productData.selectedProduct.id,
+        variantIds: [productData.selectedVariant.id],
+        artwork: file,
+        placementData: productData.selectedPlacement
+      });
+
+      const taskKey = String(response.taskId || response.task_key);
+
+      setProductData((prev) => ({
+        ...prev,
+        designFile: file,
+        designUrl: prev.designUrl || URL.createObjectURL(file),
+        mockupTaskKey: taskKey,
+        mockupUrls: undefined
+      }));
+
+      pollMockupStatus(taskKey);
     } catch (err: any) {
-      let errorMessage = 'Failed to upload design file';
-      
-      if (err?.response?.status === 500) {
-        errorMessage = 'Server error occurred while generating mockup. Please try again or contact support.';
-      } else if (err?.response?.status === 400) {
-        errorMessage = err?.response?.data?.message || 'Invalid file or request. Please check your design file and try again.';
-      } else if (err?.response?.status === 401) {
-        errorMessage = 'Authentication failed. Please login again.';
-      } else if (err?.response?.data?.message) {
-        errorMessage = err.response.data.message;
-      } else if (err?.message) {
-        errorMessage = err.message;
-      }
-      
-      setError(errorMessage);
       console.error('Failed to upload design:', err);
+
+      let message = 'Failed to upload design file.';
+      if (err?.response?.data?.message) {
+        message = err.response.data.message;
+      } else if (err?.message) {
+        message = err.message;
+      }
+
+      setError(message);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ################## ----- MOCKUP STATUS POLLING ----- ##################
   const pollMockupStatus = async (taskKey: string) => {
     const checkStatus = async () => {
       try {
         const statusResponse = await printfulAPI.getMockupStatus(taskKey);
         const status = statusResponse.result || statusResponse;
-        
+
         if (status.status === 'completed') {
-          setProductData(prev => ({
+          const urls = (status.mockups || [])
+            .map((item: any) => item.mockup_url)
+            .filter(Boolean);
+
+          if (!urls.length) {
+            setError('Mockup finished, but no mockup images were returned.');
+            return;
+          }
+
+          setProductData((prev) => ({
             ...prev,
-            mockupUrls: status.mockups?.map((m: any) => m.mockup_url) || []
+            mockupUrls: urls
           }));
-        } else if (status.status === 'failed') {
-          setError('Mockup generation failed');
-        } else {
-          // Still processing, check again in 3 seconds
-          setTimeout(checkStatus, 3000);
+          return;
         }
+
+        if (status.status === 'failed') {
+          const reason =
+            status.failureReasons?.[0]?.detail ||
+            'Mockup generation failed.';
+          setError(reason);
+          return;
+        }
+
+        setTimeout(checkStatus, 3000);
       } catch (err) {
         console.error('Failed to check mockup status:', err);
-        setError('Failed to generate mockups');
+        setError('Failed to check mockup generation status.');
       }
     };
-    
+
     checkStatus();
   };
 
-  // ################## ----- PRICING HANDLERS ----- ##################
   const handlePriceChange = (newPrice: number) => {
-    setProductData(prev => ({
+    setProductData((prev) => ({
       ...prev,
       retailPrice: newPrice
     }));
   };
 
-  // ################## ----- PRODUCT DETAILS HANDLERS ----- ##################
   const handleProductDetailsChange = (name: string, description: string) => {
-    setProductData(prev => ({
+    setProductData((prev) => ({
       ...prev,
       productName: name,
       productDescription: description
     }));
   };
 
-  // ################## ----- PUBLISH HANDLER ----- ##################
   const handlePublish = async () => {
     try {
       setIsLoading(true);
       setError('');
-      
-      if (!userBrand || !productData.selectedProduct || !productData.selectedVariant || !productData.designFile) {
-        setError('Missing required data for product creation');
+
+      if (
+        !userBrand ||
+        !productData.selectedProduct ||
+        !productData.selectedVariant ||
+        !productData.mockupUrls?.length
+      ) {
+        setError('Missing required data for product creation.');
         return;
       }
-      
-      // Create product using Printful integration
-      const productPayload = {
+
+      const payload = {
         brandId: userBrand._id,
         printfulProductId: productData.selectedProduct.id,
         name: productData.productName,
@@ -271,67 +444,42 @@ const ProductCreationWizard: React.FC = () => {
           {
             printfulVariantId: productData.selectedVariant.id,
             retailPrice: productData.retailPrice.toString(),
-            baseCost: productData.selectedVariant.price, // Use the base cost from the variant
-            mockupUrl: productData.mockupUrls?.[0] || ''
+            baseCost: productData.selectedVariant.price,
+            mockupUrl: productData.mockupUrls[0]
           }
         ]
       };
-      
-      const response = await productAPI.createPrintfulProduct(productPayload);
-      
-      // Redirect to success page or dashboard
+
+      await productAPI.createPrintfulProduct(payload);
       router.push('/dashboard?productCreated=true');
     } catch (err) {
-      setError('Failed to publish product');
-      console.error('Failed to publish product:', err);
+      console.error(err);
+      setError('Failed to publish product.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ################## ----- STEP COMPONENTS ----- ##################
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case ProductCreationStep.SELECT_PRODUCT:
-        return <SelectProductStep />;
-      case ProductCreationStep.CUSTOMIZE_DESIGN:
-        return <CustomizeDesignStep />;
-      case ProductCreationStep.SET_PRICING:
-        return <SetPricingStep />;
-      case ProductCreationStep.PRODUCT_DETAILS:
-        return <ProductDetailsStep />;
-      case ProductCreationStep.PUBLISH:
-        return <PublishStep />;
-      default:
-        return <SelectProductStep />;
-    }
-  };
-
-  // ################## ----- SELECT PRODUCT STEP ----- ##################
   const SelectProductStep = () => (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-dark mb-2">Step 1: Select Base Product</h2>
-        <p className="text-medium">Choose a product from our Printful catalog to customize</p>
+        <p className="text-medium">Choose a product from the Printful catalog.</p>
       </div>
 
-      {/* Use the existing PrintfulCatalogBrowser component */}
-      <PrintfulCatalogBrowser
-        onProductSelect={handleProductSelect}
-        searchTerm=""
-      />
+      <PrintfulCatalogBrowser onProductSelect={handleProductSelect} searchTerm="" />
     </div>
   );
 
-  // ################## ----- CUSTOMIZE DESIGN STEP ----- ##################
   const CustomizeDesignStep = () => (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-dark mb-2">Step 2: Customize Design</h2>
-        <p className="text-medium">Select product options and upload your artwork</p>
+        <p className="text-medium">
+          Pick a valid placement/style, upload your artwork, and generate the mockup.
+        </p>
       </div>
 
-      {/* Product Variant Selection */}
       {productData.selectedProduct && (
         <div className="bg-white rounded-lg border p-6">
           <h3 className="text-lg font-semibold text-dark mb-4">Product Options</h3>
@@ -343,11 +491,80 @@ const ProductCreationWizard: React.FC = () => {
         </div>
       )}
 
+      <div className="bg-white rounded-lg border p-6 space-y-4">
+        <h3 className="text-lg font-semibold text-dark">Valid Print Placement</h3>
+
+        {mockupOptions.length === 0 ? (
+          <div className="text-sm text-medium">
+            No placement options found for this product.
+          </div>
+        ) : (
+          <>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-dark mb-2">
+                  Placement
+                </label>
+                <select
+                  value={productData.selectedPlacement?.placement || ''}
+                  onChange={(e) => handlePlacementChange(e.target.value)}
+                  className="w-full px-4 py-3 border rounded-lg focus:border-primary focus:outline-none"
+                >
+                  {mockupOptions.map((option) => (
+                    <option key={option.placement} value={option.placement}>
+                      {option.displayName} ({option.technique})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-dark mb-2">
+                  Mockup Style
+                </label>
+                <select
+                  value={productData.selectedPlacement?.mockupStyleId || ''}
+                  onChange={(e) => handleMockupStyleChange(Number(e.target.value))}
+                  className="w-full px-4 py-3 border rounded-lg focus:border-primary focus:outline-none"
+                >
+                  {compatibleStyles.map((style) => (
+                    <option key={style.id} value={style.id}>
+                      {style.categoryName} - {style.viewName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {productData.selectedPlacement && (
+              <div className="bg-light rounded-lg p-4 text-sm text-medium">
+                <p>
+                  <span className="font-medium text-dark">Selected placement:</span>{' '}
+                  {productData.selectedPlacement.displayName}
+                </p>
+                <p>
+                  <span className="font-medium text-dark">Technique:</span>{' '}
+                  {productData.selectedPlacement.technique}
+                </p>
+                <p>
+                  <span className="font-medium text-dark">Print area:</span>{' '}
+                  {productData.selectedPlacement.printAreaWidth}" ×{' '}
+                  {productData.selectedPlacement.printAreaHeight}"
+                </p>
+                <p>
+                  <span className="font-medium text-dark">Mockup style:</span>{' '}
+                  {productData.selectedPlacement.mockupStyleLabel}
+                </p>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
       <div className="grid md:grid-cols-2 gap-8">
-        {/* Design Upload */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-dark">Upload Your Design</h3>
-          
+
           {!productData.designUrl ? (
             <label className="block">
               <input
@@ -363,7 +580,7 @@ const ProductCreationWizard: React.FC = () => {
                   </svg>
                 </div>
                 <p className="text-dark font-medium mb-1">Click to upload your design</p>
-                <p className="text-sm text-medium">PNG, JPG, or SVG files up to 10MB</p>
+                <p className="text-sm text-medium">PNG, JPG, or WEBP up to 15MB</p>
               </div>
             </label>
           ) : (
@@ -372,24 +589,31 @@ const ProductCreationWizard: React.FC = () => {
                 <img
                   src={productData.designUrl}
                   alt="Uploaded design"
-                  className="w-full h-32 object-contain rounded"
+                  className="w-full h-40 object-contain rounded"
                 />
               </div>
               <button
-                onClick={() => setProductData(prev => ({ ...prev, designUrl: undefined, designFile: undefined }))}
+                onClick={() =>
+                  setProductData((prev) => ({
+                    ...prev,
+                    designFile: undefined,
+                    designUrl: undefined,
+                    mockupTaskKey: undefined,
+                    mockupUrls: undefined
+                  }))
+                }
                 className="text-sm text-primary hover:text-red-600"
               >
-                Upload different design
+                Upload a different design
               </button>
             </div>
           )}
         </div>
 
-        {/* Live Mockup Preview */}
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-dark">Live Product Mockup</h3>
-          
-          {productData.mockupUrls ? (
+          <h3 className="text-lg font-semibold text-dark">Mockup Preview</h3>
+
+          {productData.mockupUrls?.length ? (
             <div className="grid grid-cols-2 gap-4">
               {productData.mockupUrls.map((url, index) => (
                 <div key={index} className="bg-white border rounded-lg p-4">
@@ -401,15 +625,22 @@ const ProductCreationWizard: React.FC = () => {
                 </div>
               ))}
             </div>
+          ) : productData.mockupTaskKey ? (
+            <div className="bg-gray-50 border rounded-lg p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-medium">Generating mockups...</p>
+            </div>
           ) : (
             <div className="bg-gray-50 border rounded-lg p-8 text-center">
-              <p className="text-medium">Upload a design to see the live mockup</p>
+              <p className="text-medium">
+                Select a valid placement and upload a design to generate a mockup.
+              </p>
             </div>
           )}
         </div>
       </div>
 
-      {productData.designUrl && (
+      {!!productData.mockupUrls?.length && (
         <div className="flex justify-center">
           <button
             onClick={goToNextStep}
@@ -422,7 +653,6 @@ const ProductCreationWizard: React.FC = () => {
     </div>
   );
 
-  // ################## ----- SET PRICING STEP ----- ##################
   const SetPricingStep = () => {
     const earnings = calculateEarnings(productData.retailPrice, productData.baseCost);
     const isValidPrice = validateRetailPrice(productData.retailPrice, productData.baseCost);
@@ -431,30 +661,21 @@ const ProductCreationWizard: React.FC = () => {
       <div className="space-y-6">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-dark mb-2">Step 3: Set Price & View Profit</h2>
-          <p className="text-medium">Set your selling price and see your potential earnings</p>
+          <p className="text-medium">Set your selling price and see your earnings.</p>
         </div>
 
         <div className="max-w-2xl mx-auto bg-white rounded-lg border p-6 space-y-6">
-          {/* Base Cost (Non-editable) */}
           <div>
-            <label className="block text-sm font-medium text-dark mb-2">
-              Base Cost (Fixed)
-            </label>
+            <label className="block text-sm font-medium text-dark mb-2">Base Cost</label>
             <div className="bg-gray-50 border rounded-lg p-3">
               <span className="text-lg font-semibold text-dark">
                 {formatPrice(productData.baseCost)}
               </span>
-              <p className="text-xs text-medium mt-1">
-                This is the cost of the product from Printful
-              </p>
             </div>
           </div>
 
-          {/* Retail Price (Editable) */}
           <div>
-            <label className="block text-sm font-medium text-dark mb-2">
-              Your Retail Price *
-            </label>
+            <label className="block text-sm font-medium text-dark mb-2">Retail Price</label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-medium">$</span>
               <input
@@ -464,11 +685,10 @@ const ProductCreationWizard: React.FC = () => {
                 min={productData.baseCost}
                 step="0.01"
                 className={`w-full pl-8 pr-4 py-3 border rounded-lg focus:outline-none ${
-                  isValidPrice 
-                    ? 'border-gray-300 focus:border-primary' 
+                  isValidPrice
+                    ? 'border-gray-300 focus:border-primary'
                     : 'border-red-500 focus:border-red-500'
                 }`}
-                placeholder="0.00"
               />
             </div>
             {!isValidPrice && (
@@ -478,40 +698,26 @@ const ProductCreationWizard: React.FC = () => {
             )}
           </div>
 
-          {/* Your Earnings (Calculated) */}
-          <div>
-            <label className="block text-sm font-medium text-dark mb-2">
-              Your Earnings (70% of profit)
-            </label>
-            <div className={`border rounded-lg p-3 ${
-              earnings > 0 ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'
-            }`}>
-              <span className={`text-lg font-semibold ${
-                earnings > 0 ? 'text-green-600' : 'text-gray-500'
-              }`}>
-                {formatPrice(earnings)}
-              </span>
-              <p className="text-xs text-medium mt-1">
-                Per sale after Printful costs and platform fee
-              </p>
-            </div>
-          </div>
-
-          {/* Pricing Breakdown */}
           <div className="bg-light p-4 rounded-lg">
             <h4 className="font-medium text-dark mb-3">Pricing Breakdown</h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-medium">Customer pays:</span>
-                <span className="font-medium text-dark">{formatPrice(productData.retailPrice)}</span>
+                <span className="font-medium text-dark">
+                  {formatPrice(productData.retailPrice)}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-medium">- Printful cost:</span>
-                <span className="text-red-500">-{formatPrice(productData.baseCost)}</span>
+                <span className="text-medium">Printful cost:</span>
+                <span className="text-red-500">
+                  -{formatPrice(productData.baseCost)}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-medium">- Platform fee (30%):</span>
-                <span className="text-red-500">-{formatPrice((productData.retailPrice - productData.baseCost) * 0.30)}</span>
+                <span className="text-medium">Platform fee (30%):</span>
+                <span className="text-red-500">
+                  -{formatPrice((productData.retailPrice - productData.baseCost) * 0.3)}
+                </span>
               </div>
               <hr className="border-gray-300" />
               <div className="flex justify-between font-semibold">
@@ -520,28 +726,27 @@ const ProductCreationWizard: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
 
-        {isValidPrice && (
-          <div className="flex justify-center">
-            <button
-              onClick={goToNextStep}
-              className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-red-600 transition-colors"
-            >
-              Continue to Product Details
-            </button>
-          </div>
-        )}
+          {isValidPrice && (
+            <div className="flex justify-center">
+              <button
+                onClick={goToNextStep}
+                className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-red-600 transition-colors"
+              >
+                Continue to Product Details
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     );
   };
 
-  // ################## ----- PRODUCT DETAILS STEP ----- ##################
   const ProductDetailsStep = () => (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-dark mb-2">Step 4: Add Product Details</h2>
-        <p className="text-medium">Provide information about your product for customers</p>
+        <p className="text-medium">Add the title and description your customers will see.</p>
       </div>
 
       <div className="max-w-2xl mx-auto space-y-6">
@@ -552,8 +757,9 @@ const ProductCreationWizard: React.FC = () => {
           <input
             type="text"
             value={productData.productName}
-            onChange={(e) => handleProductDetailsChange(e.target.value, productData.productDescription)}
-            placeholder="e.g., My Awesome Custom T-Shirt"
+            onChange={(e) =>
+              handleProductDetailsChange(e.target.value, productData.productDescription)
+            }
             className="w-full px-4 py-3 border rounded-lg focus:border-primary focus:outline-none"
           />
         </div>
@@ -564,14 +770,14 @@ const ProductCreationWizard: React.FC = () => {
           </label>
           <textarea
             value={productData.productDescription}
-            onChange={(e) => handleProductDetailsChange(productData.productName, e.target.value)}
-            placeholder="Describe your product and what makes it special..."
+            onChange={(e) =>
+              handleProductDetailsChange(productData.productName, e.target.value)
+            }
             rows={4}
             className="w-full px-4 py-3 border rounded-lg focus:border-primary focus:outline-none resize-none"
           />
         </div>
 
-        {/* Preview of how it will look on store */}
         <div className="bg-light p-4 rounded-lg">
           <h4 className="font-medium text-dark mb-3">Store Preview</h4>
           <div className="bg-white border rounded-lg p-4">
@@ -591,7 +797,7 @@ const ProductCreationWizard: React.FC = () => {
                   {formatPrice(productData.retailPrice)}
                 </p>
                 <p className="text-sm text-medium line-clamp-2">
-                  {productData.productDescription || 'Your product description will appear here...'}
+                  {productData.productDescription || 'Your description will appear here...'}
                 </p>
               </div>
             </div>
@@ -612,16 +818,14 @@ const ProductCreationWizard: React.FC = () => {
     </div>
   );
 
-  // ################## ----- PUBLISH STEP ----- ##################
   const PublishStep = () => (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-dark mb-2">Step 5: Publish Your Product</h2>
-        <p className="text-medium">Review your product and publish it to your store</p>
+        <p className="text-medium">Review and publish your new product.</p>
       </div>
 
       <div className="max-w-2xl mx-auto">
-        {/* Final Product Summary */}
         <div className="bg-white border rounded-lg p-6 space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
             <div>
@@ -634,41 +838,29 @@ const ProductCreationWizard: React.FC = () => {
                 />
               )}
             </div>
-            
+
             <div className="space-y-4">
               <div>
-                <h5 className="font-medium text-dark">Product Details</h5>
+                <h5 className="font-medium text-dark">Product</h5>
                 <p className="text-sm text-medium">
                   {productData.selectedProduct?.title} - {productData.selectedProduct?.brand}
                 </p>
               </div>
-              
+
               <div>
-                <h5 className="font-medium text-dark">Your Title</h5>
-                <p className="text-sm text-medium">{productData.productName}</p>
+                <h5 className="font-medium text-dark">Placement</h5>
+                <p className="text-sm text-medium">
+                  {productData.selectedPlacement?.displayName} ({productData.selectedPlacement?.mockupStyleLabel})
+                </p>
               </div>
-              
+
               <div>
                 <h5 className="font-medium text-dark">Pricing</h5>
                 <p className="text-sm text-medium">
-                  Retail: {formatPrice(productData.retailPrice)} | 
-                  Your earnings: {formatPrice(calculateEarnings(productData.retailPrice, productData.baseCost))}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <div className="flex items-start space-x-3">
-              <div className="bg-green-500 text-white rounded-full p-1">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div>
-                <h5 className="font-medium text-dark">Ready to Publish!</h5>
-                <p className="text-sm text-medium">
-                  Your product will be added to your storefront and available for purchase immediately.
+                  Retail: {formatPrice(productData.retailPrice)} | Earnings:{' '}
+                  {formatPrice(
+                    calculateEarnings(productData.retailPrice, productData.baseCost)
+                  )}
                 </p>
               </div>
             </div>
@@ -686,8 +878,23 @@ const ProductCreationWizard: React.FC = () => {
     </div>
   );
 
-  // ################## ----- MAIN RENDER ----- ##################
-  // Show loading while authentication is being determined
+  const renderStepContent = () => {
+    switch (currentStep) {
+      case ProductCreationStep.SELECT_PRODUCT:
+        return <SelectProductStep />;
+      case ProductCreationStep.CUSTOMIZE_DESIGN:
+        return <CustomizeDesignStep />;
+      case ProductCreationStep.SET_PRICING:
+        return <SetPricingStep />;
+      case ProductCreationStep.PRODUCT_DETAILS:
+        return <ProductDetailsStep />;
+      case ProductCreationStep.PUBLISH:
+        return <PublishStep />;
+      default:
+        return <SelectProductStep />;
+    }
+  };
+
   if (!user) {
     return (
       <Layout title="Create New Product | CreatorLaunch">
@@ -706,37 +913,48 @@ const ProductCreationWizard: React.FC = () => {
       <div className="min-h-screen bg-light">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
-            {/* Header with Back Button */}
             <div className="mb-8">
               <button
-                onClick={() => currentStep === ProductCreationStep.SELECT_PRODUCT ? router.back() : goToPreviousStep()}
+                onClick={() =>
+                  currentStep === ProductCreationStep.SELECT_PRODUCT
+                    ? router.back()
+                    : goToPreviousStep()
+                }
                 className="flex items-center text-medium hover:text-dark transition-colors mb-4"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                {currentStep === ProductCreationStep.SELECT_PRODUCT ? 'Back to Dashboard' : 'Previous Step'}
+                {currentStep === ProductCreationStep.SELECT_PRODUCT
+                  ? 'Back to Dashboard'
+                  : 'Previous Step'}
               </button>
 
-              {/* Progress Indicator */}
               <div className="flex items-center space-x-2 mb-4">
                 {Object.values(ProductCreationStep).map((step, index) => {
                   const isActive = step === currentStep;
-                  const isCompleted = Object.values(ProductCreationStep).indexOf(currentStep) > index;
-                  
+                  const isCompleted =
+                    Object.values(ProductCreationStep).indexOf(currentStep) > index;
+
                   return (
                     <div key={step} className="flex items-center">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                        isActive ? 'bg-primary text-white' :
-                        isCompleted ? 'bg-green-500 text-white' :
-                        'bg-gray-200 text-gray-500'
-                      }`}>
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                          isActive
+                            ? 'bg-primary text-white'
+                            : isCompleted
+                            ? 'bg-green-500 text-white'
+                            : 'bg-gray-200 text-gray-500'
+                        }`}
+                      >
                         {isCompleted ? '✓' : index + 1}
                       </div>
                       {index < Object.values(ProductCreationStep).length - 1 && (
-                        <div className={`w-8 h-1 mx-2 ${
-                          isCompleted ? 'bg-green-500' : 'bg-gray-200'
-                        }`} />
+                        <div
+                          className={`w-8 h-1 mx-2 ${
+                            isCompleted ? 'bg-green-500' : 'bg-gray-200'
+                          }`}
+                        />
                       )}
                     </div>
                   );
@@ -746,7 +964,6 @@ const ProductCreationWizard: React.FC = () => {
               <h1 className="text-3xl font-bold text-dark">Create Your Product</h1>
             </div>
 
-            {/* Error Display */}
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
                 <p className="text-red-600">{error}</p>
@@ -759,7 +976,6 @@ const ProductCreationWizard: React.FC = () => {
               </div>
             )}
 
-            {/* Step Content */}
             <div className="bg-white rounded-lg shadow-sm p-8">
               {renderStepContent()}
             </div>
