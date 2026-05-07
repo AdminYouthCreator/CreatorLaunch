@@ -2,20 +2,73 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
 
 const getAdminToken = () => {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('admin_token');
+
+  return localStorage.getItem('admin_token') || localStorage.getItem('token');
+};
+
+const saveAdminToken = (token: string) => {
+  localStorage.setItem('admin_token', token);
+  localStorage.setItem('token', token);
+};
+
+const clearAdminToken = () => {
+  localStorage.removeItem('admin_token');
+};
+
+const refreshAdminToken = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/auth/refresh-token`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      clearAdminToken();
+      return null;
+    }
+
+    const data = await response.json();
+    const newToken = data.accessToken || data.token;
+
+    if (!newToken) {
+      clearAdminToken();
+      return null;
+    }
+
+    saveAdminToken(newToken);
+    return newToken;
+  } catch (error) {
+    console.error('Admin token refresh failed:', error);
+    clearAdminToken();
+    return null;
+  }
 };
 
 const adminRequest = async (path: string, options: RequestInit = {}) => {
-  const token = getAdminToken();
+  let token = getAdminToken();
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-      ...(options.headers || {}),
-    },
-  });
+  const runRequest = async (requestToken: string | null) => {
+    return fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(requestToken ? { Authorization: `Bearer ${requestToken}` } : {}),
+        ...(options.headers || {}),
+      },
+    });
+  };
+
+  let response = await runRequest(token);
+
+  // If the access token expired, refresh once and retry.
+  if (response.status === 401 || response.status === 403) {
+    token = await refreshAdminToken();
+
+    if (token) {
+      response = await runRequest(token);
+    }
+  }
 
   const data = await response.json().catch(() => ({}));
 
