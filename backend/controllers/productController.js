@@ -70,9 +70,9 @@ exports.generateMockup = asyncHandler(async (req, res) => {
       uploadedFileStatus: uploadedFile?.status,
     });
 
-    const filesPayload = [
+const filesPayload = [
   {
-    placement: parsedPlacement?.placement || 'front',
+    type: 'default',
     image_url: uploadedFile.url,
     position: parsedPlacement?.position,
   },
