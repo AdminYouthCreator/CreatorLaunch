@@ -3,20 +3,34 @@ import { useRouter } from 'next/router';
 import Layout from '@/components/common/Layout';
 import { storeAPI } from '@/utils/api';
 import { formatPrice } from '@/utils/printful';
+import { useCartContext } from '@/context/CartContext';
 
-// ################## ----- PRODUCT INTERFACES ----- ##################
 interface ProductData {
   id: string;
+  _id?: string;
   name: string;
   price: number;
+  retailPrice?: number;
   description: string;
   images: string[];
+  imageUrl?: string;
+  mockupUrl?: string;
+  variants?: Array<{
+    retailPrice: number;
+    price?: number;
+    size?: string;
+    color?: string;
+    mockupUrl?: string;
+    imageUrl?: string;
+    printfulVariantId?: number;
+    baseCost?: number;
+  }>;
   storeOwner: {
     name: string;
     storeName: string;
     storeUrl: string;
   };
-  printfulProduct: {
+  printfulProduct?: {
     title: string;
     brand: string;
     model: string;
@@ -24,57 +38,116 @@ interface ProductData {
     features: string[];
     materials: string[];
     careInstructions: string[];
-    sizing?: {
-      chart: string;
-      guide: string;
-    };
   };
 }
 
-// ################## ----- STOREFRONT PRODUCT PAGE COMPONENT ----- ##################
-// Public product page shown on user's storefront
-// Follows the specified layout: user content, then Printful product info
-// ########################################################################
 const StorefrontProductPage: React.FC = () => {
   const router = useRouter();
   const { storeUrl, productId } = router.query;
+  const { addItem, toggleCart } = useCartContext();
+
   const [product, setProduct] = useState<ProductData | null>(null);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // ################## ----- LOAD PRODUCT DATA ----- ##################
+  const storePath = typeof storeUrl === 'string' ? `/store/${storeUrl}` : '/';
+
   useEffect(() => {
     if (storeUrl && productId) {
       loadProductData();
     }
   }, [storeUrl, productId]);
 
+  const normalizeProductResponse = (response: any): ProductData => {
+    const productData = response?.data || response?.product || response;
+    const storeData = response?.store;
+
+    const firstVariant = productData?.variants?.[0] || {};
+    const imageUrl =
+      productData?.imageUrl ||
+      productData?.mockupUrl ||
+      productData?.image ||
+      productData?.thumbnail ||
+      firstVariant?.mockupUrl ||
+      firstVariant?.imageUrl ||
+      '';
+
+    const price =
+      Number(productData?.price) ||
+      Number(productData?.retailPrice) ||
+      Number(firstVariant?.retailPrice) ||
+      Number(firstVariant?.price) ||
+      0;
+
+    return {
+      id: productData?.id || productData?._id,
+      _id: productData?._id,
+      name: productData?.name || 'Untitled Product',
+      description: productData?.description || '',
+      price,
+      retailPrice: price,
+      images: productData?.images?.length ? productData.images : [imageUrl].filter(Boolean),
+      imageUrl,
+      mockupUrl: imageUrl,
+      variants: productData?.variants || [],
+      storeOwner: productData?.storeOwner || {
+        name: storeData?.owner || 'Creator',
+        storeName: storeData?.brandName || 'Store',
+        storeUrl: storeData?.subdomain || String(storeUrl || ''),
+      },
+      printfulProduct: productData?.printfulProduct || {
+        title: productData?.name || '',
+        brand: storeData?.brandName || '',
+        model: '',
+        description: productData?.description || '',
+        features: [],
+        materials: [],
+        careInstructions: [],
+      },
+    };
+  };
+
   const loadProductData = async () => {
     try {
       setIsLoading(true);
       setError('');
-      
-      // Load product data from store API
+
       const response = await storeAPI.getStoreProduct(storeUrl as string, productId as string);
-      setProduct(response.data || response);
+      setProduct(normalizeProductResponse(response));
     } catch (err: any) {
-      setError(err.message || 'Failed to load product');
+      setError(err?.response?.data?.message || err.message || 'Failed to load product');
       console.error('Failed to load product:', err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ################## ----- ADD TO CART HANDLER ----- ##################
   const handleAddToCart = () => {
-    // TODO: Implement add to cart functionality
-    console.log('Adding to cart:', { productId, quantity });
-    alert(`Added ${quantity} item(s) to cart!`);
+    if (!product || typeof storeUrl !== 'string') return;
+
+    const firstVariant = product.variants?.[0];
+
+    addItem({
+      id: product.id || product._id || String(productId),
+      brandId: storeUrl,
+      brandSubdomain: storeUrl,
+      name: product.name,
+      unitPrice: product.price,
+      itemType: 'product',
+      quantity,
+      variant: {
+        size: firstVariant?.size || '',
+        color: firstVariant?.color || '',
+        printfulVariantId: firstVariant?.printfulVariantId,
+      },
+      mockupUrl: product.imageUrl || product.mockupUrl || product.images?.[0],
+    } as any);
+
+    toggleCart();
   };
 
-  // ################## ----- LOADING STATE ----- ##################
   if (isLoading) {
     return (
       <Layout title="Loading... | CreatorLaunch">
@@ -88,7 +161,6 @@ const StorefrontProductPage: React.FC = () => {
     );
   }
 
-  // ################## ----- ERROR STATE ----- ##################
   if (error || !product) {
     return (
       <Layout title="Product Not Found | CreatorLaunch">
@@ -96,10 +168,10 @@ const StorefrontProductPage: React.FC = () => {
           <div className="text-center">
             <h1 className="text-2xl font-bold text-dark mb-4">Product Not Found</h1>
             <p className="text-medium mb-6">
-              {error || 'The product you\'re looking for doesn\'t exist or has been removed.'}
+              {error || "The product you're looking for doesn't exist or has been removed."}
             </p>
             <button
-              onClick={() => router.push(`https://${storeUrl}`)}
+              onClick={() => router.push(storePath)}
               className="bg-primary text-white px-6 py-3 rounded-lg font-medium hover:bg-red-600 transition-colors"
             >
               Back to Store
@@ -110,16 +182,16 @@ const StorefrontProductPage: React.FC = () => {
     );
   }
 
-  // ################## ----- MAIN RENDER ----- ##################
+  const mainImage = product.images?.[selectedImage] || product.imageUrl || product.mockupUrl || '';
+
   return (
     <Layout title={`${product.name} | ${product.storeOwner.storeName}`}>
       <div className="min-h-screen bg-light">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-6xl mx-auto">
-            {/* Breadcrumb */}
             <nav className="mb-8">
               <button
-                onClick={() => router.push(`https://${storeUrl}`)}
+                onClick={() => router.push(storePath)}
                 className="text-medium hover:text-primary transition-colors"
               >
                 ← Back to {product.storeOwner.storeName}
@@ -127,18 +199,19 @@ const StorefrontProductPage: React.FC = () => {
             </nav>
 
             <div className="grid lg:grid-cols-2 gap-12">
-              {/* Product Images */}
               <div className="space-y-4">
-                {/* Main Image */}
-                <div className="bg-white rounded-lg overflow-hidden shadow-sm">
-                  <img
-                    src={product.images[selectedImage]}
-                    alt={product.name}
-                    className="w-full h-96 object-cover"
-                  />
+                <div className="bg-white rounded-lg overflow-hidden shadow-sm min-h-[24rem] flex items-center justify-center">
+                  {mainImage ? (
+                    <img
+                      src={mainImage}
+                      alt={product.name}
+                      className="w-full h-96 object-cover"
+                    />
+                  ) : (
+                    <div className="text-gray-400">No product image</div>
+                  )}
                 </div>
 
-                {/* Thumbnail Gallery */}
                 {product.images.length > 1 && (
                   <div className="grid grid-cols-4 gap-3">
                     {product.images.map((image, index) => (
@@ -146,7 +219,9 @@ const StorefrontProductPage: React.FC = () => {
                         key={index}
                         onClick={() => setSelectedImage(index)}
                         className={`bg-white rounded-lg overflow-hidden border-2 transition-colors ${
-                          selectedImage === index ? 'border-primary' : 'border-gray-200 hover:border-gray-300'
+                          selectedImage === index
+                            ? 'border-primary'
+                            : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
                         <img
@@ -160,18 +235,17 @@ const StorefrontProductPage: React.FC = () => {
                 )}
               </div>
 
-              {/* Product Information */}
               <div className="space-y-6">
-                {/* User's Product Information */}
                 <div>
                   <h1 className="text-3xl font-bold text-dark mb-4">{product.name}</h1>
-                  <p className="text-3xl font-bold text-primary mb-6">{formatPrice(product.price)}</p>
-                  <div className="prose prose-gray max-w-none">
-                    <p className="text-medium leading-relaxed">{product.description}</p>
-                  </div>
+                  <p className="text-3xl font-bold text-primary mb-6">
+                    {formatPrice(product.price)}
+                  </p>
+                  <p className="text-medium leading-relaxed">
+                    {product.description || 'No description available.'}
+                  </p>
                 </div>
 
-                {/* Quantity and Add to Cart */}
                 <div className="bg-white rounded-lg p-6 shadow-sm">
                   <div className="flex items-center space-x-4 mb-6">
                     <label className="text-dark font-medium">Quantity:</label>
@@ -200,12 +274,11 @@ const StorefrontProductPage: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Store Owner Info */}
                 <div className="bg-white rounded-lg p-6 shadow-sm">
                   <h3 className="font-semibold text-dark mb-2">Sold by</h3>
                   <p className="text-medium">{product.storeOwner.name}</p>
                   <button
-                    onClick={() => router.push(`https://${storeUrl}`)}
+                    onClick={() => router.push(storePath)}
                     className="text-primary hover:text-red-600 transition-colors mt-2"
                   >
                     Visit {product.storeOwner.storeName} →
@@ -214,87 +287,13 @@ const StorefrontProductPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Horizontal Rule Separator */}
             <hr className="my-12 border-gray-300" />
 
-            {/* About This Product Section */}
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-2xl font-bold text-dark mb-8">About This Product</h2>
-              
-              <div className="bg-white rounded-lg shadow-sm p-8 space-y-8">
-                {/* Product Details */}
-                <div>
-                  <h3 className="text-xl font-semibold text-dark mb-4">{product.printfulProduct.title}</h3>
-                  <p className="text-medium mb-4">{product.printfulProduct.description}</p>
-                  <p className="text-sm text-medium">
-                    <strong>Brand:</strong> {product.printfulProduct.brand} | 
-                    <strong> Model:</strong> {product.printfulProduct.model}
-                  </p>
-                </div>
-
-                {/* Features & Materials */}
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div>
-                    <h4 className="font-semibold text-dark mb-3">Features</h4>
-                    <ul className="space-y-2">
-                      {product.printfulProduct.features.map((feature, index) => (
-                        <li key={index} className="text-sm text-medium flex items-start">
-                          <span className="w-1.5 h-1.5 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></span>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold text-dark mb-3">Materials</h4>
-                    <ul className="space-y-2">
-                      {product.printfulProduct.materials.map((material, index) => (
-                        <li key={index} className="text-sm text-medium flex items-start">
-                          <span className="w-1.5 h-1.5 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></span>
-                          {material}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                {/* Care Instructions */}
-                <div>
-                  <h4 className="font-semibold text-dark mb-3">Care Instructions</h4>
-                  <ul className="grid md:grid-cols-2 gap-2">
-                    {product.printfulProduct.careInstructions.map((instruction, index) => (
-                      <li key={index} className="text-sm text-medium flex items-start">
-                        <span className="w-1.5 h-1.5 bg-primary rounded-full mr-3 mt-2 flex-shrink-0"></span>
-                        {instruction}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Sizing Information */}
-                {product.printfulProduct.sizing && (
-                  <div>
-                    <h4 className="font-semibold text-dark mb-3">Sizing</h4>
-                    <p className="text-sm text-medium mb-4">{product.printfulProduct.sizing.guide}</p>
-                    <button
-                      onClick={() => product.printfulProduct.sizing?.chart && window.open(product.printfulProduct.sizing.chart, '_blank')}
-                      className="text-primary hover:text-red-600 transition-colors text-sm font-medium"
-                    >
-                      View Size Chart →
-                    </button>
-                  </div>
-                )}
-
-                {/* Fulfillment Info */}
-                <div className="bg-light p-4 rounded-lg">
-                  <h4 className="font-semibold text-dark mb-2">Fulfillment & Shipping</h4>
-                  <p className="text-sm text-medium">
-                    This product is made-to-order and printed just for you! Orders typically ship within 2-7 business days. 
-                    Each item is printed with care using high-quality materials and processes.
-                  </p>
-                </div>
-              </div>
+            <div className="bg-white rounded-lg p-8 shadow-sm">
+              <h2 className="text-2xl font-bold text-dark mb-4">Product Details</h2>
+              <p className="text-medium">
+                This product is sold through a CreatorLaunch student storefront.
+              </p>
             </div>
           </div>
         </div>
