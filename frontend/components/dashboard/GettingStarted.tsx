@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { productAPI } from '@/utils/api';
 
 // ################## ----- TASK INTERFACE ----- ##################
 // Structure for individual getting started tasks
@@ -31,11 +32,45 @@ export const GettingStarted: React.FC<GettingStartedProps> = ({
   onTaskComplete,
   className = ''
 }) => {
+  const [hasProduct, setHasProduct] = useState(false);
+  const [isCheckingProducts, setIsCheckingProducts] = useState(true);
+
+  useEffect(() => {
+    checkProductProgress();
+  }, []);
+
+  const checkProductProgress = async () => {
+    try {
+      setIsCheckingProducts(true);
+
+      const response = await productAPI.getAll();
+
+      let products = [];
+
+      if (Array.isArray(response)) {
+        products = response;
+      } else if (Array.isArray(response?.products)) {
+        products = response.products;
+      } else if (Array.isArray(response?.data)) {
+        products = response.data;
+      } else if (Array.isArray(response?.data?.products)) {
+        products = response.data.products;
+      }
+
+      setHasProduct(products.length > 0);
+    } catch (error) {
+      console.error('Failed to check product onboarding progress:', error);
+      setHasProduct(false);
+    } finally {
+      setIsCheckingProducts(false);
+    }
+  };
+
   // ################## ----- TASKS CONFIGURATION ----- ##################
   // Defines the getting started checklist for new users
   // Tasks are ordered by typical user workflow progression
   // ################################################################
-  const [tasks, setTasks] = useState<Task[]>([
+  const tasks: Task[] = [
     {
       id: 'signup',
       title: 'Sign up for an account',
@@ -52,7 +87,7 @@ export const GettingStarted: React.FC<GettingStartedProps> = ({
       id: 'first-product',
       title: 'Create your first product',
       description: 'Add your first product to start selling',
-      completed: false,
+      completed: hasProduct,
       actionUrl: '/products/new',
       actionText: 'Add Product'
     },
@@ -64,7 +99,7 @@ export const GettingStarted: React.FC<GettingStartedProps> = ({
       actionUrl: '/store/share',
       actionText: 'Share Store'
     }
-  ]);
+  ];
 
   const completedTasks = tasks.filter(task => task.completed).length;
   const totalTasks = tasks.length;
@@ -81,7 +116,7 @@ export const GettingStarted: React.FC<GettingStartedProps> = ({
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-bold text-dark">Getting Started</h2>
         <span className="text-sm text-medium">
-          {completedTasks}/{totalTasks} completed
+          {isCheckingProducts ? 'Checking...' : `${completedTasks}/${totalTasks} completed`}
         </span>
       </div>
 
@@ -92,7 +127,7 @@ export const GettingStarted: React.FC<GettingStartedProps> = ({
           <span className="text-sm text-medium">{Math.round(progressPercentage)}%</span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
+          <div
             className="bg-primary h-2 rounded-full transition-all duration-300 ease-out"
             style={{ width: `${progressPercentage}%` }}
           ></div>
@@ -101,12 +136,12 @@ export const GettingStarted: React.FC<GettingStartedProps> = ({
 
       {/* Task List */}
       <div className="space-y-4">
-        {tasks.map((task, index) => (
-          <div 
+        {tasks.map((task) => (
+          <div
             key={task.id}
             className={`flex items-start space-x-3 p-4 rounded-lg border-2 transition-colors ${
-              task.completed 
-                ? 'bg-green-50 border-green-200' 
+              task.completed
+                ? 'bg-green-50 border-green-200'
                 : 'bg-gray-50 border-gray-200 hover:border-primary'
             }`}
           >
