@@ -65,6 +65,8 @@ router.patch('/:productId/status', protect, productController.updateProductStatu
 
 router.patch('/:productId', protect, productController.updateProductStatus);
 
+router.put('/:productId', protect, productController.updateProduct);
+
 router.delete('/:productId', protect, productController.deleteProduct);
 
 router.post('/', protect, createProductValidator, productController.createProduct);
