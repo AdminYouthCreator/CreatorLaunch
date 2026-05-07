@@ -401,6 +401,11 @@ export const orderAPI = {
     return response.data;
   },
 
+  updateFulfillment: async (orderId: string, data: { fulfillmentStatus: string }) => {
+    const response = await api.patch(`/api/orders/${orderId}/fulfillment`, data);
+    return response.data;
+  },
+
   getMetrics: async () => {
     const response = await api.get('/api/orders/metrics');
     return response.data;
