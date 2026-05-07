@@ -10,6 +10,8 @@ import {
   FiMenu,
   FiX,
   FiHome,
+  FiShield,
+  FiClock,
 } from 'react-icons/fi';
 
 interface AdminLayoutProps {
@@ -36,10 +38,22 @@ const menuItems = [
     permission: 'stores.read',
   },
   {
+    href: '/admin/security',
+    icon: FiShield,
+    label: 'Security',
+    permission: 'users.write',
+  },
+  {
     href: '/admin/analytics',
     icon: FiBarChart,
     label: 'Analytics',
     permission: 'analytics.read',
+  },
+  {
+    href: '/admin/audit-logs',
+    icon: FiClock,
+    label: 'Audit Logs',
+    permission: 'settings.read',
   },
 ];
 
@@ -74,6 +88,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       <div className={`admin-sidebar ${sidebarOpen ? 'mobile-open' : ''}`}>
         <div className="admin-sidebar-header">
           <img src="/assets/header-logo.png" alt="CreatorLaunch" className="admin-logo" />
+
           <div>
             <h2>CreatorLaunch</h2>
             <p style={{ color: '#9ca3af', fontSize: '0.8rem' }}>Admin Panel</p>
