@@ -385,5 +385,58 @@ export const serviceAPI = {
   },
 };
 
+// ################## ----- ORDER API FUNCTIONS ----- ##################
+// Order/dashboard related API calls
+// ################################################################
+
+export const orderAPI = {
+  getAll: async () => {
+    const response = await api.get('/api/orders');
+    return response.data;
+  },
+
+  getById: async (orderId: string) => {
+    const response = await api.get(`/api/orders/${orderId}`);
+    return response.data;
+  },
+
+  getMetrics: async () => {
+    const response = await api.get('/api/orders/metrics');
+    return response.data;
+  },
+
+  getDashboardMetrics: async () => {
+    const response = await api.get('/api/orders/metrics');
+    return response.data;
+  },
+};
+
+// ################## ----- CHECKOUT API FUNCTIONS ----- ##################
+// Checkout/payment related API calls
+// ################################################################
+
+export const checkoutAPI = {
+  createCheckoutSession: async (checkoutData: any) => {
+    const response = await api.post('/api/checkout/create-session', checkoutData);
+    return response.data;
+  },
+};
+
+// ################## ----- STORE API FUNCTIONS ----- ##################
+// Public storefront related API calls
+// ################################################################
+
+export const storeAPI = {
+  getStore: async (storeUrl: string) => {
+    const response = await api.get(`/api/store/${storeUrl}`);
+    return response.data;
+  },
+
+  getProduct: async (storeUrl: string, productId: string) => {
+    const response = await api.get(`/api/store/${storeUrl}/products/${productId}`);
+    return response.data;
+  },
+};
+
 // Export the main api instance for custom calls
 export default api;
