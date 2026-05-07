@@ -57,6 +57,41 @@ const userSchema = new mongoose.Schema({
     default: 'Creator',
   },
 
+  accountStatus: {
+    type: String,
+    enum: ['active', 'pending_verification', 'suspended', 'banned', 'locked'],
+    default: 'active',
+    index: true,
+  },
+
+  accountStatusReason: {
+    type: String,
+    default: '',
+    maxlength: 1000,
+  },
+
+  accountStatusUpdatedAt: {
+    type: Date,
+    default: null,
+  },
+
+  accountStatusUpdatedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    default: null,
+  },
+
+  forcePasswordReset: {
+    type: Boolean,
+    default: false,
+  },
+
+  adminNotes: {
+    type: String,
+    default: '',
+    maxlength: 3000,
+  },
+
   invitedByCode: {
     type: String,
     default: null,
@@ -92,6 +127,10 @@ userSchema.methods.isMinor = function () {
   );
 
   return age < 18;
+};
+
+userSchema.methods.canLogin = function () {
+  return !['suspended', 'banned', 'locked'].includes(this.accountStatus);
 };
 
 userSchema.methods.createPasswordResetToken = function () {
