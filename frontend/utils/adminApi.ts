@@ -102,33 +102,17 @@ const adminRequest = async (path: string, options: RequestInit = {}) => {
 };
 
 export const adminAPI = {
-  getOverview: async () => {
-    return adminRequest('/api/admin/overview');
-  },
-
-  getUsers: async () => {
-    return adminRequest('/api/admin/users');
-  },
-
-  getStores: async () => {
-    return adminRequest('/api/admin/stores');
-  },
-
-  getProducts: async () => {
-    return adminRequest('/api/admin/products');
-  },
-
-  getServices: async () => {
-    return adminRequest('/api/admin/services');
-  },
+  getOverview: async () => adminRequest('/api/admin/overview'),
+  getUsers: async () => adminRequest('/api/admin/users'),
+  getStores: async () => adminRequest('/api/admin/stores'),
+  getProducts: async () => adminRequest('/api/admin/products'),
+  getServices: async () => adminRequest('/api/admin/services'),
 
   getAnalytics: async (range = '30d') => {
     return adminRequest(`/api/admin/analytics?range=${encodeURIComponent(range)}`);
   },
 
-  getInvites: async () => {
-    return adminRequest('/api/invites');
-  },
+  getInvites: async () => adminRequest('/api/invites'),
 
   createInvite: async (payload: {
     email?: string;
@@ -249,5 +233,34 @@ export const adminAPI = {
 
   getAuditLogs: async (limit = 100) => {
     return adminRequest(`/api/admin/moderation/audit-logs?limit=${encodeURIComponent(limit)}`);
+  },
+
+  getBlogPosts: async () => {
+    return adminRequest('/api/admin/blog');
+  },
+
+  getBlogPost: async (postId: string) => {
+    return adminRequest(`/api/admin/blog/${postId}`);
+  },
+
+  createBlogPost: async (payload: any) => {
+    return adminRequest('/api/admin/blog', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  updateBlogPost: async (postId: string, payload: any) => {
+    return adminRequest(`/api/admin/blog/${postId}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  archiveBlogPost: async (postId: string, reason = '') => {
+    return adminRequest(`/api/admin/blog/${postId}`, {
+      method: 'DELETE',
+      body: JSON.stringify({ reason }),
+    });
   },
 };
