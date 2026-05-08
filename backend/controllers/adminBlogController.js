@@ -12,28 +12,17 @@ const makeSlug = (value) => {
 
 const normalizeTags = (tags) => {
   if (Array.isArray(tags)) {
-    return tags
-      .map((tag) => String(tag).trim())
-      .filter(Boolean);
+    return tags.map((tag) => String(tag).trim()).filter(Boolean);
   }
 
   if (typeof tags === 'string') {
-    return tags
-      .split(',')
-      .map((tag) => tag.trim())
-      .filter(Boolean);
+    return tags.split(',').map((tag) => tag.trim()).filter(Boolean);
   }
 
   return [];
 };
 
-const createAuditLog = async ({
-  req,
-  action,
-  targetId,
-  reason = '',
-  metadata = {},
-}) => {
+const createAuditLog = async ({ req, action, targetId, reason = '', metadata = {} }) => {
   await AuditLog.create({
     admin: req.user?._id || req.user?.id || null,
     action,
@@ -44,6 +33,27 @@ const createAuditLog = async ({
     ipAddress: req.ip || '',
     userAgent: req.headers['user-agent'] || '',
   });
+};
+
+const publishDueScheduledPosts = async () => {
+  const now = new Date();
+
+  await BlogPost.updateMany(
+    {
+      status: 'scheduled',
+      scheduledFor: { $lte: now },
+    },
+    [
+      {
+        $set: {
+          status: 'published',
+          publishedAt: {
+            $ifNull: ['$publishedAt', '$scheduledFor'],
+          },
+        },
+      },
+    ]
+  );
 };
 
 const normalizeAdminPost = (post) => {
@@ -61,6 +71,7 @@ const normalizeAdminPost = (post) => {
     status: obj.status,
     publishedAt: obj.publishedAt,
     scheduledFor: obj.scheduledFor,
+    displayOrder: obj.displayOrder || 0,
     tags: obj.tags || [],
     seoTitle: obj.seoTitle || '',
     seoDescription: obj.seoDescription || '',
@@ -94,12 +105,31 @@ const ensureUniqueSlug = async (slug, ignoreId = null) => {
   }
 };
 
+const getNextDisplayOrder = async () => {
+  const lastPost = await BlogPost.findOne().sort({ displayOrder: -1 }).select('displayOrder');
+  return Number(lastPost?.displayOrder || 0) + 1;
+};
+
 // @desc    Get all blog posts for admin
-// @route   GET /api/admin/blog
+// @route   GET /api/admin/blog?sort=custom|newest|oldest
 // @access  Admin
 exports.getAdminPosts = asyncHandler(async (req, res) => {
+  await publishDueScheduledPosts();
+
+  const sort = req.query.sort || 'custom';
+
+  let sortQuery = { displayOrder: 1, publishedAt: -1, createdAt: -1 };
+
+  if (sort === 'newest') {
+    sortQuery = { publishedAt: -1, scheduledFor: -1, createdAt: -1 };
+  }
+
+  if (sort === 'oldest') {
+    sortQuery = { publishedAt: 1, scheduledFor: 1, createdAt: 1 };
+  }
+
   const posts = await BlogPost.find()
-    .sort({ createdAt: -1 })
+    .sort(sortQuery)
     .populate('createdBy', 'username email role')
     .populate('updatedBy', 'username email role');
 
@@ -112,6 +142,8 @@ exports.getAdminPosts = asyncHandler(async (req, res) => {
 // @route   GET /api/admin/blog/:postId
 // @access  Admin
 exports.getAdminPostById = asyncHandler(async (req, res) => {
+  await publishDueScheduledPosts();
+
   const post = await BlogPost.findById(req.params.postId);
 
   if (!post) {
@@ -149,6 +181,17 @@ exports.createAdminPost = asyncHandler(async (req, res) => {
   }
 
   const finalSlug = await ensureUniqueSlug(slug || title);
+  const displayOrder = await getNextDisplayOrder();
+
+  const now = new Date();
+  const parsedScheduledFor = scheduledFor ? new Date(scheduledFor) : null;
+  let finalStatus = status;
+  let finalPublishedAt = status === 'published' ? new Date() : null;
+
+  if (status === 'scheduled' && parsedScheduledFor && parsedScheduledFor <= now) {
+    finalStatus = 'published';
+    finalPublishedAt = parsedScheduledFor;
+  }
 
   const post = await BlogPost.create({
     title,
@@ -158,14 +201,15 @@ exports.createAdminPost = asyncHandler(async (req, res) => {
     coverImageUrl,
     authorName,
     authorTitle,
-    status,
-    scheduledFor: scheduledFor || null,
+    status: finalStatus,
+    scheduledFor: parsedScheduledFor,
     tags: normalizeTags(tags),
     seoTitle,
     seoDescription,
     createdBy: req.user?._id || req.user?.id || null,
     updatedBy: req.user?._id || req.user?.id || null,
-    publishedAt: status === 'published' ? new Date() : null,
+    publishedAt: finalPublishedAt,
+    displayOrder,
   });
 
   await createAuditLog({
@@ -176,6 +220,7 @@ exports.createAdminPost = asyncHandler(async (req, res) => {
       title: post.title,
       slug: post.slug,
       status: post.status,
+      displayOrder: post.displayOrder,
     },
   });
 
@@ -199,6 +244,7 @@ exports.updateAdminPost = asyncHandler(async (req, res) => {
     title: post.title,
     slug: post.slug,
     status: post.status,
+    displayOrder: post.displayOrder,
   };
 
   const {
@@ -211,6 +257,7 @@ exports.updateAdminPost = asyncHandler(async (req, res) => {
     authorTitle,
     status,
     scheduledFor,
+    displayOrder,
     tags,
     seoTitle,
     seoDescription,
@@ -230,19 +277,34 @@ exports.updateAdminPost = asyncHandler(async (req, res) => {
     post.slug = await ensureUniqueSlug(slug || post.slug || title, post._id);
   }
 
-  if (typeof status === 'string') {
-    const wasPublished = post.status === 'published';
-    post.status = status;
-
-    if (status === 'published' && !wasPublished && !post.publishedAt) {
-      post.publishedAt = new Date();
-    }
+  if (typeof displayOrder === 'number' && Number.isFinite(displayOrder)) {
+    post.displayOrder = displayOrder;
   }
 
+  let parsedScheduledFor = post.scheduledFor;
+
   if (scheduledFor) {
-    post.scheduledFor = new Date(scheduledFor);
+    parsedScheduledFor = new Date(scheduledFor);
+    post.scheduledFor = parsedScheduledFor;
   } else if (scheduledFor === null || scheduledFor === '') {
+    parsedScheduledFor = null;
     post.scheduledFor = null;
+  }
+
+  if (typeof status === 'string') {
+    const now = new Date();
+
+    if (status === 'scheduled' && parsedScheduledFor && parsedScheduledFor <= now) {
+      post.status = 'published';
+      post.publishedAt = parsedScheduledFor;
+    } else {
+      const wasPublished = post.status === 'published';
+      post.status = status;
+
+      if (status === 'published' && !wasPublished && !post.publishedAt) {
+        post.publishedAt = new Date();
+      }
+    }
   }
 
   if (tags !== undefined) {
@@ -264,6 +326,7 @@ exports.updateAdminPost = asyncHandler(async (req, res) => {
         title: post.title,
         slug: post.slug,
         status: post.status,
+        displayOrder: post.displayOrder,
       },
     },
   });
@@ -271,6 +334,42 @@ exports.updateAdminPost = asyncHandler(async (req, res) => {
   res.status(200).json({
     message: 'Blog post updated.',
     post: normalizeAdminPost(post),
+  });
+});
+
+// @desc    Reorder blog posts
+// @route   PATCH /api/admin/blog/reorder
+// @access  Admin
+exports.reorderAdminPosts = asyncHandler(async (req, res) => {
+  const { orderedIds = [] } = req.body;
+
+  if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
+    return res.status(400).json({ message: 'orderedIds must be a non-empty array.' });
+  }
+
+  await Promise.all(
+    orderedIds.map((postId, index) => {
+      return BlogPost.findByIdAndUpdate(postId, {
+        displayOrder: index + 1,
+        updatedBy: req.user?._id || req.user?.id || null,
+      });
+    })
+  );
+
+  await createAuditLog({
+    req,
+    action: 'blog.reordered',
+    targetId: null,
+    metadata: {
+      orderedIds,
+    },
+  });
+
+  const posts = await BlogPost.find().sort({ displayOrder: 1, publishedAt: -1, createdAt: -1 });
+
+  res.status(200).json({
+    message: 'Blog posts reordered.',
+    posts: posts.map(normalizeAdminPost),
   });
 });
 
