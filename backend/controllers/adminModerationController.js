@@ -340,7 +340,12 @@ exports.adminUpdateService = asyncHandler(async (req, res) => {
   if (typeof category === 'string') service.category = category;
   if (typeof deliveryTime === 'string') service.deliveryTime = deliveryTime;
   if (typeof requirements === 'string') service.requirements = requirements;
-  if (typeof status === 'string') service.status = status;
+  if (typeof status === 'string') {
+  service.status = status;
+  service.moderationReason = reason;
+  service.moderationUpdatedAt = new Date();
+  service.moderationUpdatedBy = getAdminId(req);
+}
 
   const nextPrice = Number(price);
   if (Number.isFinite(nextPrice) && nextPrice >= 0) {
