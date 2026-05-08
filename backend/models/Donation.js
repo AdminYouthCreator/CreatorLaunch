@@ -126,12 +126,10 @@ const donationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-donationSchema.pre('save', function cleanEmptyReceiptNumber(next) {
+donationSchema.pre('save', function cleanEmptyReceiptNumber() {
   if (this.receiptNumber === '') {
     this.receiptNumber = undefined;
   }
-
-  next();
 });
 
 donationSchema.index(
