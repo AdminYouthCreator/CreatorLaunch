@@ -12,6 +12,8 @@ import {
   FiHome,
   FiShield,
   FiClock,
+  FiPackage,
+  FiTool,
 } from 'react-icons/fi';
 
 interface AdminLayoutProps {
@@ -36,6 +38,18 @@ const menuItems = [
     icon: FiShoppingBag,
     label: 'Stores',
     permission: 'stores.read',
+  },
+  {
+    href: '/admin/products',
+    icon: FiPackage,
+    label: 'Products',
+    permission: 'stores.write',
+  },
+  {
+    href: '/admin/services',
+    icon: FiTool,
+    label: 'Services',
+    permission: 'stores.write',
   },
   {
     href: '/admin/security',
