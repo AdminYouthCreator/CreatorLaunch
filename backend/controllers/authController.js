@@ -8,8 +8,16 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const { generateAccessToken, generateRefreshToken } = require('../utils/generateToken');
 
-const isInviteOnlyEnabled = () => {
-  return process.env.INVITE_ONLY !== 'false';
+const PlatformSettings = require('../models/PlatformSettings');
+
+const isInviteOnlyEnabled = async () => {
+  let settings = await PlatformSettings.findOne({ singletonKey: 'platform' });
+
+  if (!settings) {
+    settings = await PlatformSettings.create({ singletonKey: 'platform' });
+  }
+
+  return Boolean(settings.inviteOnlyEnabled);
 };
 
 const isBootstrapAdminEmail = (email) => {
