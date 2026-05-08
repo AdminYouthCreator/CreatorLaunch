@@ -128,6 +128,24 @@ export const adminAPI = {
     return adminRequest(`/api/admin/analytics?range=${encodeURIComponent(range)}`);
   },
 
+getSettings: async () => {
+  return adminRequest('/api/admin/settings');
+},
+
+updateSettings: async (payload: {
+  platformLocked?: boolean;
+  platformLockMessage?: string;
+  inviteOnlyEnabled?: boolean;
+  siteAnnouncementEnabled?: boolean;
+  siteAnnouncementText?: string;
+  reason?: string;
+}) => {
+  return adminRequest('/api/admin/settings', {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+},
+  
   // ################## ----- INVITES ----- ##################
 
   getInvites: async () => {
