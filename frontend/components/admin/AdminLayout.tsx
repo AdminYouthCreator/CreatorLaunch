@@ -14,6 +14,7 @@ import {
   FiClock,
   FiPackage,
   FiTool,
+  FiEdit3,
 } from 'react-icons/fi';
 
 interface AdminLayoutProps {
@@ -50,6 +51,12 @@ const menuItems = [
     icon: FiTool,
     label: 'Services',
     permission: 'stores.write',
+  },
+  {
+    href: '/admin/blog',
+    icon: FiEdit3,
+    label: 'Blog',
+    permission: 'settings.write',
   },
   {
     href: '/admin/security',
