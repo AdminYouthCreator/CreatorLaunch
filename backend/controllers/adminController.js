@@ -113,13 +113,19 @@ const normalizeUser = (user, brandMap, todoMap) => {
   const brand = brandMap.get(String(user._id));
   const todo = todoMap.get(String(user._id));
   const age = getUserAge(user.dob);
+  const accountStatus = user.accountStatus || 'active';
 
   return {
     id: user._id,
     name: user.username,
     email: user.email,
     role: user.role,
-    status: user.emailVerified ? 'active' : 'inactive',
+    status: accountStatus,
+    accountStatus,
+    accountStatusReason: user.accountStatusReason || '',
+    accountStatusUpdatedAt: user.accountStatusUpdatedAt || null,
+    forcePasswordReset: Boolean(user.forcePasswordReset),
+    adminNotes: user.adminNotes || '',
     registrationDate: user.createdAt,
     lastLogin: null,
     storeCount: brand ? 1 : 0,
@@ -129,6 +135,91 @@ const normalizeUser = (user, brandMap, todoMap) => {
     age,
     emailVerified: user.emailVerified,
     invitedByCode: user.invitedByCode || null,
+  };
+};
+
+const normalizeProduct = (product) => {
+  const obj = product.toObject ? product.toObject() : product;
+  const firstVariant = obj.variants?.[0] || {};
+
+  const price =
+    Number(obj.price) ||
+    Number(obj.retailPrice) ||
+    Number(firstVariant.retailPrice) ||
+    Number(firstVariant.price) ||
+    0;
+
+  const imageUrl =
+    obj.imageUrl ||
+    obj.image ||
+    obj.thumbnail ||
+    obj.mockupUrl ||
+    firstVariant.mockupUrl ||
+    firstVariant.imageUrl ||
+    '';
+
+  return {
+    id: obj._id,
+    name: obj.name || 'Untitled Product',
+    description: obj.description || '',
+    status: obj.status || 'published',
+    price,
+    retailPrice: price,
+    imageUrl,
+    mockupUrl: imageUrl,
+    variants: obj.variants || [],
+    createdAt: obj.createdAt,
+    updatedAt: obj.updatedAt,
+    brand: obj.brand
+      ? {
+          id: obj.brand._id || obj.brand,
+          name: obj.brand.brandName || 'Unknown Store',
+          subdomain: obj.brand.subdomain || '',
+          status: obj.brand.status || 'active',
+          owner: obj.brand.user
+            ? {
+                id: obj.brand.user._id || obj.brand.user,
+                name: obj.brand.user.username || 'Unknown Creator',
+                email: obj.brand.user.email || '',
+                accountStatus: obj.brand.user.accountStatus || 'active',
+              }
+            : null,
+        }
+      : null,
+  };
+};
+
+const normalizeService = (service) => {
+  const obj = service.toObject ? service.toObject() : service;
+
+  return {
+    id: obj._id,
+    title: obj.title || 'Untitled Service',
+    description: obj.description || '',
+    category: obj.category || 'other',
+    price: Number(obj.price || 0),
+    deliveryTime: obj.deliveryTime || '',
+    revisions: Number(obj.revisions || 0),
+    requirements: obj.requirements || '',
+    status: obj.status || 'draft',
+    createdAt: obj.createdAt,
+    updatedAt: obj.updatedAt,
+    brand: obj.brand
+      ? {
+          id: obj.brand._id || obj.brand,
+          name: obj.brand.brandName || 'Unknown Store',
+          subdomain: obj.brand.subdomain || '',
+          status: obj.brand.status || 'active',
+          owner: obj.brand.user
+            ? {
+                id: obj.brand.user._id || obj.brand.user,
+                name: obj.brand.user.username || 'Unknown Creator',
+                email: obj.brand.user.email || '',
+                accountStatus: obj.brand.user.accountStatus || 'active',
+              }
+            : null,
+        }
+      : null,
   };
 };
 
@@ -159,8 +250,11 @@ const normalizeStore = async (brand) => {
       id: brand.user?._id || brand.user,
       name: brand.user?.username || 'Unknown Creator',
       email: brand.user?.email || '',
+      accountStatus: brand.user?.accountStatus || 'active',
     },
-    status: 'active',
+    status: brand.status || 'active',
+    statusReason: brand.statusReason || '',
+    adminNotes: brand.adminNotes || '',
     createdDate: brand.createdAt,
     lastActivity: brand.updatedAt || brand.createdAt,
     productCount,
@@ -168,7 +262,7 @@ const normalizeStore = async (brand) => {
     totalSales: Number(totalSales.toFixed(2)),
     monthlyRevenue: Number(monthlyRevenue.toFixed(2)),
     category: 'Creator Store',
-    isApproved: true,
+    isApproved: brand.status === 'active',
   };
 };
 
@@ -231,9 +325,6 @@ const buildRecentActivity = async () => {
     .slice(0, 12);
 };
 
-// @desc    Admin dashboard overview
-// @route   GET /api/admin/overview
-// @access  Admin
 exports.getOverview = asyncHandler(async (req, res) => {
   const monthStart = new Date();
   monthStart.setDate(1);
@@ -242,7 +333,9 @@ exports.getOverview = asyncHandler(async (req, res) => {
   const [
     totalUsers,
     verifiedUsers,
+    restrictedUsers,
     totalStores,
+    restrictedStores,
     totalProducts,
     totalServices,
     paidOrders,
@@ -252,7 +345,9 @@ exports.getOverview = asyncHandler(async (req, res) => {
   ] = await Promise.all([
     User.countDocuments(),
     User.countDocuments({ emailVerified: true }),
+    User.countDocuments({ accountStatus: { $in: ['suspended', 'banned', 'locked'] } }),
     Brand.countDocuments(),
+    Brand.countDocuments({ status: { $in: ['locked', 'hidden', 'suspended', 'under_review'] } }),
     Product.countDocuments(),
     Service.countDocuments(),
     Order.find({ paymentStatus: 'paid' }).select('total'),
@@ -268,22 +363,21 @@ exports.getOverview = asyncHandler(async (req, res) => {
     stats: {
       totalUsers,
       activeUsers: verifiedUsers,
+      restrictedUsers,
       totalStores,
-      activeStores: totalStores,
+      activeStores: Math.max(totalStores - restrictedStores, 0),
+      restrictedStores,
       totalProducts,
       totalServices,
       totalRevenue: Number(totalRevenue.toFixed(2)),
       monthlyRevenue: Number(monthlyRevenue.toFixed(2)),
       pendingApprovals: pendingInvites,
-      systemAlerts: 0,
+      systemAlerts: restrictedUsers + restrictedStores,
     },
     recentActivity,
   });
 });
 
-// @desc    Admin user list
-// @route   GET /api/admin/users
-// @access  Admin
 exports.getUsers = asyncHandler(async (req, res) => {
   const [users, brands, todos] = await Promise.all([
     User.find().sort({ createdAt: -1 }).select('-password'),
@@ -299,22 +393,50 @@ exports.getUsers = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Admin store list
-// @route   GET /api/admin/stores
-// @access  Admin
 exports.getStores = asyncHandler(async (req, res) => {
   const brands = await Brand.find()
     .sort({ createdAt: -1 })
-    .populate('user', 'username email role');
+    .populate('user', 'username email role accountStatus');
 
   const stores = await Promise.all(brands.map((brand) => normalizeStore(brand)));
 
   res.status(200).json({ stores });
 });
 
-// @desc    Admin analytics
-// @route   GET /api/admin/analytics?range=30d
-// @access  Admin
+exports.getProducts = asyncHandler(async (req, res) => {
+  const products = await Product.find()
+    .sort({ createdAt: -1 })
+    .populate({
+      path: 'brand',
+      select: 'brandName subdomain status user',
+      populate: {
+        path: 'user',
+        select: 'username email accountStatus',
+      },
+    });
+
+  res.status(200).json({
+    products: products.map(normalizeProduct),
+  });
+});
+
+exports.getServices = asyncHandler(async (req, res) => {
+  const services = await Service.find()
+    .sort({ createdAt: -1 })
+    .populate({
+      path: 'brand',
+      select: 'brandName subdomain status user',
+      populate: {
+        path: 'user',
+        select: 'username email accountStatus',
+      },
+    });
+
+  res.status(200).json({
+    services: services.map(normalizeService),
+  });
+});
+
 exports.getAnalytics = asyncHandler(async (req, res) => {
   const range = req.query.range || '30d';
   const startDate = getStartDate(range);
