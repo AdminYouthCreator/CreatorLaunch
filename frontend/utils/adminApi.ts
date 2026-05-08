@@ -128,6 +128,16 @@ export const adminAPI = {
     return adminRequest(`/api/admin/analytics?range=${encodeURIComponent(range)}`);
   },
 
+    getDonations: async () => {
+    return adminRequest('/api/donations/admin');
+  },
+
+  resendDonationReceipt: async (donationId: string) => {
+    return adminRequest(`/api/donations/admin/${donationId}/resend-receipt`, {
+      method: 'POST',
+    });
+  },
+
 getSettings: async () => {
   return adminRequest('/api/admin/settings');
 },
