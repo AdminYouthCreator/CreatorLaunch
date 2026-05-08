@@ -5,6 +5,7 @@ const {
   getAdminPostById,
   createAdminPost,
   updateAdminPost,
+  reorderAdminPosts,
   archiveAdminPost,
 } = require('../controllers/adminBlogController');
 
@@ -17,6 +18,7 @@ router.use(authorizeRoles('Admin'));
 
 router.get('/', getAdminPosts);
 router.post('/', createAdminPost);
+router.patch('/reorder', reorderAdminPosts);
 router.get('/:postId', getAdminPostById);
 router.put('/:postId', updateAdminPost);
 router.delete('/:postId', archiveAdminPost);
