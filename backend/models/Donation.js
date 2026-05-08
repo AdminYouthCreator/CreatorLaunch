@@ -109,9 +109,8 @@ const donationSchema = new mongoose.Schema(
 
     receiptNumber: {
       type: String,
-      default: '',
-      unique: true,
-      sparse: true,
+      trim: true,
+      default: undefined,
     },
 
     paidAt: {
@@ -125,6 +124,28 @@ const donationSchema = new mongoose.Schema(
     },
   },
   { timestamps: true }
+);
+
+donationSchema.pre('save', function cleanEmptyReceiptNumber(next) {
+  if (this.receiptNumber === '') {
+    this.receiptNumber = undefined;
+  }
+
+  next();
+});
+
+donationSchema.index(
+  { receiptNumber: 1 },
+  {
+    unique: true,
+    sparse: true,
+    partialFilterExpression: {
+      receiptNumber: {
+        $type: 'string',
+        $ne: '',
+      },
+    },
+  }
 );
 
 module.exports = mongoose.model('Donation', donationSchema);
