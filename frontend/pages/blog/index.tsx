@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import PublicHeader from '@/components/public/PublicHeader';
+import { Footer } from '@/components/common/Footer';
 
 interface BlogPost {
   id: string;
@@ -11,128 +13,12 @@ interface BlogPost {
   authorName: string;
   authorTitle?: string;
   publishedAt?: string;
+  scheduledFor?: string;
+  displayOrder?: number;
   tags: string[];
 }
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
-
-const PublicHeader = () => {
-  return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
-          <Link href="/" className="flex items-center gap-3">
-            <img
-              src="/assets/header-logo.png"
-              alt="CreatorLaunch"
-              className="h-10 w-auto"
-            />
-            <span className="text-2xl font-bold text-dark">CreatorLaunch</span>
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-8">
-            <Link href="/" className="text-dark hover:text-primary font-medium">
-              Home
-            </Link>
-            <Link href="/about" className="text-dark hover:text-primary font-medium">
-              About
-            </Link>
-            <Link href="/about/team" className="text-dark hover:text-primary font-medium">
-              Team
-            </Link>
-            <Link href="/partners" className="text-dark hover:text-primary font-medium">
-              Partners
-            </Link>
-            <Link href="/blog" className="text-primary font-bold">
-              Blog
-            </Link>
-            <Link href="/contact" className="text-dark hover:text-primary font-medium">
-              Contact
-            </Link>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/auth/login"
-              className="hidden sm:inline-block text-dark hover:text-primary font-medium"
-            >
-              Login
-            </Link>
-
-            <Link
-              href="/donate"
-              className="bg-primary text-white px-5 py-2 rounded-lg font-bold hover:bg-red-600 transition-colors"
-            >
-              Donate
-            </Link>
-          </div>
-        </div>
-      </div>
-    </header>
-  );
-};
-
-const PublicFooter = () => {
-  return (
-    <footer className="bg-dark text-white py-12">
-      <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-4 gap-8">
-          <div className="md:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <img
-                src="/assets/header-logo.png"
-                alt="CreatorLaunch"
-                className="h-10 w-auto"
-              />
-              <span className="text-2xl font-bold">CreatorLaunch</span>
-            </div>
-
-            <p className="text-gray-300 max-w-md">
-              A St. Louis nonprofit dedicated to youth entrepreneurship. Founded and run by youth.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-bold mb-4">Explore</h3>
-            <div className="space-y-2">
-              <Link href="/about" className="block text-gray-300 hover:text-white">
-                About
-              </Link>
-              <Link href="/about/team" className="block text-gray-300 hover:text-white">
-                Team
-              </Link>
-              <Link href="/partners" className="block text-gray-300 hover:text-white">
-                Partners
-              </Link>
-              <Link href="/blog" className="block text-gray-300 hover:text-white">
-                Blog
-              </Link>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="font-bold mb-4">Get Involved</h3>
-            <div className="space-y-2">
-              <Link href="/contact" className="block text-gray-300 hover:text-white">
-                Contact
-              </Link>
-              <Link href="/donate" className="block text-gray-300 hover:text-white">
-                Donate
-              </Link>
-              <Link href="/auth/register" className="block text-gray-300 hover:text-white">
-                Join Waitlist
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t border-gray-700 mt-10 pt-6 text-gray-400 text-sm">
-          © 2025 CreatorLaunch, NPO.
-        </div>
-      </div>
-    </footer>
-  );
-};
 
 const BlogPage: React.FC = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -148,7 +34,7 @@ const BlogPage: React.FC = () => {
       setLoading(true);
       setError('');
 
-      const response = await fetch(`${API_BASE_URL}/api/blog`);
+      const response = await fetch(`${API_BASE_URL}/api/blog?sort=custom`);
       const data = await response.json();
 
       if (!response.ok) {
@@ -241,7 +127,7 @@ const BlogPage: React.FC = () => {
 
                     <div className="p-6">
                       <p className="text-sm text-medium mb-3">
-                        {formatDate(post.publishedAt)} | {post.authorName}
+                        {formatDate(post.publishedAt || post.scheduledFor)} | {post.authorName}
                       </p>
 
                       <h2 className="text-2xl font-bold text-dark mb-3">
@@ -251,6 +137,19 @@ const BlogPage: React.FC = () => {
                       <p className="text-medium mb-5">
                         {post.excerpt}
                       </p>
+
+                      {post.tags?.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mb-5">
+                          {post.tags.slice(0, 3).map((tag) => (
+                            <span
+                              key={tag}
+                              className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
 
                       <Link
                         href={`/blog/${post.slug}`}
@@ -267,7 +166,7 @@ const BlogPage: React.FC = () => {
         </section>
       </main>
 
-      <PublicFooter />
+      <Footer />
     </>
   );
 };
