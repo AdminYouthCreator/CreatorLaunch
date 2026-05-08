@@ -30,24 +30,30 @@ const normalizePublicPost = (post, includeContent = false) => {
   return normalized;
 };
 
+// ################## ----- SCHEDULED POST AUTO-PUBLISH ----- ##################
+// Mongoose update pipelines caused this error:
+// "Cannot pass an array to query updates unless the updatePipeline option is set."
+// So this uses find + save instead.
+// ###########################################################################
 const publishDueScheduledPosts = async () => {
   const now = new Date();
 
-  await BlogPost.updateMany(
-    {
-      status: 'scheduled',
-      scheduledFor: { $lte: now },
-    },
-    [
-      {
-        $set: {
-          status: 'published',
-          publishedAt: {
-            $ifNull: ['$publishedAt', '$scheduledFor'],
-          },
-        },
-      },
-    ]
+  const duePosts = await BlogPost.find({
+    status: 'scheduled',
+    scheduledFor: { $lte: now },
+  });
+
+  await Promise.all(
+    duePosts.map(async (post) => {
+      post.status = 'published';
+
+      // Keep the original scheduled date as the published date.
+      if (!post.publishedAt) {
+        post.publishedAt = post.scheduledFor || now;
+      }
+
+      await post.save();
+    })
   );
 };
 
@@ -58,21 +64,31 @@ const getPublicQuery = () => {
 };
 
 // @desc    Get public blog posts
-// @route   GET /api/blog
+// @route   GET /api/blog?sort=custom|newest|oldest
 // @access  Public
 exports.getPublicPosts = asyncHandler(async (req, res) => {
   await publishDueScheduledPosts();
 
   const sort = req.query.sort || 'custom';
 
-  let sortQuery = { displayOrder: 1, publishedAt: -1, createdAt: -1 };
+  let sortQuery = {
+    displayOrder: 1,
+    publishedAt: -1,
+    createdAt: -1,
+  };
 
   if (sort === 'newest') {
-    sortQuery = { publishedAt: -1, createdAt: -1 };
+    sortQuery = {
+      publishedAt: -1,
+      createdAt: -1,
+    };
   }
 
   if (sort === 'oldest') {
-    sortQuery = { publishedAt: 1, createdAt: 1 };
+    sortQuery = {
+      publishedAt: 1,
+      createdAt: 1,
+    };
   }
 
   const posts = await BlogPost.find(getPublicQuery())
