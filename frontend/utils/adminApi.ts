@@ -114,6 +114,14 @@ export const adminAPI = {
     return adminRequest('/api/admin/stores');
   },
 
+  getProducts: async () => {
+    return adminRequest('/api/admin/products');
+  },
+
+  getServices: async () => {
+    return adminRequest('/api/admin/services');
+  },
+
   getAnalytics: async (range = '30d') => {
     return adminRequest(`/api/admin/analytics?range=${encodeURIComponent(range)}`);
   },
