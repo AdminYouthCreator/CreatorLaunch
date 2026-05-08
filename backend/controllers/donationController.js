@@ -68,6 +68,10 @@ const normalizeDonation = (donation) => {
   };
 };
 
+const formatMoney = (amount, currency = 'usd') => {
+  return `$${Number(amount || 0).toFixed(2)} ${String(currency || 'usd').toUpperCase()}`;
+};
+
 const buildTaxReceiptEmail = (donation) => {
   const legalName = process.env.CREATORLAUNCH_LEGAL_NAME || 'CreatorLaunch';
   const ein = process.env.CREATORLAUNCH_EIN || '';
@@ -77,35 +81,64 @@ const buildTaxReceiptEmail = (donation) => {
 
   const donationDate = donation.receivedDate || donation.paidAt || donation.createdAt || new Date();
   const isItemDonation = donation.donationKind === 'item';
+  const receiptNumber = donation.receiptNumber || createReceiptNumber(donation._id);
 
   return `
-Thank you for supporting ${legalName}.
+Dear ${donation.donorName || 'CreatorLaunch Supporter'},
 
-Donation Receipt / Charitable Contribution Acknowledgement
+Thank you for believing in young founders.
 
-Receipt Number: ${donation.receiptNumber || createReceiptNumber(donation._id)}
+Your contribution helps CreatorLaunch continue building a youth-led launchpad where students can learn real business skills, create products and services, participate in workshops, and turn ideas into real ventures.
+
+CreatorLaunch is founded by youth, run by youth, and built for youth — and your support helps remove the barriers that stop young people from starting.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DONATION RECEIPT / CHARITABLE CONTRIBUTION ACKNOWLEDGEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Receipt Number: ${receiptNumber}
+Organization: ${legalName}
+${ein ? `EIN: ${ein}` : ''}
 Donor Name: ${donation.donorName || 'Supporter'}
 ${donation.donorEmail ? `Donor Email: ${donation.donorEmail}` : ''}
 ${donation.donorPhone ? `Donor Phone: ${donation.donorPhone}` : ''}
 ${donation.donorAddress ? `Donor Address: ${donation.donorAddress}` : ''}
 
 Donation Date: ${new Date(donationDate).toLocaleDateString()}
-Campaign: ${donation.campaign || 'General Fund'}
-Donation Source: ${donation.source === 'manual' ? 'Manual / Offline Donation' : 'Online Stripe Donation'}
-Donation Type: ${isItemDonation ? 'In-kind item donation' : donation.recurring ? 'Monthly recurring donation' : 'One-time cash donation'}
+Campaign / Fund: ${donation.campaign || 'General Fund'}
+Donation Source: ${donation.source === 'manual' ? 'Manual / Offline Donation' : 'Online Donation'}
+Donation Type: ${
+    isItemDonation
+      ? 'In-kind item donation'
+      : donation.recurring
+        ? 'Monthly recurring monetary donation'
+        : 'One-time monetary donation'
+  }
 
 ${
   isItemDonation
-    ? `Item Description: ${donation.itemDescription || 'In-kind contribution'}${
-        Number(donation.estimatedValue || 0) > 0
-          ? `\nDonor/organization entered estimated value: $${Number(donation.estimatedValue || 0).toFixed(2)}`
-          : ''
-      }`
-    : `Donation Amount: $${Number(donation.amount || 0).toFixed(2)} ${String(donation.currency || 'usd').toUpperCase()}`
+    ? `Item Description:
+${donation.itemDescription || 'In-kind contribution'}
+
+${
+  Number(donation.estimatedValue || 0) > 0
+    ? `Estimated Value Entered: ${formatMoney(donation.estimatedValue, donation.currency)}`
+    : 'Estimated Value Entered: Not provided'
+}`
+    : `Donation Amount: ${formatMoney(donation.amount, donation.currency)}`
 }
 
-Organization: ${legalName}
-${ein ? `EIN: ${ein}` : ''}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+YOUR IMPACT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Your support helps fund hands-on youth entrepreneurship education, workshop materials, student business tools, launch capital, pitch opportunities, and the continued development of the CreatorLaunch platform.
+
+Every donation helps us move closer to a future where a student's age, income, or connections do not decide whether their idea gets a chance.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TAX ACKNOWLEDGEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ${taxStatusText}
 
@@ -115,12 +148,14 @@ ${
     : ''
 }
 
-${donation.acknowledgementNotes ? `Additional Notes: ${donation.acknowledgementNotes}` : ''}
+${donation.acknowledgementNotes ? `Additional Notes:\n${donation.acknowledgementNotes}\n` : ''}
 
 Please keep this receipt for your records.
 
 With gratitude,
+
 The CreatorLaunch Team
+Building the next generation of founders.
 `.trim();
 };
 
@@ -136,7 +171,7 @@ const sendTaxReceiptIfNeeded = async (donation) => {
 
     await sendEmail({
       to: donation.donorEmail,
-      subject: `Your CreatorLaunch Donation Receipt - ${donation.receiptNumber}`,
+      subject: `Thank you for supporting CreatorLaunch — Receipt ${donation.receiptNumber}`,
       text: buildTaxReceiptEmail(donation),
     });
 

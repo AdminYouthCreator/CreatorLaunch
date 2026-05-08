@@ -6,7 +6,6 @@ import {
   FiRefreshCw,
   FiSearch,
   FiMail,
-  FiRepeat,
   FiCheckCircle,
   FiClock,
   FiXCircle,
@@ -227,6 +226,15 @@ const AdminDonationsPage: React.FC = () => {
     return new Date(date).toLocaleString();
   };
 
+  const escapeHtml = (value?: string | number | null) => {
+    return String(value ?? '')
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  };
+
   const getStatusClass = (status: string) => {
     if (status === 'paid') return 'bg-green-100 text-green-700';
     if (status === 'pending') return 'bg-yellow-100 text-yellow-700';
@@ -371,174 +379,403 @@ const AdminDonationsPage: React.FC = () => {
   const buildPrintableSheet = (donation: AdminDonation) => {
     const legalName = 'CreatorLaunch';
     const isItem = donation.donationKind === 'item';
+    const receiptNumber = donation.receiptNumber || 'Pending Receipt Number';
+    const displayAmount = formatCurrency(donation.amount || donation.estimatedValue || 0);
+    const donationDate = formatDate(donation.receivedDate || donation.paidAt || donation.createdAt);
 
     return `
 <!doctype html>
 <html>
 <head>
-  <title>${donation.receiptNumber || 'Donation Receipt'}</title>
+  <title>${escapeHtml(receiptNumber)} - CreatorLaunch Donation Acknowledgement</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
       color: #111827;
       padding: 40px;
       line-height: 1.5;
+      background: #f3f4f6;
     }
+
     .sheet {
-      max-width: 800px;
+      max-width: 850px;
       margin: 0 auto;
+      background: #ffffff;
       border: 1px solid #d1d5db;
-      padding: 36px;
-      border-radius: 12px;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
     }
-    .header {
+
+    .brand-bar {
+      height: 12px;
+      background: linear-gradient(90deg, #dc2626, #1d4ed8, #111827);
+    }
+
+    .content {
+      padding: 42px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      gap: 28px;
       border-bottom: 2px solid #111827;
-      padding-bottom: 18px;
-      margin-bottom: 24px;
+      padding-bottom: 24px;
+      margin-bottom: 28px;
     }
+
+    .brand-title {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #dc2626;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
     h1 {
       margin: 0;
-      font-size: 26px;
+      font-size: 30px;
+      line-height: 1.15;
+      color: #111827;
     }
+
     .subtitle {
       color: #4b5563;
-      margin-top: 6px;
+      margin-top: 10px;
+      font-size: 15px;
+      max-width: 520px;
     }
+
+    .receipt-box {
+      min-width: 210px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      background: #f9fafb;
+      text-align: right;
+    }
+
+    .receipt-label {
+      font-size: 11px;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+    }
+
     .receipt-number {
-      font-weight: bold;
-      margin-top: 14px;
-      font-size: 16px;
+      margin-top: 4px;
+      font-size: 17px;
+      font-weight: 900;
+      color: #111827;
     }
+
+    .mission-card {
+      background: linear-gradient(135deg, #fff1f2, #eff6ff);
+      border: 1px solid #fee2e2;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 26px;
+    }
+
+    .mission-card h2 {
+      margin: 0 0 8px 0;
+      font-size: 20px;
+      color: #111827;
+    }
+
+    .mission-card p {
+      margin: 0;
+      color: #374151;
+      font-size: 14px;
+    }
+
+    .impact-line {
+      margin-top: 12px;
+      font-weight: 800;
+      color: #b91c1c;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px 28px;
+      gap: 16px 30px;
       margin-top: 20px;
     }
+
+    .field {
+      border-bottom: 1px solid #f3f4f6;
+      padding-bottom: 10px;
+    }
+
     .field-label {
-      font-size: 12px;
+      font-size: 11px;
       text-transform: uppercase;
       color: #6b7280;
-      font-weight: bold;
-      letter-spacing: 0.04em;
+      font-weight: 800;
+      letter-spacing: 0.06em;
     }
+
     .field-value {
       font-size: 15px;
-      margin-top: 2px;
+      margin-top: 3px;
+      font-weight: 600;
+      color: #111827;
+      word-break: break-word;
     }
+
     .section {
-      margin-top: 26px;
-      padding-top: 20px;
+      margin-top: 28px;
+      padding-top: 22px;
       border-top: 1px solid #e5e7eb;
     }
+
+    .section h3 {
+      margin: 0 0 10px 0;
+      font-size: 17px;
+      color: #111827;
+    }
+
+    .paragraph {
+      color: #374151;
+      font-size: 14px;
+      margin: 0;
+      white-space: pre-wrap;
+    }
+
     .notice {
-      margin-top: 26px;
-      padding: 16px;
+      margin-top: 28px;
+      padding: 18px;
       background: #f9fafb;
       border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      font-size: 14px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      color: #374151;
     }
+
+    .notice strong {
+      color: #111827;
+    }
+
     .invalidated {
       color: #991b1b;
-      font-weight: bold;
+      font-weight: 900;
       border: 2px solid #991b1b;
-      padding: 10px;
+      background: #fef2f2;
+      padding: 12px;
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
+      border-radius: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
+
     .signature {
-      margin-top: 42px;
+      margin-top: 34px;
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: flex-end;
     }
+
+    .signature-message {
+      color: #374151;
+      font-size: 14px;
+    }
+
+    .signature-name {
+      margin-top: 10px;
+      font-size: 18px;
+      font-weight: 900;
+      color: #111827;
+    }
+
+    .tagline {
+      font-size: 12px;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .footer {
+      margin-top: 30px;
+      padding-top: 18px;
+      border-top: 1px solid #e5e7eb;
+      color: #6b7280;
+      font-size: 12px;
+      text-align: center;
+    }
+
     @media print {
       body {
         padding: 0;
+        background: #ffffff;
       }
+
       .sheet {
         border: none;
+        box-shadow: none;
+        border-radius: 0;
+      }
+
+      .content {
+        padding: 32px;
       }
     }
   </style>
 </head>
 <body>
   <div class="sheet">
-    ${
-      donation.paymentStatus === 'invalidated'
-        ? `<div class="invalidated">INVALIDATED — ${donation.invalidationReason || ''}</div>`
-        : ''
-    }
+    <div class="brand-bar"></div>
 
-    <div class="header">
-      <h1>Donation Receipt / Charitable Contribution Acknowledgement</h1>
-      <div class="subtitle">${legalName}</div>
-      <div class="receipt-number">Receipt Number: ${donation.receiptNumber || '—'}</div>
-    </div>
-
-    <div class="grid">
-      <div>
-        <div class="field-label">Donor Name</div>
-        <div class="field-value">${donation.anonymous ? 'Anonymous' : donation.donorName || 'Supporter'}</div>
-      </div>
-      <div>
-        <div class="field-label">Donor Email</div>
-        <div class="field-value">${donation.donorEmail || '—'}</div>
-      </div>
-      <div>
-        <div class="field-label">Donor Phone</div>
-        <div class="field-value">${donation.donorPhone || '—'}</div>
-      </div>
-      <div>
-        <div class="field-label">Donation Date</div>
-        <div class="field-value">${formatDate(donation.receivedDate || donation.paidAt || donation.createdAt)}</div>
-      </div>
-      <div>
-        <div class="field-label">Campaign / Fund</div>
-        <div class="field-value">${donation.campaign || 'General Fund'}</div>
-      </div>
-      <div>
-        <div class="field-label">Donation Type</div>
-        <div class="field-value">${isItem ? 'In-kind item donation' : 'Cash / monetary donation'}</div>
-      </div>
-      <div>
-        <div class="field-label">Payment Method</div>
-        <div class="field-value">${donation.paymentMethod || donation.source}</div>
-      </div>
-      <div>
-        <div class="field-label">${isItem ? 'Estimated Value' : 'Amount'}</div>
-        <div class="field-value">${formatCurrency(donation.amount || donation.estimatedValue || 0)}</div>
-      </div>
-    </div>
-
-    ${
-      donation.donorAddress
-        ? `<div class="section"><div class="field-label">Donor Address</div><div class="field-value">${donation.donorAddress}</div></div>`
-        : ''
-    }
-
-    ${
-      isItem
-        ? `<div class="section"><div class="field-label">Item Description</div><div class="field-value">${donation.itemDescription || '—'}</div></div>`
-        : ''
-    }
-
-    ${
-      donation.acknowledgementNotes
-        ? `<div class="section"><div class="field-label">Additional Notes</div><div class="field-value">${donation.acknowledgementNotes}</div></div>`
-        : ''
-    }
-
-    <div class="notice">
-      CreatorLaunch is a tax-exempt nonprofit organization. No goods or services were provided in exchange for this contribution.
+    <div class="content">
       ${
-        isItem
-          ? ' For in-kind contributions, the donor is responsible for determining the tax-deductible value of donated goods.'
+        donation.paymentStatus === 'invalidated'
+          ? `<div class="invalidated">Invalidated Record — ${escapeHtml(donation.invalidationReason || 'No reason provided')}</div>`
           : ''
       }
-    </div>
 
-    <div class="signature">
-      With gratitude,<br />
-      <strong>The CreatorLaunch Team</strong>
+      <div class="top">
+        <div>
+          <div class="brand-title">CreatorLaunch</div>
+          <h1>Donation Receipt & Charitable Contribution Acknowledgement</h1>
+          <div class="subtitle">
+            Thank you for helping us build a youth-led launchpad where young founders can learn, create, pitch, and launch real ventures.
+          </div>
+        </div>
+
+        <div class="receipt-box">
+          <div class="receipt-label">Receipt Number</div>
+          <div class="receipt-number">${escapeHtml(receiptNumber)}</div>
+          <div style="margin-top: 12px;" class="receipt-label">Status</div>
+          <div class="receipt-number" style="font-size: 14px; text-transform: capitalize;">
+            ${escapeHtml(donation.paymentStatus)}
+          </div>
+        </div>
+      </div>
+
+      <div class="mission-card">
+        <h2>Founded by youth. Run by youth. Built for youth.</h2>
+        <p>
+          CreatorLaunch exists to remove the barriers that stop students from turning ideas into real businesses.
+          Your support helps provide hands-on workshops, business tools, student launch resources, pitch opportunities,
+          and the platform we are building for the next generation of founders.
+        </p>
+        <div class="impact-line">
+          This is more than a donation — it is fuel for a young creator's first launch.
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="field">
+          <div class="field-label">Donor Name</div>
+          <div class="field-value">${escapeHtml(donation.anonymous ? 'Anonymous' : donation.donorName || 'Supporter')}</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Donor Email</div>
+          <div class="field-value">${escapeHtml(donation.donorEmail || '—')}</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Donor Phone</div>
+          <div class="field-value">${escapeHtml(donation.donorPhone || '—')}</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Donation Date</div>
+          <div class="field-value">${escapeHtml(donationDate)}</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Campaign / Fund</div>
+          <div class="field-value">${escapeHtml(donation.campaign || 'General Fund')}</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Donation Type</div>
+          <div class="field-value">${escapeHtml(isItem ? 'In-kind item donation' : 'Monetary donation')}</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Payment / Contribution Method</div>
+          <div class="field-value">${escapeHtml(donation.paymentMethod || donation.source)}</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">${escapeHtml(isItem ? 'Estimated Value Entered' : 'Donation Amount')}</div>
+          <div class="field-value">${escapeHtml(displayAmount)}</div>
+        </div>
+      </div>
+
+      ${
+        donation.donorAddress
+          ? `<div class="section">
+              <h3>Donor Address</h3>
+              <p class="paragraph">${escapeHtml(donation.donorAddress)}</p>
+            </div>`
+          : ''
+      }
+
+      ${
+        isItem
+          ? `<div class="section">
+              <h3>In-Kind Donation Description</h3>
+              <p class="paragraph">${escapeHtml(donation.itemDescription || 'In-kind contribution')}</p>
+            </div>`
+          : ''
+      }
+
+      ${
+        donation.acknowledgementNotes
+          ? `<div class="section">
+              <h3>Additional Acknowledgement Notes</h3>
+              <p class="paragraph">${escapeHtml(donation.acknowledgementNotes)}</p>
+            </div>`
+          : ''
+      }
+
+      <div class="section">
+        <h3>Your Impact</h3>
+        <p class="paragraph">
+Your contribution supports CreatorLaunch programs that help young people move from idea to action. It helps us create practical entrepreneurship experiences, provide access to tools and resources, support student business launches, and build a platform where youth creators can grow safely and confidently.
+        </p>
+      </div>
+
+      <div class="notice">
+        <strong>Tax acknowledgement:</strong> CreatorLaunch is a tax-exempt nonprofit organization.
+        No goods or services were provided in exchange for this contribution.
+        ${
+          isItem
+            ? ' For in-kind contributions, the donor is responsible for determining the tax-deductible value of donated goods.'
+            : ''
+        }
+        Please keep this acknowledgement for your records.
+      </div>
+
+      <div class="signature">
+        <div>
+          <div class="signature-message">With gratitude,</div>
+          <div class="signature-name">The CreatorLaunch Team</div>
+        </div>
+
+        <div class="tagline">
+          Building the next<br />
+          generation of founders
+        </div>
+      </div>
+
+      <div class="footer">
+        ${escapeHtml(legalName)} • Donation acknowledgement generated by CreatorLaunch Admin • ${escapeHtml(receiptNumber)}
+      </div>
     </div>
   </div>
 </body>
@@ -1181,6 +1418,14 @@ const AdminDonationsPage: React.FC = () => {
                     INVALIDATED: {viewingSheet.invalidationReason || 'No reason provided.'}
                   </div>
                 )}
+
+                <div className="bg-gradient-to-br from-red-50 to-blue-50 border border-red-100 rounded-xl p-5">
+                  <h3 className="text-xl font-bold mb-2">Thank you for supporting young founders.</h3>
+                  <p className="text-gray-700 text-sm">
+                    This acknowledgement helps document support for CreatorLaunch’s youth-led mission:
+                    helping students learn real business skills, build real ventures, and launch with confidence.
+                  </p>
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
