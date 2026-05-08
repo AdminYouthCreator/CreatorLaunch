@@ -10,18 +10,19 @@ const variantSchema = new mongoose.Schema(
     retailPrice: {
       type: Number,
       required: true,
-      default: 0,
+      min: 0,
     },
 
     price: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
     baseCost: {
       type: Number,
       required: true,
-      default: 0,
+      min: 0,
     },
 
     size: {
@@ -86,15 +87,16 @@ const productSchema = new mongoose.Schema(
       default: '',
     },
 
-    // Top-level display fields for the frontend product cards
     price: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
     retailPrice: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
     imageUrl: {
@@ -117,20 +119,51 @@ const productSchema = new mongoose.Schema(
       default: '',
     },
 
-    variants: {
-      type: [variantSchema],
-      default: [],
-    },
+    variants: [variantSchema],
 
     status: {
       type: String,
-      enum: ['published', 'draft', 'archived', 'active', 'inactive', 'processing'],
+      enum: [
+        'published',
+        'active',
+        'inactive',
+        'draft',
+        'hidden',
+        'removed',
+        'under_review',
+        'archived',
+      ],
       default: 'published',
+      index: true,
     },
 
     isActive: {
       type: Boolean,
       default: false,
+      index: true,
+    },
+
+    adminNotes: {
+      type: String,
+      default: '',
+      maxlength: 3000,
+    },
+
+    moderationReason: {
+      type: String,
+      default: '',
+      maxlength: 1000,
+    },
+
+    moderationUpdatedAt: {
+      type: Date,
+      default: null,
+    },
+
+    moderationUpdatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
     },
   },
   { timestamps: true }
