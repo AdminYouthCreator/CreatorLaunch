@@ -102,8 +102,6 @@ const adminRequest = async (path: string, options: RequestInit = {}) => {
 };
 
 export const adminAPI = {
-  // ################## ----- OVERVIEW / DATA ----- ##################
-
   getOverview: async () => {
     return adminRequest('/api/admin/overview');
   },
@@ -128,8 +126,47 @@ export const adminAPI = {
     return adminRequest(`/api/admin/analytics?range=${encodeURIComponent(range)}`);
   },
 
-    getDonations: async () => {
+  getSettings: async () => {
+    return adminRequest('/api/admin/settings');
+  },
+
+  updateSettings: async (payload: {
+    platformLocked?: boolean;
+    platformLockMessage?: string;
+    inviteOnlyEnabled?: boolean;
+    siteAnnouncementEnabled?: boolean;
+    siteAnnouncementText?: string;
+    reason?: string;
+  }) => {
+    return adminRequest('/api/admin/settings', {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  getDonations: async () => {
     return adminRequest('/api/donations/admin');
+  },
+
+  createManualDonation: async (payload: any) => {
+    return adminRequest('/api/donations/admin/manual', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  updateManualDonation: async (donationId: string, payload: any) => {
+    return adminRequest(`/api/donations/admin/${donationId}/manual`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  invalidateDonation: async (donationId: string, payload: { reason?: string }) => {
+    return adminRequest(`/api/donations/admin/${donationId}/invalidate`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
   },
 
   resendDonationReceipt: async (donationId: string) => {
@@ -137,26 +174,6 @@ export const adminAPI = {
       method: 'POST',
     });
   },
-
-getSettings: async () => {
-  return adminRequest('/api/admin/settings');
-},
-
-updateSettings: async (payload: {
-  platformLocked?: boolean;
-  platformLockMessage?: string;
-  inviteOnlyEnabled?: boolean;
-  siteAnnouncementEnabled?: boolean;
-  siteAnnouncementText?: string;
-  reason?: string;
-}) => {
-  return adminRequest('/api/admin/settings', {
-    method: 'PATCH',
-    body: JSON.stringify(payload),
-  });
-},
-  
-  // ################## ----- INVITES ----- ##################
 
   getInvites: async () => {
     return adminRequest('/api/invites');
@@ -179,8 +196,6 @@ updateSettings: async (payload: {
       method: 'PATCH',
     });
   },
-
-  // ################## ----- USER MODERATION ----- ##################
 
   updateUserStatus: async (
     userId: string,
@@ -219,8 +234,6 @@ updateSettings: async (payload: {
     });
   },
 
-  // ################## ----- STORE MODERATION ----- ##################
-
   updateStoreStatus: async (
     brandId: string,
     payload: {
@@ -245,8 +258,6 @@ updateSettings: async (payload: {
       body: JSON.stringify(payload),
     });
   },
-
-  // ################## ----- PRODUCT / SERVICE MODERATION ----- ##################
 
   adminUpdateProduct: async (
     productId: string,
@@ -285,13 +296,9 @@ updateSettings: async (payload: {
     });
   },
 
-  // ################## ----- AUDIT LOGS ----- ##################
-
   getAuditLogs: async (limit = 100) => {
     return adminRequest(`/api/admin/moderation/audit-logs?limit=${encodeURIComponent(limit)}`);
   },
-
-  // ################## ----- BLOG MANAGEMENT ----- ##################
 
   getBlogPosts: async (sort = 'custom') => {
     return adminRequest(`/api/admin/blog?sort=${encodeURIComponent(sort)}`);

@@ -2,6 +2,20 @@ const mongoose = require('mongoose');
 
 const donationSchema = new mongoose.Schema(
   {
+    source: {
+      type: String,
+      enum: ['stripe', 'manual'],
+      default: 'stripe',
+      index: true,
+    },
+
+    donationKind: {
+      type: String,
+      enum: ['cash', 'item'],
+      default: 'cash',
+      index: true,
+    },
+
     donorName: {
       type: String,
       trim: true,
@@ -17,10 +31,25 @@ const donationSchema = new mongoose.Schema(
       index: true,
     },
 
+    donorPhone: {
+      type: String,
+      trim: true,
+      default: '',
+      maxlength: 50,
+    },
+
+    donorAddress: {
+      type: String,
+      trim: true,
+      default: '',
+      maxlength: 500,
+    },
+
     amount: {
       type: Number,
       required: true,
-      min: 1,
+      min: 0,
+      default: 0,
     },
 
     currency: {
@@ -63,9 +92,79 @@ const donationSchema = new mongoose.Schema(
 
     paymentStatus: {
       type: String,
-      enum: ['pending', 'paid', 'failed', 'expired', 'refunded'],
+      enum: ['pending', 'paid', 'failed', 'expired', 'refunded', 'invalidated'],
       default: 'pending',
       index: true,
+    },
+
+    paymentMethod: {
+      type: String,
+      enum: ['stripe', 'cash', 'check', 'money_order', 'item', 'other'],
+      default: 'stripe',
+      index: true,
+    },
+
+    itemDescription: {
+      type: String,
+      trim: true,
+      default: '',
+      maxlength: 2000,
+    },
+
+    estimatedValue: {
+      type: Number,
+      min: 0,
+      default: 0,
+    },
+
+    receivedDate: {
+      type: Date,
+      default: null,
+      index: true,
+    },
+
+    acknowledgementNotes: {
+      type: String,
+      trim: true,
+      default: '',
+      maxlength: 2000,
+    },
+
+    internalNotes: {
+      type: String,
+      trim: true,
+      default: '',
+      maxlength: 2000,
+    },
+
+    issuedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
+
+    updatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
+
+    invalidatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null,
+    },
+
+    invalidatedAt: {
+      type: Date,
+      default: null,
+    },
+
+    invalidationReason: {
+      type: String,
+      trim: true,
+      default: '',
+      maxlength: 1000,
     },
 
     stripeCheckoutSessionId: {

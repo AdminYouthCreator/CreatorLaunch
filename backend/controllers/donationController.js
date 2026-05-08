@@ -35,8 +35,12 @@ const normalizeDonation = (donation) => {
 
   return {
     id: obj._id,
+    source: obj.source || 'stripe',
+    donationKind: obj.donationKind || 'cash',
     donorName: obj.anonymous ? 'Anonymous' : obj.donorName,
     donorEmail: obj.donorEmail,
+    donorPhone: obj.donorPhone,
+    donorAddress: obj.donorAddress,
     amount: obj.amount,
     currency: obj.currency,
     campaign: obj.campaign,
@@ -45,6 +49,14 @@ const normalizeDonation = (donation) => {
     recurring: obj.recurring,
     interval: obj.interval,
     paymentStatus: obj.paymentStatus,
+    paymentMethod: obj.paymentMethod,
+    itemDescription: obj.itemDescription,
+    estimatedValue: obj.estimatedValue,
+    receivedDate: obj.receivedDate,
+    acknowledgementNotes: obj.acknowledgementNotes,
+    internalNotes: obj.internalNotes,
+    invalidatedAt: obj.invalidatedAt,
+    invalidationReason: obj.invalidationReason,
     stripeCheckoutSessionId: obj.stripeCheckoutSessionId,
     stripeReceiptUrl: obj.stripeReceiptUrl,
     taxReceiptSent: obj.taxReceiptSent,
@@ -63,7 +75,8 @@ const buildTaxReceiptEmail = (donation) => {
     process.env.CREATORLAUNCH_TAX_STATUS_TEXT ||
     'CreatorLaunch is a tax-exempt nonprofit organization. No goods or services were provided in exchange for this contribution.';
 
-  const donationDate = donation.paidAt || donation.createdAt || new Date();
+  const donationDate = donation.receivedDate || donation.paidAt || donation.createdAt || new Date();
+  const isItemDonation = donation.donationKind === 'item';
 
   return `
 Thank you for supporting ${legalName}.
@@ -72,16 +85,37 @@ Donation Receipt / Charitable Contribution Acknowledgement
 
 Receipt Number: ${donation.receiptNumber || createReceiptNumber(donation._id)}
 Donor Name: ${donation.donorName || 'Supporter'}
-Donor Email: ${donation.donorEmail}
-Donation Amount: $${Number(donation.amount || 0).toFixed(2)} ${String(donation.currency || 'usd').toUpperCase()}
+${donation.donorEmail ? `Donor Email: ${donation.donorEmail}` : ''}
+${donation.donorPhone ? `Donor Phone: ${donation.donorPhone}` : ''}
+${donation.donorAddress ? `Donor Address: ${donation.donorAddress}` : ''}
+
 Donation Date: ${new Date(donationDate).toLocaleDateString()}
 Campaign: ${donation.campaign || 'General Fund'}
-Donation Type: ${donation.recurring ? 'Monthly recurring donation' : 'One-time donation'}
+Donation Source: ${donation.source === 'manual' ? 'Manual / Offline Donation' : 'Online Stripe Donation'}
+Donation Type: ${isItemDonation ? 'In-kind item donation' : donation.recurring ? 'Monthly recurring donation' : 'One-time cash donation'}
+
+${
+  isItemDonation
+    ? `Item Description: ${donation.itemDescription || 'In-kind contribution'}${
+        Number(donation.estimatedValue || 0) > 0
+          ? `\nDonor/organization entered estimated value: $${Number(donation.estimatedValue || 0).toFixed(2)}`
+          : ''
+      }`
+    : `Donation Amount: $${Number(donation.amount || 0).toFixed(2)} ${String(donation.currency || 'usd').toUpperCase()}`
+}
 
 Organization: ${legalName}
 ${ein ? `EIN: ${ein}` : ''}
 
 ${taxStatusText}
+
+${
+  isItemDonation
+    ? 'For in-kind contributions, the donor is responsible for determining the tax-deductible value of donated goods.'
+    : ''
+}
+
+${donation.acknowledgementNotes ? `Additional Notes: ${donation.acknowledgementNotes}` : ''}
 
 Please keep this receipt for your records.
 
@@ -144,6 +178,8 @@ exports.createCheckoutSession = asyncHandler(async (req, res) => {
   }
 
   const donation = await Donation.create({
+    source: 'stripe',
+    donationKind: 'cash',
     donorName,
     donorEmail,
     amount: numericAmount,
@@ -153,6 +189,7 @@ exports.createCheckoutSession = asyncHandler(async (req, res) => {
     recurring: Boolean(recurring),
     interval: recurring ? 'month' : 'one_time',
     paymentStatus: 'pending',
+    paymentMethod: 'stripe',
   });
 
   const successUrl = `${getFrontendUrl()}/donate/success?session_id={CHECKOUT_SESSION_ID}`;
@@ -245,7 +282,7 @@ exports.handleWebhook = asyncHandler(async (req, res) => {
         donation = await Donation.findOne({ stripeCheckoutSessionId: session.id });
       }
 
-      if (donation) {
+      if (donation && donation.paymentStatus !== 'invalidated') {
         donation.paymentStatus = 'paid';
         donation.paidAt = new Date();
         donation.stripeCheckoutSessionId = session.id;
@@ -299,7 +336,7 @@ exports.handleWebhook = asyncHandler(async (req, res) => {
         stripePaymentIntentId: paymentIntent.id,
       });
 
-      if (donation) {
+      if (donation && donation.paymentStatus !== 'invalidated') {
         donation.paymentStatus = 'failed';
 
         if (!donation.rawStripeEventIds.includes(event.id)) {
@@ -340,15 +377,22 @@ exports.getDonationBySession = asyncHandler(async (req, res) => {
 exports.getAdminDonations = asyncHandler(async (req, res) => {
   const donations = await Donation.find()
     .sort({ createdAt: -1 })
-    .limit(500);
+    .limit(1000);
 
-  const totalPaid = donations
-    .filter((donation) => donation.paymentStatus === 'paid')
-    .reduce((sum, donation) => sum + Number(donation.amount || 0), 0);
+  const activePaidDonations = donations.filter(
+    (donation) => donation.paymentStatus === 'paid'
+  );
 
-  const paidCount = donations.filter((donation) => donation.paymentStatus === 'paid').length;
-  const recurringCount = donations.filter(
-    (donation) => donation.paymentStatus === 'paid' && donation.recurring
+  const totalPaid = activePaidDonations.reduce(
+    (sum, donation) => sum + Number(donation.amount || 0),
+    0
+  );
+
+  const paidCount = activePaidDonations.length;
+  const recurringCount = activePaidDonations.filter((donation) => donation.recurring).length;
+  const manualSheetCount = donations.filter((donation) => donation.source === 'manual').length;
+  const invalidatedCount = donations.filter(
+    (donation) => donation.paymentStatus === 'invalidated'
   ).length;
 
   res.status(200).json({
@@ -357,8 +401,192 @@ exports.getAdminDonations = asyncHandler(async (req, res) => {
       totalPaid: Number(totalPaid.toFixed(2)),
       paidCount,
       recurringCount,
+      manualSheetCount,
+      invalidatedCount,
       totalCount: donations.length,
     },
+  });
+});
+
+// @desc    Create manual donation / acknowledgement sheet
+// @route   POST /api/donations/admin/manual
+// @access  Admin
+exports.createManualDonation = asyncHandler(async (req, res) => {
+  const {
+    donationKind = 'cash',
+    donorName = '',
+    donorEmail = '',
+    donorPhone = '',
+    donorAddress = '',
+    amount = 0,
+    campaign = 'General Fund',
+    paymentMethod = 'cash',
+    itemDescription = '',
+    estimatedValue = 0,
+    receivedDate,
+    acknowledgementNotes = '',
+    internalNotes = '',
+    anonymous = false,
+  } = req.body;
+
+  if (!donorName && !anonymous) {
+    return res.status(400).json({ message: 'Donor name is required unless marked anonymous.' });
+  }
+
+  if (!['cash', 'item'].includes(donationKind)) {
+    return res.status(400).json({ message: 'Donation kind must be cash or item.' });
+  }
+
+  const numericAmount = Number(amount || 0);
+  const numericEstimatedValue = Number(estimatedValue || 0);
+
+  if (donationKind === 'cash' && numericAmount <= 0) {
+    return res.status(400).json({ message: 'Cash donations must have an amount greater than $0.' });
+  }
+
+  if (donationKind === 'item' && !itemDescription.trim()) {
+    return res.status(400).json({ message: 'Item donations must include an item description.' });
+  }
+
+  const donation = new Donation({
+    source: 'manual',
+    donationKind,
+    donorName,
+    donorEmail,
+    donorPhone,
+    donorAddress,
+    amount: donationKind === 'cash' ? numericAmount : numericEstimatedValue,
+    currency: 'usd',
+    campaign,
+    message: '',
+    anonymous: Boolean(anonymous),
+    recurring: false,
+    interval: 'one_time',
+    paymentStatus: 'paid',
+    paymentMethod: donationKind === 'item' ? 'item' : paymentMethod,
+    itemDescription,
+    estimatedValue: donationKind === 'item' ? numericEstimatedValue : 0,
+    receivedDate: receivedDate ? new Date(receivedDate) : new Date(),
+    acknowledgementNotes,
+    internalNotes,
+    issuedBy: req.user?._id || null,
+    paidAt: receivedDate ? new Date(receivedDate) : new Date(),
+  });
+
+  donation.receiptNumber = createReceiptNumber(donation._id);
+
+  await donation.save();
+
+  res.status(201).json({
+    message: 'Manual donation acknowledgement created.',
+    donation: normalizeDonation(donation),
+  });
+});
+
+// @desc    Update manual donation / acknowledgement sheet
+// @route   PUT /api/donations/admin/:donationId/manual
+// @access  Admin
+exports.updateManualDonation = asyncHandler(async (req, res) => {
+  const donation = await Donation.findById(req.params.donationId);
+
+  if (!donation) {
+    return res.status(404).json({ message: 'Donation not found.' });
+  }
+
+  if (donation.source !== 'manual') {
+    return res.status(400).json({ message: 'Only manual acknowledgement sheets can be edited here.' });
+  }
+
+  if (donation.paymentStatus === 'invalidated') {
+    return res.status(400).json({ message: 'Invalidated acknowledgement sheets cannot be edited.' });
+  }
+
+  const {
+    donationKind,
+    donorName,
+    donorEmail,
+    donorPhone,
+    donorAddress,
+    amount,
+    campaign,
+    paymentMethod,
+    itemDescription,
+    estimatedValue,
+    receivedDate,
+    acknowledgementNotes,
+    internalNotes,
+    anonymous,
+  } = req.body;
+
+  if (donationKind && !['cash', 'item'].includes(donationKind)) {
+    return res.status(400).json({ message: 'Donation kind must be cash or item.' });
+  }
+
+  const nextDonationKind = donationKind || donation.donationKind;
+  const numericAmount = Number(amount ?? donation.amount ?? 0);
+  const numericEstimatedValue = Number(estimatedValue ?? donation.estimatedValue ?? 0);
+
+  if (nextDonationKind === 'cash' && numericAmount <= 0) {
+    return res.status(400).json({ message: 'Cash donations must have an amount greater than $0.' });
+  }
+
+  if (nextDonationKind === 'item' && !(itemDescription ?? donation.itemDescription || '').trim()) {
+    return res.status(400).json({ message: 'Item donations must include an item description.' });
+  }
+
+  donation.donationKind = nextDonationKind;
+  donation.donorName = donorName ?? donation.donorName;
+  donation.donorEmail = donorEmail ?? donation.donorEmail;
+  donation.donorPhone = donorPhone ?? donation.donorPhone;
+  donation.donorAddress = donorAddress ?? donation.donorAddress;
+  donation.amount = nextDonationKind === 'cash' ? numericAmount : numericEstimatedValue;
+  donation.campaign = campaign ?? donation.campaign;
+  donation.paymentMethod = nextDonationKind === 'item' ? 'item' : paymentMethod ?? donation.paymentMethod;
+  donation.itemDescription = itemDescription ?? donation.itemDescription;
+  donation.estimatedValue = nextDonationKind === 'item' ? numericEstimatedValue : 0;
+  donation.receivedDate = receivedDate ? new Date(receivedDate) : donation.receivedDate;
+  donation.acknowledgementNotes = acknowledgementNotes ?? donation.acknowledgementNotes;
+  donation.internalNotes = internalNotes ?? donation.internalNotes;
+  donation.anonymous = typeof anonymous === 'boolean' ? anonymous : donation.anonymous;
+  donation.updatedBy = req.user?._id || null;
+  donation.paidAt = donation.receivedDate || donation.paidAt || new Date();
+
+  if (!donation.receiptNumber) {
+    donation.receiptNumber = createReceiptNumber(donation._id);
+  }
+
+  await donation.save();
+
+  res.status(200).json({
+    message: 'Manual acknowledgement sheet updated.',
+    donation: normalizeDonation(donation),
+  });
+});
+
+// @desc    Invalidate donation/payment/sheet
+// @route   PATCH /api/donations/admin/:donationId/invalidate
+// @access  Admin
+exports.invalidateDonation = asyncHandler(async (req, res) => {
+  const donation = await Donation.findById(req.params.donationId);
+
+  if (!donation) {
+    return res.status(404).json({ message: 'Donation not found.' });
+  }
+
+  const { reason = '' } = req.body;
+
+  donation.paymentStatus = 'invalidated';
+  donation.invalidatedAt = new Date();
+  donation.invalidatedBy = req.user?._id || null;
+  donation.invalidationReason = reason || 'Invalidated by admin.';
+  donation.taxReceiptSent = false;
+  donation.updatedBy = req.user?._id || null;
+
+  await donation.save();
+
+  res.status(200).json({
+    message: 'Donation record invalidated.',
+    donation: normalizeDonation(donation),
   });
 });
 
@@ -374,6 +602,14 @@ exports.resendDonationReceipt = asyncHandler(async (req, res) => {
 
   if (donation.paymentStatus !== 'paid') {
     return res.status(400).json({ message: 'Receipt can only be sent for paid donations.' });
+  }
+
+  if (!donation.donorEmail) {
+    return res.status(400).json({ message: 'This donation does not have a donor email.' });
+  }
+
+  if (!donation.receiptNumber) {
+    donation.receiptNumber = createReceiptNumber(donation._id);
   }
 
   donation.taxReceiptSent = false;
