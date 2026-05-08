@@ -18,7 +18,7 @@ interface HeaderProps {
 // ##########################################################
 const Header: React.FC<HeaderProps> = ({
   showAnnouncement = true,
-  announcementText = 'CreatorLaunch is building the next generation of founders.'
+  announcementText = 'CreatorLaunch is building the next generation of founders.',
 }) => {
   const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(showAnnouncement);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -28,7 +28,16 @@ const Header: React.FC<HeaderProps> = ({
   const { user, logout, loading } = useAuthContext();
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
+  // ################## ----- SYNC ANNOUNCEMENT VISIBILITY ----- ##################
+  // Keeps banner behavior correct if parent props change
+  // ###########################################################################
+  useEffect(() => {
+    setIsAnnouncementVisible(showAnnouncement);
+  }, [showAnnouncement, announcementText]);
+
+  // ################## ----- CLOSE DROPDOWN ON OUTSIDE CLICK ----- ##################
+  // Closes the user dropdown when clicking outside of it
+  // ###########################################################################
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
@@ -45,7 +54,9 @@ const Header: React.FC<HeaderProps> = ({
     };
   }, [showUserMenu]);
 
-  // Handle logout
+  // ################## ----- LOGOUT HANDLER ----- ##################
+  // Logs out current user and returns them to public homepage
+  // ################################################################
   const handleLogout = async () => {
     try {
       setShowUserMenu(false);
@@ -57,7 +68,7 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   // ################## ----- NAVIGATION ITEMS ----- ##################
-  // Main navigation menu items
+  // Main public navigation menu items
   // ################################################################
   const navigation = [
     { name: 'Home', href: '/' },
@@ -65,10 +76,13 @@ const Header: React.FC<HeaderProps> = ({
     { name: 'Team', href: '/about/team' },
     { name: 'Partners', href: '/partners' },
     { name: 'Blog', href: '/blog' },
-    { name: 'Contact', href: '/contact' }
+    { name: 'Platform Progress', href: '/progress' },
+    { name: 'Contact', href: '/contact' },
   ];
 
   // ################## ----- ACTIVE LINK CHECKER ----- ##################
+  // Highlights the current page in the navbar
+  // ###################################################################
   const isActiveLink = (href: string) => {
     if (href === '/' && router.pathname === '/') return true;
     if (href !== '/' && router.pathname.startsWith(href)) return true;
@@ -78,7 +92,7 @@ const Header: React.FC<HeaderProps> = ({
   return (
     <>
       {/* Announcement Banner */}
-      {isAnnouncementVisible && (
+      {isAnnouncementVisible && announcementText && (
         <div className="announcement-banner show">
           <p>{announcementText}</p>
           <button
@@ -105,7 +119,7 @@ const Header: React.FC<HeaderProps> = ({
 
           {/* Centered Navigation */}
           <div className="flex-1 flex justify-center">
-            <div className="hidden md:flex items-center gap-8 font-semibold">
+            <div className="hidden md:flex items-center gap-6 font-semibold">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
@@ -130,7 +144,7 @@ const Header: React.FC<HeaderProps> = ({
                 alignItems: 'center',
                 height: '40px',
                 backgroundColor: 'var(--color-primary)',
-                color: 'white'
+                color: 'white',
               }}
             >
               Donate
@@ -152,19 +166,33 @@ const Header: React.FC<HeaderProps> = ({
                       ? user.name.charAt(0).toUpperCase()
                       : user.email.charAt(0).toUpperCase()}
                   </div>
+
                   <span className="font-medium text-gray-700 hidden sm:block">
                     {user.name || user.email.split('@')[0]}
                   </span>
-                  <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+
+                  <svg
+                    className="w-4 h-4 text-gray-500"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </button>
 
-                {/* User dropdown menu */}
+                {/* User Dropdown Menu */}
                 {showUserMenu && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
                     <div className="px-4 py-3 border-b border-gray-200">
-                      <p className="text-sm font-medium text-gray-700">{user.name || 'User'}</p>
+                      <p className="text-sm font-medium text-gray-700">
+                        {user.name || 'User'}
+                      </p>
                       <p className="text-sm text-gray-500">{user.email}</p>
                     </div>
 
@@ -222,7 +250,7 @@ const Header: React.FC<HeaderProps> = ({
                     height: '40px',
                     border: '2px solid var(--color-accent)',
                     color: 'var(--color-accent)',
-                    backgroundColor: 'white'
+                    backgroundColor: 'white',
                   }}
                 >
                   Login
@@ -231,7 +259,11 @@ const Header: React.FC<HeaderProps> = ({
                 <Link
                   href="/auth/register"
                   className="px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-bold text-sm transition-colors whitespace-nowrap"
-                  style={{ display: 'flex', alignItems: 'center', height: '40px' }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    height: '40px',
+                  }}
                 >
                   Sign Up
                 </Link>
@@ -307,7 +339,9 @@ const Header: React.FC<HeaderProps> = ({
                 ) : user ? (
                   <div className="flex flex-col space-y-3">
                     <div className="px-5 py-3 bg-gray-50 rounded-lg">
-                      <p className="font-medium text-gray-700">{user.name || 'User'}</p>
+                      <p className="font-medium text-gray-700">
+                        {user.name || 'User'}
+                      </p>
                       <p className="text-sm text-gray-500">{user.email}</p>
                     </div>
 
