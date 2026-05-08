@@ -19,6 +19,8 @@ const adminBlogRoutes = require('./routes/adminBlogRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 const settingsRoutes = require('./routes/settingsRoutes');
 const adminSettingsRoutes = require('./routes/adminSettingsRoutes');
+const donationRoutes = require('./routes/donationRoutes');
+const donationController = require('./controllers/donationController');
 
 const app = express();
 
@@ -47,6 +49,11 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.post(
+  '/api/donations/webhook',
+  express.raw({ type: 'application/json' }),
+  donationController.handleWebhook
+);
 app.use(express.json({ limit: '25mb' }));
 app.use(cookieParser());
 
@@ -77,6 +84,7 @@ app.use('/api/blog', blogRoutes);
 app.use('/api/admin/blog', adminBlogRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/admin/settings', adminSettingsRoutes);
+app.use('/api/donations', donationRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
