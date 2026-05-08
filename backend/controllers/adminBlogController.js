@@ -16,13 +16,22 @@ const normalizeTags = (tags) => {
   }
 
   if (typeof tags === 'string') {
-    return tags.split(',').map((tag) => tag.trim()).filter(Boolean);
+    return tags
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter(Boolean);
   }
 
   return [];
 };
 
-const createAuditLog = async ({ req, action, targetId, reason = '', metadata = {} }) => {
+const createAuditLog = async ({
+  req,
+  action,
+  targetId,
+  reason = '',
+  metadata = {},
+}) => {
   await AuditLog.create({
     admin: req.user?._id || req.user?.id || null,
     action,
@@ -35,24 +44,30 @@ const createAuditLog = async ({ req, action, targetId, reason = '', metadata = {
   });
 };
 
+// ################## ----- SCHEDULED POST AUTO-PUBLISH ----- ##################
+// Mongoose update pipelines caused this error:
+// "Cannot pass an array to query updates unless the updatePipeline option is set."
+// So this uses find + save instead.
+// ###########################################################################
 const publishDueScheduledPosts = async () => {
   const now = new Date();
 
-  await BlogPost.updateMany(
-    {
-      status: 'scheduled',
-      scheduledFor: { $lte: now },
-    },
-    [
-      {
-        $set: {
-          status: 'published',
-          publishedAt: {
-            $ifNull: ['$publishedAt', '$scheduledFor'],
-          },
-        },
-      },
-    ]
+  const duePosts = await BlogPost.find({
+    status: 'scheduled',
+    scheduledFor: { $lte: now },
+  });
+
+  await Promise.all(
+    duePosts.map(async (post) => {
+      post.status = 'published';
+
+      // Keep the original scheduled date as the published date.
+      if (!post.publishedAt) {
+        post.publishedAt = post.scheduledFor || now;
+      }
+
+      await post.save();
+    })
   );
 };
 
@@ -83,7 +98,7 @@ const normalizeAdminPost = (post) => {
 };
 
 const ensureUniqueSlug = async (slug, ignoreId = null) => {
-  let baseSlug = makeSlug(slug) || 'blog-post';
+  const baseSlug = makeSlug(slug) || 'blog-post';
   let finalSlug = baseSlug;
   let counter = 2;
 
@@ -106,7 +121,10 @@ const ensureUniqueSlug = async (slug, ignoreId = null) => {
 };
 
 const getNextDisplayOrder = async () => {
-  const lastPost = await BlogPost.findOne().sort({ displayOrder: -1 }).select('displayOrder');
+  const lastPost = await BlogPost.findOne()
+    .sort({ displayOrder: -1 })
+    .select('displayOrder');
+
   return Number(lastPost?.displayOrder || 0) + 1;
 };
 
@@ -118,14 +136,26 @@ exports.getAdminPosts = asyncHandler(async (req, res) => {
 
   const sort = req.query.sort || 'custom';
 
-  let sortQuery = { displayOrder: 1, publishedAt: -1, createdAt: -1 };
+  let sortQuery = {
+    displayOrder: 1,
+    publishedAt: -1,
+    createdAt: -1,
+  };
 
   if (sort === 'newest') {
-    sortQuery = { publishedAt: -1, scheduledFor: -1, createdAt: -1 };
+    sortQuery = {
+      publishedAt: -1,
+      scheduledFor: -1,
+      createdAt: -1,
+    };
   }
 
   if (sort === 'oldest') {
-    sortQuery = { publishedAt: 1, scheduledFor: 1, createdAt: 1 };
+    sortQuery = {
+      publishedAt: 1,
+      scheduledFor: 1,
+      createdAt: 1,
+    };
   }
 
   const posts = await BlogPost.find()
@@ -185,9 +215,12 @@ exports.createAdminPost = asyncHandler(async (req, res) => {
 
   const now = new Date();
   const parsedScheduledFor = scheduledFor ? new Date(scheduledFor) : null;
+
   let finalStatus = status;
   let finalPublishedAt = status === 'published' ? new Date() : null;
 
+  // If a scheduled post is created with a date already in the past,
+  // publish it immediately but keep scheduledFor.
   if (status === 'scheduled' && parsedScheduledFor && parsedScheduledFor <= now) {
     finalStatus = 'published';
     finalPublishedAt = parsedScheduledFor;
@@ -220,6 +253,8 @@ exports.createAdminPost = asyncHandler(async (req, res) => {
       title: post.title,
       slug: post.slug,
       status: post.status,
+      scheduledFor: post.scheduledFor,
+      publishedAt: post.publishedAt,
       displayOrder: post.displayOrder,
     },
   });
@@ -244,6 +279,8 @@ exports.updateAdminPost = asyncHandler(async (req, res) => {
     title: post.title,
     slug: post.slug,
     status: post.status,
+    scheduledFor: post.scheduledFor,
+    publishedAt: post.publishedAt,
     displayOrder: post.displayOrder,
   };
 
@@ -296,14 +333,21 @@ exports.updateAdminPost = asyncHandler(async (req, res) => {
 
     if (status === 'scheduled' && parsedScheduledFor && parsedScheduledFor <= now) {
       post.status = 'published';
-      post.publishedAt = parsedScheduledFor;
+
+      if (!post.publishedAt) {
+        post.publishedAt = parsedScheduledFor;
+      }
     } else {
       const wasPublished = post.status === 'published';
+
       post.status = status;
 
       if (status === 'published' && !wasPublished && !post.publishedAt) {
         post.publishedAt = new Date();
       }
+
+      // If moving back to draft/archived/scheduled, keep publishedAt as historical record.
+      // scheduledFor is preserved unless explicitly cleared above.
     }
   }
 
@@ -326,6 +370,8 @@ exports.updateAdminPost = asyncHandler(async (req, res) => {
         title: post.title,
         slug: post.slug,
         status: post.status,
+        scheduledFor: post.scheduledFor,
+        publishedAt: post.publishedAt,
         displayOrder: post.displayOrder,
       },
     },
@@ -344,7 +390,9 @@ exports.reorderAdminPosts = asyncHandler(async (req, res) => {
   const { orderedIds = [] } = req.body;
 
   if (!Array.isArray(orderedIds) || orderedIds.length === 0) {
-    return res.status(400).json({ message: 'orderedIds must be a non-empty array.' });
+    return res.status(400).json({
+      message: 'orderedIds must be a non-empty array.',
+    });
   }
 
   await Promise.all(
@@ -365,7 +413,14 @@ exports.reorderAdminPosts = asyncHandler(async (req, res) => {
     },
   });
 
-  const posts = await BlogPost.find().sort({ displayOrder: 1, publishedAt: -1, createdAt: -1 });
+  const posts = await BlogPost.find()
+    .sort({
+      displayOrder: 1,
+      publishedAt: -1,
+      createdAt: -1,
+    })
+    .populate('createdBy', 'username email role')
+    .populate('updatedBy', 'username email role');
 
   res.status(200).json({
     message: 'Blog posts reordered.',
@@ -385,6 +440,7 @@ exports.archiveAdminPost = asyncHandler(async (req, res) => {
 
   post.status = 'archived';
   post.updatedBy = req.user?._id || req.user?.id || null;
+
   await post.save();
 
   await createAuditLog({
@@ -395,6 +451,8 @@ exports.archiveAdminPost = asyncHandler(async (req, res) => {
     metadata: {
       title: post.title,
       slug: post.slug,
+      scheduledFor: post.scheduledFor,
+      publishedAt: post.publishedAt,
     },
   });
 
