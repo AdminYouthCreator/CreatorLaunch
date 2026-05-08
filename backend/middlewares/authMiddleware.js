@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
+const PlatformSettings = require('../models/PlatformSettings');
 
 const getJwtSecret = () => {
   const secret = process.env.JWT_SECRET;
@@ -20,6 +21,16 @@ const getTokenFromRequest = (req) => {
   }
 
   return null;
+};
+
+const getPlatformSettings = async () => {
+  let settings = await PlatformSettings.findOne({ singletonKey: 'platform' });
+
+  if (!settings) {
+    settings = await PlatformSettings.create({ singletonKey: 'platform' });
+  }
+
+  return settings;
 };
 
 const protect = asyncHandler(async (req, res, next) => {
@@ -64,6 +75,15 @@ const protect = asyncHandler(async (req, res, next) => {
       message: `Account access denied. Your account is currently ${user.accountStatus}.`,
       accountStatus: user.accountStatus,
       reason: user.accountStatusReason || '',
+    });
+  }
+
+  const settings = await getPlatformSettings();
+
+  if (settings.platformLocked && user.role !== 'Admin') {
+    return res.status(403).json({
+      message: settings.platformLockMessage || 'CreatorLaunch is currently locked.',
+      platformLocked: true,
     });
   }
 
