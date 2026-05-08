@@ -14,6 +14,8 @@ const checkoutRoutes = require('./routes/checkoutRoutes');
 const inviteRoutes = require('./routes/inviteRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const adminModerationRoutes = require('./routes/adminModerationRoutes');
+const blogRoutes = require('./routes/blogRoutes');
+const adminBlogRoutes = require('./routes/adminBlogRoutes');
 
 const errorHandler = require('./middlewares/errorHandler');
 
@@ -70,6 +72,8 @@ app.use('/api/checkout', checkoutRoutes);
 app.use('/api/invites', inviteRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/moderation', adminModerationRoutes);
+app.use('/api/blog', blogRoutes);
+app.use('/api/admin/blog', adminBlogRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
