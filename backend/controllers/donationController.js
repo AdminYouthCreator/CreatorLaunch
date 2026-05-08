@@ -186,6 +186,86 @@ const sendTaxReceiptIfNeeded = async (donation) => {
   return donation;
 };
 
+// @desc    Get public donation impact stats
+// @route   GET /api/donations/impact/public
+// @access  Public
+exports.getPublicDonationImpact = asyncHandler(async (req, res) => {
+  const validPaidFilter = {
+    paymentStatus: 'paid',
+  };
+
+  const donations = await Donation.find(validPaidFilter)
+    .select('amount campaign recurring source donationKind createdAt paidAt receivedDate')
+    .lean();
+
+  const totalRaised = donations.reduce((sum, donation) => {
+    return sum + Number(donation.amount || 0);
+  }, 0);
+
+  const paidDonationCount = donations.length;
+  const recurringDonorCount = donations.filter((donation) => donation.recurring).length;
+  const manualAcknowledgementCount = donations.filter((donation) => donation.source === 'manual').length;
+  const itemDonationCount = donations.filter((donation) => donation.donationKind === 'item').length;
+
+  const campaignTotals = donations.reduce((acc, donation) => {
+    const campaign = donation.campaign || 'General Fund';
+
+    if (!acc[campaign]) {
+      acc[campaign] = {
+        campaign,
+        totalRaised: 0,
+        donationCount: 0,
+      };
+    }
+
+    acc[campaign].totalRaised += Number(donation.amount || 0);
+    acc[campaign].donationCount += 1;
+
+    return acc;
+  }, {});
+
+  const topCampaigns = Object.values(campaignTotals)
+    .map((campaign) => ({
+      ...campaign,
+      totalRaised: Number(campaign.totalRaised.toFixed(2)),
+    }))
+    .sort((a, b) => b.totalRaised - a.totalRaised)
+    .slice(0, 5);
+
+  const topCampaign = topCampaigns[0] || {
+    campaign: 'General Fund',
+    totalRaised: 0,
+    donationCount: 0,
+  };
+
+  const latestDonation = donations
+    .slice()
+    .sort((a, b) => {
+      const aDate = new Date(a.paidAt || a.receivedDate || a.createdAt || 0).getTime();
+      const bDate = new Date(b.paidAt || b.receivedDate || b.createdAt || 0).getTime();
+
+      return bDate - aDate;
+    })[0];
+
+  res.status(200).json({
+    totalRaised: Number(totalRaised.toFixed(2)),
+    paidDonationCount,
+    recurringDonorCount,
+    manualAcknowledgementCount,
+    itemDonationCount,
+    topCampaign,
+    topCampaigns,
+    impactEquivalents: {
+      workshopSupplyPacks: Math.floor(totalRaised / 25),
+      studentToolKits: Math.floor(totalRaised / 100),
+      launchCapitalGrants: Math.floor(totalRaised / 500),
+    },
+    lastUpdated: latestDonation
+      ? latestDonation.paidAt || latestDonation.receivedDate || latestDonation.createdAt
+      : null,
+  });
+});
+
 // @desc    Create Stripe Checkout session for donation
 // @route   POST /api/donations/create-checkout-session
 // @access  Public
