@@ -267,10 +267,13 @@ exports.adminUpdateProduct = asyncHandler(async (req, res) => {
     }
   }
 
-  if (typeof status === 'string') {
-    product.status = status;
-    product.isActive = status === 'active' || status === 'published';
-  }
+if (typeof status === 'string') {
+  product.status = status;
+  product.isActive = status === 'active' || status === 'published';
+  product.moderationReason = reason;
+  product.moderationUpdatedAt = new Date();
+  product.moderationUpdatedBy = getAdminId(req);
+}
 
   await product.save();
 
