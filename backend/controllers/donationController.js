@@ -525,12 +525,13 @@ exports.updateManualDonation = asyncHandler(async (req, res) => {
   const nextDonationKind = donationKind || donation.donationKind;
   const numericAmount = Number(amount ?? donation.amount ?? 0);
   const numericEstimatedValue = Number(estimatedValue ?? donation.estimatedValue ?? 0);
+  const nextItemDescription = itemDescription ?? donation.itemDescription ?? '';
 
   if (nextDonationKind === 'cash' && numericAmount <= 0) {
     return res.status(400).json({ message: 'Cash donations must have an amount greater than $0.' });
   }
 
-  if (nextDonationKind === 'item' && !(itemDescription ?? donation.itemDescription || '').trim()) {
+  if (nextDonationKind === 'item' && !String(nextItemDescription).trim()) {
     return res.status(400).json({ message: 'Item donations must include an item description.' });
   }
 
@@ -542,7 +543,7 @@ exports.updateManualDonation = asyncHandler(async (req, res) => {
   donation.amount = nextDonationKind === 'cash' ? numericAmount : numericEstimatedValue;
   donation.campaign = campaign ?? donation.campaign;
   donation.paymentMethod = nextDonationKind === 'item' ? 'item' : paymentMethod ?? donation.paymentMethod;
-  donation.itemDescription = itemDescription ?? donation.itemDescription;
+  donation.itemDescription = nextItemDescription;
   donation.estimatedValue = nextDonationKind === 'item' ? numericEstimatedValue : 0;
   donation.receivedDate = receivedDate ? new Date(receivedDate) : donation.receivedDate;
   donation.acknowledgementNotes = acknowledgementNotes ?? donation.acknowledgementNotes;
