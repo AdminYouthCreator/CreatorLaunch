@@ -19,6 +19,7 @@ import {
 
 interface AdminLayoutProps {
   children: ReactNode;
+  FiSettings,
 }
 
 const menuItems = [
@@ -70,6 +71,12 @@ const menuItems = [
     label: 'Analytics',
     permission: 'analytics.read',
   },
+  {
+  href: '/admin/settings',
+  icon: FiSettings,
+  label: 'Settings',
+  permission: 'settings.write',
+},
   {
     href: '/admin/audit-logs',
     icon: FiClock,
