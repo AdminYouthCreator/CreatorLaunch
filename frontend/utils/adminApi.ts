@@ -236,9 +236,9 @@ export const adminAPI = {
     return adminRequest(`/api/admin/moderation/audit-logs?limit=${encodeURIComponent(limit)}`);
   },
 
-  getBlogPosts: async () => {
-    return adminRequest('/api/admin/blog');
-  },
+  getBlogPosts: async (sort = 'custom') => {
+  return adminRequest(`/api/admin/blog?sort=${encodeURIComponent(sort)}`);
+},
 
   getBlogPost: async (postId: string) => {
     return adminRequest(`/api/admin/blog/${postId}`);
@@ -263,10 +263,7 @@ export const adminAPI = {
       method: 'DELETE',
       body: JSON.stringify({ reason }),
 
-      getBlogPosts: async (sort = 'custom') => {
-  return adminRequest(`/api/admin/blog?sort=${encodeURIComponent(sort)}`);
-},
-
+      
 reorderBlogPosts: async (orderedIds: string[]) => {
   return adminRequest('/api/admin/blog/reorder', {
     method: 'PATCH',
