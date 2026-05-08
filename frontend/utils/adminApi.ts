@@ -101,19 +101,38 @@ const adminRequest = async (path: string, options: RequestInit = {}) => {
   return data;
 };
 
-
 export const adminAPI = {
-  getOverview: async () => adminRequest('/api/admin/overview'),
-  getUsers: async () => adminRequest('/api/admin/users'),
-  getStores: async () => adminRequest('/api/admin/stores'),
-  getProducts: async () => adminRequest('/api/admin/products'),
-  getServices: async () => adminRequest('/api/admin/services'),
+  // ################## ----- OVERVIEW / DATA ----- ##################
+
+  getOverview: async () => {
+    return adminRequest('/api/admin/overview');
+  },
+
+  getUsers: async () => {
+    return adminRequest('/api/admin/users');
+  },
+
+  getStores: async () => {
+    return adminRequest('/api/admin/stores');
+  },
+
+  getProducts: async () => {
+    return adminRequest('/api/admin/products');
+  },
+
+  getServices: async () => {
+    return adminRequest('/api/admin/services');
+  },
 
   getAnalytics: async (range = '30d') => {
     return adminRequest(`/api/admin/analytics?range=${encodeURIComponent(range)}`);
   },
 
-  getInvites: async () => adminRequest('/api/invites'),
+  // ################## ----- INVITES ----- ##################
+
+  getInvites: async () => {
+    return adminRequest('/api/invites');
+  },
 
   createInvite: async (payload: {
     email?: string;
@@ -132,6 +151,8 @@ export const adminAPI = {
       method: 'PATCH',
     });
   },
+
+  // ################## ----- USER MODERATION ----- ##################
 
   updateUserStatus: async (
     userId: string,
@@ -170,6 +191,8 @@ export const adminAPI = {
     });
   },
 
+  // ################## ----- STORE MODERATION ----- ##################
+
   updateStoreStatus: async (
     brandId: string,
     payload: {
@@ -194,6 +217,8 @@ export const adminAPI = {
       body: JSON.stringify(payload),
     });
   },
+
+  // ################## ----- PRODUCT / SERVICE MODERATION ----- ##################
 
   adminUpdateProduct: async (
     productId: string,
@@ -232,13 +257,17 @@ export const adminAPI = {
     });
   },
 
+  // ################## ----- AUDIT LOGS ----- ##################
+
   getAuditLogs: async (limit = 100) => {
     return adminRequest(`/api/admin/moderation/audit-logs?limit=${encodeURIComponent(limit)}`);
   },
 
+  // ################## ----- BLOG MANAGEMENT ----- ##################
+
   getBlogPosts: async (sort = 'custom') => {
-  return adminRequest(`/api/admin/blog?sort=${encodeURIComponent(sort)}`);
-},
+    return adminRequest(`/api/admin/blog?sort=${encodeURIComponent(sort)}`);
+  },
 
   getBlogPost: async (postId: string) => {
     return adminRequest(`/api/admin/blog/${postId}`);
@@ -258,18 +287,17 @@ export const adminAPI = {
     });
   },
 
+  reorderBlogPosts: async (orderedIds: string[]) => {
+    return adminRequest('/api/admin/blog/reorder', {
+      method: 'PATCH',
+      body: JSON.stringify({ orderedIds }),
+    });
+  },
+
   archiveBlogPost: async (postId: string, reason = '') => {
     return adminRequest(`/api/admin/blog/${postId}`, {
       method: 'DELETE',
       body: JSON.stringify({ reason }),
-
-      
-reorderBlogPosts: async (orderedIds: string[]) => {
-  return adminRequest('/api/admin/blog/reorder', {
-    method: 'PATCH',
-    body: JSON.stringify({ orderedIds }),
-  });
-},
     });
   },
 };
