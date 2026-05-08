@@ -72,6 +72,12 @@ const blogPostSchema = new mongoose.Schema(
       index: true,
     },
 
+    displayOrder: {
+      type: Number,
+      default: 0,
+      index: true,
+    },
+
     tags: {
       type: [String],
       default: [],
