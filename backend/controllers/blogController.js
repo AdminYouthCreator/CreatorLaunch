@@ -14,6 +14,8 @@ const normalizePublicPost = (post, includeContent = false) => {
     authorTitle: obj.authorTitle || '',
     status: obj.status,
     publishedAt: obj.publishedAt,
+    scheduledFor: obj.scheduledFor,
+    displayOrder: obj.displayOrder || 0,
     tags: obj.tags || [],
     seoTitle: obj.seoTitle || obj.title,
     seoDescription: obj.seoDescription || obj.excerpt,
@@ -28,19 +30,30 @@ const normalizePublicPost = (post, includeContent = false) => {
   return normalized;
 };
 
-const getPublicQuery = () => {
+const publishDueScheduledPosts = async () => {
   const now = new Date();
 
+  await BlogPost.updateMany(
+    {
+      status: 'scheduled',
+      scheduledFor: { $lte: now },
+    },
+    [
+      {
+        $set: {
+          status: 'published',
+          publishedAt: {
+            $ifNull: ['$publishedAt', '$scheduledFor'],
+          },
+        },
+      },
+    ]
+  );
+};
+
+const getPublicQuery = () => {
   return {
-    $or: [
-      {
-        status: 'published',
-      },
-      {
-        status: 'scheduled',
-        scheduledFor: { $lte: now },
-      },
-    ],
+    status: 'published',
   };
 };
 
@@ -48,8 +61,22 @@ const getPublicQuery = () => {
 // @route   GET /api/blog
 // @access  Public
 exports.getPublicPosts = asyncHandler(async (req, res) => {
+  await publishDueScheduledPosts();
+
+  const sort = req.query.sort || 'custom';
+
+  let sortQuery = { displayOrder: 1, publishedAt: -1, createdAt: -1 };
+
+  if (sort === 'newest') {
+    sortQuery = { publishedAt: -1, createdAt: -1 };
+  }
+
+  if (sort === 'oldest') {
+    sortQuery = { publishedAt: 1, createdAt: 1 };
+  }
+
   const posts = await BlogPost.find(getPublicQuery())
-    .sort({ publishedAt: -1, scheduledFor: -1, createdAt: -1 })
+    .sort(sortQuery)
     .select('-content');
 
   res.status(200).json({
@@ -61,6 +88,8 @@ exports.getPublicPosts = asyncHandler(async (req, res) => {
 // @route   GET /api/blog/:slug
 // @access  Public
 exports.getPublicPostBySlug = asyncHandler(async (req, res) => {
+  await publishDueScheduledPosts();
+
   const { slug } = req.params;
 
   const post = await BlogPost.findOne({
