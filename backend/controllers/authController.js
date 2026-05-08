@@ -93,8 +93,8 @@ exports.register = asyncHandler(async (req, res) => {
   let assignedRole = 'Creator';
   const bootstrapAdmin = isBootstrapAdminEmail(normalizedEmail);
 
-  if (isInviteOnlyEnabled() && !bootstrapAdmin) {
-    if (!inviteCode) {
+if ((await isInviteOnlyEnabled()) && !bootstrapAdmin) {
+  if (!inviteCode) {
       return res.status(403).json({
         message: 'CreatorLaunch is currently invite-only. Please enter a valid invite code.',
       });
