@@ -2,7 +2,16 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { adminAPI } from '@/utils/adminApi';
-import { FiRefreshCw, FiSearch, FiEdit3, FiPlus, FiArchive, FiExternalLink } from 'react-icons/fi';
+import {
+  FiRefreshCw,
+  FiSearch,
+  FiEdit3,
+  FiPlus,
+  FiArchive,
+  FiExternalLink,
+  FiArrowUp,
+  FiArrowDown,
+} from 'react-icons/fi';
 
 interface BlogPost {
   id: string;
@@ -14,6 +23,7 @@ interface BlogPost {
   status: 'draft' | 'published' | 'archived' | 'scheduled';
   publishedAt?: string | null;
   scheduledFor?: string | null;
+  displayOrder?: number;
   tags: string[];
   createdAt: string;
   updatedAt: string;
@@ -23,14 +33,16 @@ const AdminBlogPage: React.FC = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [sortMode, setSortMode] = useState('custom');
   const [loading, setLoading] = useState(true);
   const [archivingId, setArchivingId] = useState('');
+  const [reordering, setReordering] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
     loadPosts();
-  }, []);
+  }, [sortMode]);
 
   const loadPosts = async () => {
     try {
@@ -38,7 +50,7 @@ const AdminBlogPage: React.FC = () => {
       setError('');
       setSuccess('');
 
-      const data = await adminAPI.getBlogPosts();
+      const data = await adminAPI.getBlogPosts(sortMode);
       setPosts(data.posts || []);
     } catch (err: any) {
       setError(err.message || 'Failed to load blog posts.');
@@ -65,7 +77,6 @@ const AdminBlogPage: React.FC = () => {
 
   const archivePost = async (postId: string) => {
     const reason = window.prompt('Reason for archiving this blog post?') || '';
-
     const confirmed = window.confirm('Archive this blog post?');
 
     if (!confirmed) return;
@@ -83,6 +94,43 @@ const AdminBlogPage: React.FC = () => {
       setError(err.message || 'Failed to archive blog post.');
     } finally {
       setArchivingId('');
+    }
+  };
+
+  const movePost = async (postId: string, direction: 'up' | 'down') => {
+    if (sortMode !== 'custom') {
+      setError('Switch sorting to Custom Order before moving posts.');
+      return;
+    }
+
+    const currentIndex = posts.findIndex((post) => post.id === postId);
+    const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+
+    if (currentIndex < 0 || targetIndex < 0 || targetIndex >= posts.length) return;
+
+    const nextPosts = [...posts];
+    const current = nextPosts[currentIndex];
+    const target = nextPosts[targetIndex];
+
+    nextPosts[currentIndex] = target;
+    nextPosts[targetIndex] = current;
+
+    try {
+      setReordering(true);
+      setError('');
+      setSuccess('');
+
+      setPosts(nextPosts);
+
+      await adminAPI.reorderBlogPosts(nextPosts.map((post) => post.id));
+
+      setSuccess('Blog order updated.');
+      await loadPosts();
+    } catch (err: any) {
+      setError(err.message || 'Failed to reorder posts.');
+      await loadPosts();
+    } finally {
+      setReordering(false);
     }
   };
 
@@ -110,7 +158,7 @@ const AdminBlogPage: React.FC = () => {
         <div className="admin-page-header">
           <div>
             <h1>Blog</h1>
-            <p>Create, edit, publish, schedule, or archive CreatorLaunch blog posts.</p>
+            <p>Create, edit, publish, schedule, archive, and order CreatorLaunch blog posts.</p>
           </div>
 
           <div className="flex gap-3">
@@ -155,15 +203,15 @@ const AdminBlogPage: React.FC = () => {
 
           <div className="admin-stat-card">
             <h3 className="admin-stat-value">
-              {posts.filter((post) => post.status === 'draft').length}
+              {posts.filter((post) => post.status === 'scheduled').length}
             </h3>
-            <p className="admin-stat-label">Drafts</p>
-            <p className="admin-stat-change">Internal only</p>
+            <p className="admin-stat-label">Scheduled</p>
+            <p className="admin-stat-change">Auto-publishes after date</p>
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-          <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+          <div className="flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between">
             <div className="relative">
               <FiSearch className="absolute left-3 top-3 text-gray-400" />
               <input
@@ -175,18 +223,36 @@ const AdminBlogPage: React.FC = () => {
               />
             </div>
 
-            <select
-              value={statusFilter}
-              onChange={(event) => setStatusFilter(event.target.value)}
-              className="px-4 py-2 border rounded-lg"
-            >
-              <option value="all">All Statuses</option>
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-              <option value="scheduled">Scheduled</option>
-              <option value="archived">Archived</option>
-            </select>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <select
+                value={sortMode}
+                onChange={(event) => setSortMode(event.target.value)}
+                className="px-4 py-2 border rounded-lg"
+              >
+                <option value="custom">Custom Order</option>
+                <option value="newest">Newest Published First</option>
+                <option value="oldest">Oldest Published First</option>
+              </select>
+
+              <select
+                value={statusFilter}
+                onChange={(event) => setStatusFilter(event.target.value)}
+                className="px-4 py-2 border rounded-lg"
+              >
+                <option value="all">All Statuses</option>
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
           </div>
+
+          {sortMode !== 'custom' && (
+            <p className="text-sm text-gray-500 mt-3">
+              Switch to <strong>Custom Order</strong> to move posts up or down manually.
+            </p>
+          )}
         </div>
 
         <div className="admin-table-container">
@@ -196,76 +262,109 @@ const AdminBlogPage: React.FC = () => {
             <table className="admin-table">
               <thead>
                 <tr>
+                  <th>Order</th>
                   <th>Post</th>
                   <th>Author</th>
                   <th>Status</th>
-                  <th>Published</th>
+                  <th>Published/Scheduled</th>
                   <th>Updated</th>
                   <th>Actions</th>
                 </tr>
               </thead>
 
               <tbody>
-                {filteredPosts.map((post) => (
-                  <tr key={post.id}>
-                    <td>
-                      <div>
-                        <div className="font-semibold">{post.title}</div>
-                        <div className="text-sm text-gray-500 max-w-md truncate">
-                          {post.excerpt}
+                {filteredPosts.map((post) => {
+                  const realIndex = posts.findIndex((p) => p.id === post.id);
+
+                  return (
+                    <tr key={post.id}>
+                      <td>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold">{post.displayOrder || realIndex + 1}</span>
+
+                          <div className="flex flex-col gap-1">
+                            <button
+                              type="button"
+                              disabled={sortMode !== 'custom' || realIndex === 0 || reordering}
+                              onClick={() => movePost(post.id, 'up')}
+                              className="admin-btn secondary"
+                              style={{ padding: '0.25rem 0.5rem' }}
+                            >
+                              <FiArrowUp />
+                            </button>
+
+                            <button
+                              type="button"
+                              disabled={sortMode !== 'custom' || realIndex === posts.length - 1 || reordering}
+                              onClick={() => movePost(post.id, 'down')}
+                              className="admin-btn secondary"
+                              style={{ padding: '0.25rem 0.5rem' }}
+                            >
+                              <FiArrowDown />
+                            </button>
+                          </div>
                         </div>
-                        <div className="text-xs text-gray-500">/{post.slug}</div>
-                      </div>
-                    </td>
+                      </td>
 
-                    <td>
-                      <div>{post.authorName}</div>
-                      {post.authorTitle && (
-                        <div className="text-sm text-gray-500">{post.authorTitle}</div>
-                      )}
-                    </td>
+                      <td>
+                        <div>
+                          <div className="font-semibold">{post.title}</div>
+                          <div className="text-sm text-gray-500 max-w-md truncate">
+                            {post.excerpt}
+                          </div>
+                          <div className="text-xs text-gray-500">/{post.slug}</div>
+                        </div>
+                      </td>
 
-                    <td>
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${getStatusClass(post.status)}`}>
-                        {post.status}
-                      </span>
-                    </td>
+                      <td>
+                        <div>{post.authorName}</div>
+                        {post.authorTitle && (
+                          <div className="text-sm text-gray-500">{post.authorTitle}</div>
+                        )}
+                      </td>
 
-                    <td>{formatDate(post.publishedAt || post.scheduledFor)}</td>
-                    <td>{formatDate(post.updatedAt)}</td>
+                      <td>
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${getStatusClass(post.status)}`}>
+                          {post.status}
+                        </span>
+                      </td>
 
-                    <td>
-                      <div className="flex flex-wrap gap-2">
-                        <Link href={`/admin/blog/${post.id}`} className="admin-btn secondary">
-                          <FiEdit3 />
-                          Edit
-                        </Link>
+                      <td>{formatDate(post.publishedAt || post.scheduledFor)}</td>
+                      <td>{formatDate(post.updatedAt)}</td>
 
-                        {post.status === 'published' && (
-                          <Link href={`/blog/${post.slug}`} target="_blank" className="admin-btn secondary">
-                            <FiExternalLink />
-                            View
+                      <td>
+                        <div className="flex flex-wrap gap-2">
+                          <Link href={`/admin/blog/${post.id}`} className="admin-btn secondary">
+                            <FiEdit3 />
+                            Edit
                           </Link>
-                        )}
 
-                        {post.status !== 'archived' && (
-                          <button
-                            onClick={() => archivePost(post.id)}
-                            disabled={archivingId === post.id}
-                            className="admin-btn danger"
-                          >
-                            <FiArchive />
-                            Archive
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          {post.status === 'published' && (
+                            <Link href={`/blog/${post.slug}`} target="_blank" className="admin-btn secondary">
+                              <FiExternalLink />
+                              View
+                            </Link>
+                          )}
+
+                          {post.status !== 'archived' && (
+                            <button
+                              onClick={() => archivePost(post.id)}
+                              disabled={archivingId === post.id}
+                              className="admin-btn danger"
+                            >
+                              <FiArchive />
+                              Archive
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
 
                 {filteredPosts.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="text-center p-8">
+                    <td colSpan={7} className="text-center p-8">
                       No blog posts found.
                     </td>
                   </tr>
