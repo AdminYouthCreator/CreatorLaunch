@@ -15,11 +15,11 @@ import {
   FiPackage,
   FiTool,
   FiEdit3,
+  FiSettings,
 } from 'react-icons/fi';
 
 interface AdminLayoutProps {
   children: ReactNode;
-  FiSettings,
 }
 
 const menuItems = [
