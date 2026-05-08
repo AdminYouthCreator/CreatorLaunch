@@ -101,6 +101,7 @@ const adminRequest = async (path: string, options: RequestInit = {}) => {
   return data;
 };
 
+
 export const adminAPI = {
   getOverview: async () => adminRequest('/api/admin/overview'),
   getUsers: async () => adminRequest('/api/admin/users'),
@@ -261,6 +262,17 @@ export const adminAPI = {
     return adminRequest(`/api/admin/blog/${postId}`, {
       method: 'DELETE',
       body: JSON.stringify({ reason }),
+
+      getBlogPosts: async (sort = 'custom') => {
+  return adminRequest(`/api/admin/blog?sort=${encodeURIComponent(sort)}`);
+},
+
+reorderBlogPosts: async (orderedIds: string[]) => {
+  return adminRequest('/api/admin/blog/reorder', {
+    method: 'PATCH',
+    body: JSON.stringify({ orderedIds }),
+  });
+},
     });
   },
 };
