@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import Layout from '@/components/layout/Layout';
 
 interface BlogPost {
   id: string;
@@ -56,6 +56,7 @@ const BlogPostPage: React.FC = () => {
 
   const formatDate = (date?: string) => {
     if (!date) return '';
+
     return new Date(date).toLocaleDateString(undefined, {
       month: 'long',
       day: 'numeric',
@@ -105,93 +106,109 @@ const BlogPostPage: React.FC = () => {
 
   if (loading) {
     return (
-      <Layout title="Loading Blog Post | CreatorLaunch">
-        <div className="min-h-screen flex items-center justify-center bg-light">
+      <>
+        <Head>
+          <title>Loading Blog Post | CreatorLaunch</title>
+        </Head>
+
+        <main className="min-h-screen flex items-center justify-center bg-light">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      </Layout>
+        </main>
+      </>
     );
   }
 
   if (error || !post) {
     return (
-      <Layout title="Blog Post Not Found | CreatorLaunch">
-        <div className="min-h-screen flex items-center justify-center bg-light">
+      <>
+        <Head>
+          <title>Blog Post Not Found | CreatorLaunch</title>
+        </Head>
+
+        <main className="min-h-screen flex items-center justify-center bg-light">
           <div className="text-center px-4">
-            <h1 className="text-4xl font-bold text-dark mb-4">Blog Post Not Found</h1>
+            <h1 className="text-4xl font-bold text-dark mb-4">
+              Blog Post Not Found
+            </h1>
+
             <p className="text-medium mb-6">{error}</p>
+
             <Link href="/blog" className="bg-primary text-white px-6 py-3 rounded-lg font-bold">
               Back to Blog
             </Link>
           </div>
-        </div>
-      </Layout>
+        </main>
+      </>
     );
   }
 
   return (
-    <Layout
-      title={`${post.seoTitle || post.title} | CreatorLaunch`}
-      description={post.seoDescription || post.excerpt}
-    >
-      <article className="bg-white">
-        <section className="py-16 border-b">
-          <div className="container mx-auto px-4 max-w-4xl">
-            <Link href="/blog" className="text-primary font-bold hover:text-red-600">
-              ← Back to Blog
-            </Link>
+    <>
+      <Head>
+        <title>{post.seoTitle || post.title} | CreatorLaunch</title>
+        <meta name="description" content={post.seoDescription || post.excerpt} />
+      </Head>
 
-            <p className="text-primary font-bold uppercase tracking-widest mt-8 mb-3">
-              CreatorLaunch Blog
-            </p>
+      <main>
+        <article className="bg-white">
+          <section className="py-16 border-b">
+            <div className="container mx-auto px-4 max-w-4xl">
+              <Link href="/blog" className="text-primary font-bold hover:text-red-600">
+                ← Back to Blog
+              </Link>
 
-            <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
-              {post.title}
-            </h1>
-
-            <p className="text-xl text-medium mb-6">
-              {post.excerpt}
-            </p>
-
-            <div className="text-medium">
-              <p>
-                {formatDate(post.publishedAt)} | {post.authorName}
-                {post.authorTitle ? `, ${post.authorTitle}` : ''}
+              <p className="text-primary font-bold uppercase tracking-widest mt-8 mb-3">
+                CreatorLaunch Blog
               </p>
-            </div>
 
-            {post.tags?.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-6">
-                {post.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium"
-                  >
-                    {tag}
-                  </span>
-                ))}
+              <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
+                {post.title}
+              </h1>
+
+              <p className="text-xl text-medium mb-6">
+                {post.excerpt}
+              </p>
+
+              <div className="text-medium">
+                <p>
+                  {formatDate(post.publishedAt)} | {post.authorName}
+                  {post.authorTitle ? `, ${post.authorTitle}` : ''}
+                </p>
               </div>
-            )}
-          </div>
-        </section>
 
-        {post.coverImageUrl && (
-          <div className="container mx-auto px-4 max-w-5xl py-10">
-            <img
-              src={post.coverImageUrl}
-              alt={post.title}
-              className="w-full rounded-2xl shadow-sm object-cover max-h-[500px]"
-            />
-          </div>
-        )}
+              {post.tags?.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-6">
+                  {post.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
 
-        <section className="py-12">
-          <div className="container mx-auto px-4 max-w-3xl">
-            {renderContent(post.content)}
-          </div>
-        </section>
-      </article>
-    </Layout>
+          {post.coverImageUrl && (
+            <div className="container mx-auto px-4 max-w-5xl py-10">
+              <img
+                src={post.coverImageUrl}
+                alt={post.title}
+                className="w-full rounded-2xl shadow-sm object-cover max-h-[500px]"
+              />
+            </div>
+          )}
+
+          <section className="py-12">
+            <div className="container mx-auto px-4 max-w-3xl">
+              {renderContent(post.content)}
+            </div>
+          </section>
+        </article>
+      </main>
+    </>
   );
 };
 
