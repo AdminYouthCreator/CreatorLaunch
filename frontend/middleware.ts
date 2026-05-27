@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { maintenanceConfig } from './config/maintenance';
+
+const maintenanceConfig = {
+  maintenanceMode: false,
+};
 
 const ROOT_DOMAINS = [
   'localhost',
