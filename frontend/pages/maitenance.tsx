@@ -1,6 +1,16 @@
 import React from 'react';
 import Head from 'next/head';
-import { maintenanceConfig } from '@/config/maintenance';
+
+const maintenanceContent = {
+  title: 'CreatorLaunch is getting an upgrade.',
+  subtitle:
+    'We are making improvements to the CreatorLaunch platform so young creators can have a better, safer, and smoother experience.',
+  statusLabel: 'Platform Maintenance',
+  estimatedReturn: 'We will be back soon.',
+  message:
+    'The site is temporarily unavailable while we update parts of the platform. Thank you for your patience as we continue building CreatorLaunch in public.',
+  contactEmail: 'qwentin@blassingame.org',
+};
 
 const MaintenancePage: React.FC = () => {
   return (
@@ -37,30 +47,28 @@ const MaintenancePage: React.FC = () => {
 
                 <div className="inline-flex items-center gap-2 bg-red-50 border border-red-100 text-primary rounded-full px-4 py-2 text-sm font-bold w-fit mb-6">
                   <span className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse" />
-                  {maintenanceConfig.statusLabel}
+                  {maintenanceContent.statusLabel}
                 </div>
 
                 <h2 className="text-4xl md:text-5xl font-black text-dark leading-tight mb-5">
-                  {maintenanceConfig.title}
+                  {maintenanceContent.title}
                 </h2>
 
                 <p className="text-lg text-medium leading-relaxed mb-6">
-                  {maintenanceConfig.subtitle}
+                  {maintenanceContent.subtitle}
                 </p>
 
                 <div className="bg-light rounded-2xl border border-gray-100 p-5 mb-8">
-                  <p className="text-dark font-bold mb-2">
-                    What is happening?
-                  </p>
+                  <p className="text-dark font-bold mb-2">What is happening?</p>
 
                   <p className="text-medium leading-relaxed">
-                    {maintenanceConfig.message}
+                    {maintenanceContent.message}
                   </p>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <a
-                    href={`mailto:${maintenanceConfig.contactEmail}`}
+                    href={`mailto:${maintenanceContent.contactEmail}`}
                     className="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-red-600 transition-colors text-center"
                   >
                     Contact CreatorLaunch
@@ -97,36 +105,30 @@ const MaintenancePage: React.FC = () => {
 
                   <div className="grid gap-4">
                     <div className="bg-white/10 border border-white/10 rounded-2xl p-5">
-                      <p className="font-bold text-white mb-1">
-                        Safer creator tools
-                      </p>
+                      <p className="font-bold text-white mb-1">Safer creator tools</p>
                       <p className="text-white/70 text-sm">
                         We are improving the experience for creators, admins, and visitors.
                       </p>
                     </div>
 
                     <div className="bg-white/10 border border-white/10 rounded-2xl p-5">
-                      <p className="font-bold text-white mb-1">
-                        Better platform stability
-                      </p>
+                      <p className="font-bold text-white mb-1">Better platform stability</p>
                       <p className="text-white/70 text-sm">
                         We are checking pages, routes, dashboards, and platform features.
                       </p>
                     </div>
 
                     <div className="bg-white/10 border border-white/10 rounded-2xl p-5">
-                      <p className="font-bold text-white mb-1">
-                        More launch-ready features
-                      </p>
+                      <p className="font-bold text-white mb-1">More launch-ready features</p>
                       <p className="text-white/70 text-sm">
-                        Every update brings CreatorLaunch closer to public release.
+                        Every update brings CreatorLaunch closer to release.
                       </p>
                     </div>
                   </div>
 
                   <div className="mt-8 pt-6 border-t border-white/10">
                     <p className="text-sm text-white/60">
-                      {maintenanceConfig.estimatedReturn}
+                      {maintenanceContent.estimatedReturn}
                     </p>
                   </div>
                 </div>
