@@ -6,10 +6,10 @@ const maintenanceContent = {
   subtitle:
     'We are making improvements to the CreatorLaunch platform so young creators can have a better, safer, and smoother experience.',
   statusLabel: 'Platform Maintenance',
-  estimatedReturn: 'We will be back soon.',
+  estimatedReturn: 'Estimated Return: June 1, 2026',
   message:
     'The site is temporarily unavailable while we update parts of the platform. Thank you for your patience as we continue building CreatorLaunch in public.',
-  contactEmail: 'qwentin@blassingame.org',
+  contactEmail: 'qwentin@youthcreatorlaunch.org',
 };
 
 const MaintenancePage: React.FC = () => {
@@ -107,7 +107,7 @@ const MaintenancePage: React.FC = () => {
                     <div className="bg-white/10 border border-white/10 rounded-2xl p-5">
                       <p className="font-bold text-white mb-1">Safer creator tools</p>
                       <p className="text-white/70 text-sm">
-                        We are improving the experience for creators, admins, and visitors.
+                        We are improving the experience for creators and visitors.
                       </p>
                     </div>
 
