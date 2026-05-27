@@ -26,6 +26,14 @@ const shouldIgnorePath = (pathname: string) => {
   );
 };
 
+const isRootDomain = (hostname: string) => {
+  return (
+    ROOT_DOMAINS.includes(hostname) ||
+    hostname.endsWith('.vercel.app') ||
+    hostname.endsWith('.vercel.dev')
+  );
+};
+
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const pathname = url.pathname;
@@ -40,6 +48,10 @@ export function middleware(request: NextRequest) {
     hostname === '127.0.0.1' ||
     hostname.endsWith('.localhost');
 
+  if (isLocalhost) {
+    return NextResponse.next();
+  }
+
   // Allow /admin on the main domain.
   if (pathname.startsWith('/admin')) {
     return NextResponse.next();
@@ -53,8 +65,8 @@ export function middleware(request: NextRequest) {
     return NextResponse.rewrite(url);
   }
 
-  // Main/root domains behave normally.
-  if (ROOT_DOMAINS.includes(hostname) || isLocalhost) {
+  // Main/root domains and Vercel preview/production domains behave normally.
+  if (isRootDomain(hostname)) {
     return NextResponse.next();
   }
 
