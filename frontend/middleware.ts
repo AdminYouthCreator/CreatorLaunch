@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { maintenanceConfig } from './config/maintenance';
 
 const ROOT_DOMAINS = [
   'localhost',
@@ -21,7 +22,10 @@ const shouldIgnorePath = (pathname: string) => {
     pathname.startsWith('/api') ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/assets') ||
+    pathname.startsWith('/images') ||
     pathname === '/favicon.ico' ||
+    pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml' ||
     pathname.includes('.')
   );
 };
@@ -43,6 +47,15 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (maintenanceConfig.maintenanceMode && pathname !== '/maintenance') {
+    url.pathname = '/maintenance';
+    return NextResponse.redirect(url);
+  }
+
+  if (pathname === '/maintenance') {
+    return NextResponse.next();
+  }
+
   const isLocalhost =
     hostname === 'localhost' ||
     hostname === '127.0.0.1' ||
@@ -52,27 +65,21 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Allow /admin on the main domain.
   if (pathname.startsWith('/admin')) {
     return NextResponse.next();
   }
 
   const isAdminSubdomain = hostname.startsWith('admin.');
 
-  // If admin subdomain is ever used, rewrite it to /admin.
   if (isAdminSubdomain) {
     url.pathname = `/admin${pathname === '/' ? '' : pathname}`;
     return NextResponse.rewrite(url);
   }
 
-  // Main/root domains and Vercel preview/production domains behave normally.
   if (isRootDomain(hostname)) {
     return NextResponse.next();
   }
 
-  // Store subdomain routing:
-  // demo.youthcreatorlaunch.org -> /store/demo
-  // demo.mycreatorlaunch.me -> /store/demo
   const subdomain = hostname.split('.')[0];
 
   if (!subdomain || subdomain === 'www' || subdomain === 'admin') {
