@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 const maintenanceConfig = {
-  maintenanceMode: true,
+  maintenanceMode: false,
 };
 
 const ROOT_DOMAINS = [
