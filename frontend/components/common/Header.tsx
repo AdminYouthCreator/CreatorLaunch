@@ -58,6 +58,7 @@ const Header: React.FC<HeaderProps> = ({
   const navigation = [
     { name: 'Home', href: '/' },
     { name: 'Bring CreatorLaunch', href: '/bring-creatorlaunch' },
+    { name: 'Games', href: '/games' },
     { name: 'About', href: '/about' },
     { name: 'Team', href: '/about/team' },
     { name: 'Partners', href: '/partners' },
