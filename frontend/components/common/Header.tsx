@@ -1,24 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useAuthContext } from '../../context/AuthContext';
 
-// ################## ----- HEADER PROPS INTERFACE ----- ##################
-// Props for the header component
-// Controls announcement banner display and messaging
-// ####################################################################
 interface HeaderProps {
   showAnnouncement?: boolean;
   announcementText?: string;
 }
 
-// ################## ----- HEADER COMPONENT ----- ##################
-// Main navigation header with announcement banner
-// Handles mobile menu toggle and active link highlighting
-// ##########################################################
+const CONTACT_EMAIL = 'qwentin@youthcreatorlaunch.org';
+const contactHref = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+  'CreatorLaunch Inquiry'
+)}`;
+
 const Header: React.FC<HeaderProps> = ({
   showAnnouncement = true,
-  announcementText = 'CreatorLaunch is building the next generation of founders.',
+  announcementText = 'Bring CreatorLaunch workshops to your school, summer program, or community organization.',
 }) => {
   const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(showAnnouncement);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -28,16 +25,10 @@ const Header: React.FC<HeaderProps> = ({
   const { user, logout, loading } = useAuthContext();
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  // ################## ----- SYNC ANNOUNCEMENT VISIBILITY ----- ##################
-  // Keeps banner behavior correct if parent props change
-  // ###########################################################################
   useEffect(() => {
     setIsAnnouncementVisible(showAnnouncement);
   }, [showAnnouncement, announcementText]);
 
-  // ################## ----- CLOSE DROPDOWN ON OUTSIDE CLICK ----- ##################
-  // Closes the user dropdown when clicking outside of it
-  // ###########################################################################
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
@@ -54,9 +45,6 @@ const Header: React.FC<HeaderProps> = ({
     };
   }, [showUserMenu]);
 
-  // ################## ----- LOGOUT HANDLER ----- ##################
-  // Logs out current user and returns them to public homepage
-  // ################################################################
   const handleLogout = async () => {
     try {
       setShowUserMenu(false);
@@ -67,22 +55,16 @@ const Header: React.FC<HeaderProps> = ({
     }
   };
 
-  // ################## ----- NAVIGATION ITEMS ----- ##################
-  // Main public navigation menu items
-  // ################################################################
   const navigation = [
     { name: 'Home', href: '/' },
+    { name: 'Bring CreatorLaunch', href: '/bring-creatorlaunch' },
     { name: 'About', href: '/about' },
     { name: 'Team', href: '/about/team' },
     { name: 'Partners', href: '/partners' },
     { name: 'Blog', href: '/blog' },
-    { name: 'Platform Progress', href: '/progress' },
-    { name: 'Contact', href: '/contact' },
+    { name: 'Platform', href: '/progress' },
   ];
 
-  // ################## ----- ACTIVE LINK CHECKER ----- ##################
-  // Highlights the current page in the navbar
-  // ###################################################################
   const isActiveLink = (href: string) => {
     if (href === '/' && router.pathname === '/') return true;
     if (href !== '/' && router.pathname.startsWith(href)) return true;
@@ -91,7 +73,6 @@ const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      {/* Announcement Banner */}
       {isAnnouncementVisible && announcementText && (
         <div className="announcement-banner show">
           <p>{announcementText}</p>
@@ -105,10 +86,8 @@ const Header: React.FC<HeaderProps> = ({
         </div>
       )}
 
-      {/* Main Header */}
       <header className="p-4 glass-nav shadow-sm sticky top-0 z-50">
         <nav className="container mx-auto flex items-center">
-          {/* Logo */}
           <Link href="/" aria-label="CreatorLaunch home">
             <img
               src="/assets/header-logo.png"
@@ -117,9 +96,8 @@ const Header: React.FC<HeaderProps> = ({
             />
           </Link>
 
-          {/* Centered Navigation */}
           <div className="flex-1 flex justify-center">
-            <div className="hidden md:flex items-center gap-6 font-semibold">
+            <div className="hidden lg:flex items-center gap-5 font-semibold">
               {navigation.map((item) => (
                 <Link
                   key={item.name}
@@ -134,8 +112,14 @@ const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Right-aligned Button Group */}
-          <div className="hidden md:flex items-center gap-2 ml-4">
+          <div className="hidden lg:flex items-center gap-2 ml-4">
+            <a
+              href={contactHref}
+              className="px-3 py-2 rounded-lg font-bold text-sm whitespace-nowrap transition-colors border border-gray-200 hover:border-primary hover:text-primary"
+            >
+              Contact
+            </a>
+
             <Link
               href="/donate"
               className="px-3 py-2 rounded-lg font-bold text-sm whitespace-nowrap transition-colors"
@@ -150,7 +134,6 @@ const Header: React.FC<HeaderProps> = ({
               Donate
             </Link>
 
-            {/* Authentication Section */}
             {loading ? (
               <div className="flex items-center space-x-3">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
@@ -186,7 +169,6 @@ const Header: React.FC<HeaderProps> = ({
                   </svg>
                 </button>
 
-                {/* User Dropdown Menu */}
                 {showUserMenu && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
                     <div className="px-4 py-3 border-b border-gray-200">
@@ -255,24 +237,11 @@ const Header: React.FC<HeaderProps> = ({
                 >
                   Login
                 </Link>
-
-                <Link
-                  href="/auth/register"
-                  className="px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-bold text-sm transition-colors whitespace-nowrap"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    height: '40px',
-                  }}
-                >
-                  Sign Up
-                </Link>
               </div>
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden ml-auto">
+          <div className="lg:hidden ml-auto">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="text-medium hover:text-primary transition-colors"
@@ -304,9 +273,8 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         </nav>
 
-        {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden mt-4 pb-4 border-t border-gray-200">
+          <div className="lg:hidden mt-4 pb-4 border-t border-gray-200">
             <div className="flex flex-col space-y-4 pt-4">
               {navigation.map((item) => (
                 <Link
@@ -321,8 +289,15 @@ const Header: React.FC<HeaderProps> = ({
                 </Link>
               ))}
 
-              {/* Mobile Button Group */}
               <div className="flex flex-col space-y-3 pt-4 border-t border-gray-100">
+                <a
+                  href={contactHref}
+                  className="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-bold text-center transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Contact
+                </a>
+
                 <Link
                   href="/donate"
                   className="px-5 py-2 rounded-lg btn-primary-solid font-bold text-center"
@@ -331,7 +306,6 @@ const Header: React.FC<HeaderProps> = ({
                   Donate
                 </Link>
 
-                {/* Mobile Authentication Section */}
                 {loading ? (
                   <div className="flex justify-center py-4">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
@@ -353,22 +327,6 @@ const Header: React.FC<HeaderProps> = ({
                       Dashboard
                     </Link>
 
-                    <Link
-                      href="/products"
-                      className="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-bold text-center transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Products
-                    </Link>
-
-                    <Link
-                      href="/onboarding"
-                      className="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-bold text-center transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Onboarding
-                    </Link>
-
                     <button
                       onClick={() => {
                         setIsMobileMenuOpen(false);
@@ -380,23 +338,13 @@ const Header: React.FC<HeaderProps> = ({
                     </button>
                   </div>
                 ) : (
-                  <div className="flex flex-col space-y-3">
-                    <Link
-                      href="/auth/login"
-                      className="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-bold text-center transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Login
-                    </Link>
-
-                    <Link
-                      href="/auth/register"
-                      className="px-5 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 font-bold text-center transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Sign Up
-                    </Link>
-                  </div>
+                  <Link
+                    href="/auth/login"
+                    className="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-bold text-center transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
                 )}
               </div>
             </div>

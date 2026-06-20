@@ -2,175 +2,182 @@ import React from 'react';
 import Link from 'next/link';
 import Layout from '@/components/common/Layout';
 
+const CONTACT_EMAIL = 'qwentin@youthcreatorlaunch.org';
+const bringHref = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+  'Bring CreatorLaunch to our community'
+)}`;
+
 const AboutPage = () => {
   return (
-    <Layout title="About | CreatorLaunch">
+    <Layout
+      title="About | CreatorLaunch"
+      description="Learn about CreatorLaunch, a youth-led nonprofit making entrepreneurship education more accessible through workshops, community partnerships, and digital tools."
+    >
       <main className="min-h-screen bg-white">
-        {/* Hero */}
-        <section className="bg-gradient-to-br from-white via-red-50 to-orange-50 py-20">
+        <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <p className="text-primary font-semibold mb-3">
-                By a student, for every student.
-              </p>
-              <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
-                Real business learning should not wait until college.
-              </h1>
-              <p className="text-lg md:text-xl text-medium max-w-3xl mx-auto">
-                CreatorLaunch was built from a simple belief: young people do not need to
-                wait for permission to create, lead, sell, build, and launch.
-              </p>
+            <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
+              <div>
+                <p className="text-primary font-bold uppercase tracking-widest mb-3">
+                  Our Story
+                </p>
+
+                <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6 leading-tight">
+                  CreatorLaunch started with a simple frustration.
+                </h1>
+
+                <p className="text-lg md:text-xl text-medium">
+                  Young people are told to dream big, but too often they are not given the
+                  tools, support, funding, or real-world spaces to actually build. CreatorLaunch
+                  exists to change that.
+                </p>
+              </div>
+
+              <div className="rounded-3xl overflow-hidden shadow-2xl border border-white bg-white">
+                <img
+                  src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80"
+                  alt="Creative workspace with laptops and planning materials"
+                  className="w-full h-[430px] object-cover"
+                />
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Origin Story */}
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-10 items-center">
-              <div className="bg-light rounded-2xl min-h-[360px] flex items-center justify-center border border-gray-100">
-                <div className="text-center p-8">
-                  <div className="w-24 h-24 bg-primary rounded-full mx-auto mb-4 flex items-center justify-center text-white text-4xl font-bold">
-                    CL
-                  </div>
-                  <p className="text-medium">Founder photo coming soon</p>
-                </div>
-              </div>
+            <div className="max-w-5xl mx-auto">
+              <div className="bg-light rounded-3xl p-8 md:p-12 border border-gray-100">
+                <p className="text-primary font-bold uppercase tracking-widest mb-3">
+                  Why We Exist
+                </p>
 
-              <div>
-                <p className="text-primary font-semibold mb-2">Our Origin Story</p>
                 <h2 className="text-3xl md:text-4xl font-bold text-dark mb-6">
-                  Founded by a 16-year-old entrepreneur.
+                  We believe young people should not have to wait until adulthood to build.
                 </h2>
 
-                <div className="space-y-4 text-medium text-lg">
+                <div className="space-y-5 text-lg text-medium">
                   <p>
-                    CreatorLaunch began when our founder, a 16-year-old student with an
-                    entrepreneurial mindset, looked at the existing landscape and saw a wall
-                    between youth and the business world.
+                    CreatorLaunch was founded by Qwentin Blassingame, a young entrepreneur who
+                    saw how hard it can be for students to access real entrepreneurship support.
+                    A lot of programs talk about leadership and business, but not enough give
+                    students practical ways to create, test, pitch, and launch.
                   </p>
 
                   <p>
-                    High school offered clubs, but not launch capital. It offered theory,
-                    but not launchpads. It encouraged ambition, but rarely gave students the
-                    tools to turn ideas into real ventures.
+                    We are building CreatorLaunch to be more than a class. It is a launchpad:
+                    a place where students can learn by doing, communities can bring workshops
+                    to their youth, and partners can help remove barriers for young founders.
                   </p>
 
                   <p>
-                    Driven by the desire to see more youth-run businesses in St. Louis and
-                    beyond, CreatorLaunch was built to be the bridge. It is a peer-led movement
-                    designed to prove that age is not a barrier to innovation. It can be an
-                    advantage.
+                    Our work is personal because we know what it feels like to be young and
+                    serious about an idea. CreatorLaunch is here for the student with a business
+                    idea in their notes app, the kid who wants to sell something but does not
+                    know where to start, and the community that wants to give youth something
+                    real to build.
                   </p>
                 </div>
-
-                <blockquote className="mt-6 border-l-4 border-primary pl-4 italic text-dark font-medium">
-                  “We are not just waiting for our turn to lead. We are building the businesses
-                  of today.”
-                </blockquote>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Mission + Vision */}
+        <section className="py-20 bg-dark text-white">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-6">
+              <div className="bg-white/10 rounded-2xl p-6 border border-white/10">
+                <div className="text-4xl mb-4">🎯</div>
+                <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
+                <p className="text-gray-200">
+                  To make entrepreneurship education more accessible by helping young people
+                  build real ideas, skills, confidence, and launch-ready ventures.
+                </p>
+              </div>
+
+              <div className="bg-white/10 rounded-2xl p-6 border border-white/10">
+                <div className="text-4xl mb-4">🤝</div>
+                <h2 className="text-2xl font-bold mb-4">Our Model</h2>
+                <p className="text-gray-200">
+                  We partner with schools, programs, and organizations to bring hands-on
+                  entrepreneurship workshops directly to communities.
+                </p>
+              </div>
+
+              <div className="bg-white/10 rounded-2xl p-6 border border-white/10">
+                <div className="text-4xl mb-4">🚀</div>
+                <h2 className="text-2xl font-bold mb-4">Our Future</h2>
+                <p className="text-gray-200">
+                  We are also building a digital platform where young creators can create
+                  stores, products, services, and launch pathways online.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="py-20 bg-light">
           <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
-              <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-                <h2 className="text-2xl font-bold text-dark mb-4">
-                  The Mission: What We Do Now
-                </h2>
-                <p className="text-medium text-lg">
-                  We empower young creators with hands-on workshops, launch funding, pitch
-                  opportunities, and practical tools that help them build real ventures in a
-                  low-risk, youth-centered environment.
+            <div className="grid lg:grid-cols-2 gap-10 items-center max-w-6xl mx-auto">
+              <div>
+                <p className="text-primary font-bold uppercase tracking-widest mb-3">
+                  What Makes Us Different
                 </p>
+
+                <h2 className="text-3xl md:text-4xl font-bold text-dark mb-6">
+                  CreatorLaunch is built from the student perspective.
+                </h2>
+
+                <div className="space-y-4">
+                  {[
+                    'We focus on practical, hands-on entrepreneurship instead of theory-only learning.',
+                    'We make workshops no-cost for students and families.',
+                    'We are youth-led, so students see entrepreneurship modeled by people closer to their own experience.',
+                    'We work with community partners who already serve youth.',
+                    'We are building a digital platform, but community impact comes first.',
+                  ].map((item) => (
+                    <div key={item} className="bg-white rounded-2xl p-5 border border-gray-100">
+                      <p className="text-medium">{item}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-                <h2 className="text-2xl font-bold text-dark mb-4">
-                  The Vision: Where We Are Going
-                </h2>
-                <p className="text-medium text-lg">
-                  We are scaling our St. Louis model into the CreatorLaunch digital platform,
-                  making youth entrepreneurship more accessible through guided tools,
-                  storefronts, resources, and launch pathways.
-                </p>
+              <div className="rounded-3xl overflow-hidden shadow-xl border border-white bg-white">
+                <img
+                  src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80"
+                  alt="Team planning around laptops"
+                  className="w-full h-[520px] object-cover"
+                />
               </div>
             </div>
           </div>
         </section>
 
-        {/* History */}
-        <section className="py-20 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">
-                The History of Entrepreneurship Education in St. Louis
-              </h2>
-              <p className="text-lg text-medium">
-                St. Louis has always been a city of builders. CreatorLaunch is here to make
-                sure young founders are included in that future.
-              </p>
-            </div>
-
-            <div className="max-w-4xl mx-auto space-y-6">
-              <div className="bg-light rounded-2xl p-6 border border-gray-100">
-                <h3 className="text-xl font-bold text-dark mb-2">The Traditional Era</h3>
-                <p className="text-medium">
-                  For decades, entrepreneurship was often gate-kept within universities,
-                  professional networks, and adult business spaces. High schoolers were often
-                  told to wait until college to start thinking like founders.
-                </p>
-              </div>
-
-              <div className="bg-light rounded-2xl p-6 border border-gray-100">
-                <h3 className="text-xl font-bold text-dark mb-2">The Theory Gap</h3>
-                <p className="text-medium">
-                  As entrepreneurship clubs and school programs became more common, many still
-                  focused on business plans, slides, and ideas without giving students real
-                  funding, tools, or launch opportunities.
-                </p>
-              </div>
-
-              <div className="bg-red-50 rounded-2xl p-6 border border-red-100">
-                <h3 className="text-xl font-bold text-dark mb-2">
-                  2025: The CreatorLaunch Revolution
-                </h3>
-                <p className="text-medium">
-                  CreatorLaunch is rewriting that story by putting youth at the center and
-                  focusing on real business creation, launch capital, pitch competitions, and
-                  tools that help young founders move from idea to action.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA */}
         <section className="py-20 bg-primary text-white">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Be Part of the History.
+              Help us make entrepreneurship real for more young people.
             </h2>
+
             <p className="text-white/90 text-lg max-w-2xl mx-auto mb-8">
-              Whether you are a student, parent, educator, partner, or donor, you can help
-              make youth entrepreneurship real.
+              Whether you are a school, community organization, donor, sponsor, or supporter,
+              there is a place for you in the CreatorLaunch mission.
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link
-                href="/contact"
+              <a
+                href={bringHref}
                 className="bg-white text-primary px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
               >
-                Apply Now
-              </Link>
+                Bring CreatorLaunch
+              </a>
+
               <Link
                 href="/donate"
                 className="bg-red-700 text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-800 transition-colors"
               >
-                Support Our Mission
+                Donate
               </Link>
             </div>
           </div>

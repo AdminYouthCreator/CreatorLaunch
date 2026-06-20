@@ -1,82 +1,148 @@
-// ################## ----- FOOTER COMPONENT ----- ##################
-// Site footer with branding, links, and social media
-// Pulls configuration data from config.json file
-// ################################################################
 import Link from 'next/link';
 import { FaLinkedin, FaInstagram, FaFacebook } from 'react-icons/fa';
-import config from '@/config/config.json';
 
-// ################## ----- FOOTER COMPONENT ----- ##################
-// Main footer component with logo, links, and social icons
-// Uses configuration data for dynamic content
-// ##########################################################
+const CONTACT_EMAIL = 'qwentin@youthcreatorlaunch.org';
+
 export const Footer = () => {
-  const { footer } = config;
-
   return (
     <footer className="site-footer">
       <div className="container mx-auto px-4">
         <div className="footer-grid">
-          {/* Logo & Description */}
           <div className="footer-col">
-          <img
-            src={footer.logo.src}
-            alt={footer.logo.alt}
-            className="footer-logo"
-          />
-          <p className="footer-desc">{footer.description}</p>
-          <div className="footer-social">
-            <a
-              href={footer.social[0].link}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FaLinkedin className="social-icon" />
-            </a>
-            <a
-              href={footer.social[1].link}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FaInstagram className="social-icon" />
-            </a>
-            <a
-              href={footer.social[2].link}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FaFacebook className="social-icon" />
-            </a>
+            <img
+              src="/assets/footer-logo.png"
+              alt="CreatorLaunch Logo"
+              className="footer-logo"
+            />
+
+            <p className="footer-desc">
+              CreatorLaunch is a youth-led 501(c)(3) nonprofit helping young people
+              learn entrepreneurship, build ideas, and launch real ventures through
+              community workshops, partnerships, and digital tools.
+            </p>
+
+            <div className="footer-social">
+              <a
+                href="https://www.linkedin.com/company/the-young-ceo-launchpad"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="CreatorLaunch LinkedIn"
+              >
+                <FaLinkedin className="social-icon" />
+              </a>
+
+              <a
+                href="https://www.instagram.com/thecreatorlaunch"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="CreatorLaunch Instagram"
+              >
+                <FaInstagram className="social-icon" />
+              </a>
+
+              <a
+                href="https://www.facebook.com/people/CreatorLaunch/61577895815824/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="CreatorLaunch Facebook"
+              >
+                <FaFacebook className="social-icon" />
+              </a>
+            </div>
           </div>
-        </div>
 
-        {/* Quick Links */}
-        <div className="footer-col">
-          <h3>Quick Links</h3>
-          <ul className="footer-links">
-            {footer.quickLinks.map((l) => (
-              <li key={l.label}>
-                <Link href={l.link} className="footer-link">
-                  {l.label}
+          <div className="footer-col">
+            <h3>For Communities</h3>
+            <ul className="footer-links">
+              <li>
+                <Link href="/bring-creatorlaunch" className="footer-link">
+                  Bring CreatorLaunch
                 </Link>
               </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Resources */}
-        <div className="footer-col">
-          <h3>Resources</h3>
-          <ul className="footer-links">
-            {footer.resources.map((r) => (
-              <li key={r.label}>
-                <Link href={r.link} className="footer-link">
-                  {r.label}
+              <li>
+                <Link href="/partners" className="footer-link">
+                  Partners
                 </Link>
               </li>
-            ))}
-          </ul>
-        </div>
+              <li>
+                <a
+                  href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+                    'Bring CreatorLaunch to our community'
+                  )}`}
+                  className="footer-link"
+                >
+                  Request a Workshop
+                </a>
+              </li>
+              <li>
+                <Link href="/donate" className="footer-link">
+                  Donate
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div className="footer-col">
+            <h3>About</h3>
+            <ul className="footer-links">
+              <li>
+                <Link href="/about" className="footer-link">
+                  Our Story
+                </Link>
+              </li>
+              <li>
+                <Link href="/about/team" className="footer-link">
+                  Team
+                </Link>
+              </li>
+              <li>
+                <Link href="/progress" className="footer-link">
+                  Digital Platform
+                </Link>
+              </li>
+              <li>
+                <Link href="/blog" className="footer-link">
+                  Blog
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div className="footer-col">
+            <h3>Contact</h3>
+            <ul className="footer-links">
+              <li>
+                <a
+                  href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+                    'General CreatorLaunch Inquiry'
+                  )}`}
+                  className="footer-link"
+                >
+                  {CONTACT_EMAIL}
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+                    'Partnership Inquiry'
+                  )}`}
+                  className="footer-link"
+                >
+                  Partnership Inquiry
+                </a>
+              </li>
+              <li>
+                <a
+                  href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+                    'Donation Inquiry'
+                  )}`}
+                  className="footer-link"
+                >
+                  Donation Inquiry
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 
@@ -84,7 +150,11 @@ export const Footer = () => {
 
       <div className="container mx-auto px-4">
         <div className="footer-bottom">
-          {footer.copyright}
+          <p>
+            CreatorLaunch is a nationally recognized 501(c)(3) nonprofit organization.
+            EIN: 39-2689174
+          </p>
+          <p className="mt-2">© 2026 CreatorLaunch. All rights reserved.</p>
         </div>
       </div>
     </footer>
