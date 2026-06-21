@@ -100,16 +100,6 @@ export const Footer = () => {
                   Digital Platform
                 </Link>
               </li>
-              <li>
-                <Link href="/apply" className="footer-link">
-                  Program Application
-                </Link>
-              </li>
-              <li>
-                <Link href="/pitch" className="footer-link">
-                  Pitch Submission
-                </Link>
-              </li>
             </ul>
           </div>
 
