@@ -46,7 +46,6 @@
       { "label": "Meet Mox", "link": "/meet-mox" }
     ],
     "resources": [
-      { "label": "Creator Tools", "link": "/tools" },
       { "label": "Verify Certificate", "link": "/verify-certificate" },
       { "label": "Donate", "link": "/donate" },
       { "label": "Blog", "link": "/blog" }

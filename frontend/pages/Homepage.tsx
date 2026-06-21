@@ -236,66 +236,6 @@ const Homepage = () => {
           </div>
         </section>
 
-        <section className="py-20 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-2 gap-10 max-w-6xl mx-auto items-center">
-              <div>
-                <p className="text-primary font-bold uppercase tracking-widest mb-3">
-                  Creator Tools
-                </p>
-
-                <h2 className="text-3xl md:text-5xl font-bold text-dark mb-6">
-                  Extra tools for students who want to build something.
-                </h2>
-
-                <p className="text-lg text-medium mb-6">
-                  Creator Tools gives young creators simple interactive resources for
-                  brainstorming business ideas, estimating launch costs, downloading founder
-                  worksheets, and turning thoughts into action.
-                </p>
-
-                <div className="grid sm:grid-cols-2 gap-4 mb-8">
-                  {[
-                    'Build-a-Business Challenge',
-                    'Spin the Startup Wheel',
-                    'Founder Toolkit Downloads',
-                    'Launch Cost Calculator',
-                  ].map((item) => (
-                    <div key={item} className="bg-light rounded-2xl p-5 border border-gray-100">
-                      <p className="font-bold text-dark">{item}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <Link
-                  href="/tools"
-                  className="inline-block bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors"
-                >
-                  Explore Creator Tools
-                </Link>
-              </div>
-
-              <div className="bg-light rounded-3xl p-6 md:p-8 border border-gray-100">
-                <div className="bg-white rounded-2xl p-6 shadow-sm">
-                  <p className="text-primary font-bold mb-2">Build-a-Business Prompt</p>
-                  <h3 className="text-2xl font-bold text-dark mb-3">
-                    What problem could you solve this week?
-                  </h3>
-                  <p className="text-medium mb-6">
-                    Students can save their responses and use them later during a workshop,
-                    pitch practice, or planning session.
-                  </p>
-                  <div className="space-y-3">
-                    <div className="h-3 rounded-full bg-red-100 w-full" />
-                    <div className="h-3 rounded-full bg-red-100 w-5/6" />
-                    <div className="h-3 rounded-full bg-red-100 w-3/4" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
         <section className="py-20 bg-violet-50">
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-10 max-w-6xl mx-auto items-center">
