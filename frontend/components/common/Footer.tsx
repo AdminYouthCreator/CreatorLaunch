@@ -96,8 +96,18 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link href="/games" className="footer-link">
+                  CreatorGames
+                </Link>
+              </li>
+              <li>
                 <Link href="/progress" className="footer-link">
                   Digital Platform
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="footer-link">
+                  FAQ
                 </Link>
               </li>
               <li>

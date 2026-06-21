@@ -143,6 +143,98 @@ const Homepage = () => {
           </div>
         </section>
 
+        <section className="py-20 bg-slate-950 text-white overflow-hidden">
+          <div className="container mx-auto px-4">
+            <div className="grid lg:grid-cols-2 gap-10 max-w-6xl mx-auto items-center">
+              <div>
+                <p className="text-red-300 font-bold uppercase tracking-widest mb-3">
+                  CreatorGames
+                </p>
+
+                <h2 className="text-3xl md:text-5xl font-bold mb-6">
+                  Students can practice money and business decisions through games.
+                </h2>
+
+                <p className="text-white/75 text-lg mb-6">
+                  CreatorGames is our learning arcade with curated financial and
+                  entrepreneurship games. Students can explore budgeting, credit, investing,
+                  careers, insurance, and entrepreneurship in a fun, interactive way.
+                </p>
+
+                <p className="text-white/60 mb-8">
+                  It is a great add-on for workshops, classrooms, afterschool programs,
+                  and students who want to keep learning outside of a live session.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link
+                    href="/games"
+                    className="bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors text-center"
+                  >
+                    Explore CreatorGames
+                  </Link>
+
+                  <Link
+                    href="/bring-creatorlaunch"
+                    className="bg-white/10 text-white border border-white/10 px-8 py-4 rounded-lg font-semibold hover:bg-white/15 transition-colors text-center"
+                  >
+                    Use Games in a Workshop
+                  </Link>
+                </div>
+              </div>
+
+              <div className="relative">
+                <div className="absolute -top-20 -right-20 w-72 h-72 bg-red-500/25 rounded-full blur-3xl" />
+                <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-blue-500/25 rounded-full blur-3xl" />
+
+                <div className="relative bg-white/10 border border-white/10 rounded-3xl p-6 shadow-2xl">
+                  <div className="grid gap-4">
+                    <div className="bg-white text-slate-950 rounded-2xl p-5">
+                      <div className="flex items-center gap-4">
+                        <div className="text-4xl">🎮</div>
+                        <div>
+                          <p className="font-black text-lg">CreatorGames Arcade</p>
+                          <p className="text-sm text-slate-600">
+                            Financial learning games curated by CreatorLaunch.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      {[
+                        'Entrepreneurship',
+                        'Budgeting',
+                        'Credit',
+                        'Investing',
+                        'Insurance',
+                        'Careers',
+                      ].map((item) => (
+                        <div
+                          key={item}
+                          className="bg-white/10 border border-white/10 rounded-2xl p-4"
+                        >
+                          <p className="font-bold">{item}</p>
+                          <p className="text-sm text-white/60 mt-1">
+                            Learn by playing
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <Link
+                      href="/games/influencd"
+                      className="block bg-red-500 hover:bg-red-600 text-white text-center rounded-2xl p-4 font-black transition-colors"
+                    >
+                      Featured Game: Influenc’d →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="py-20 bg-dark text-white">
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-10 max-w-6xl mx-auto items-center">

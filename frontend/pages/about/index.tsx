@@ -83,6 +83,71 @@ const AboutPage = () => {
           </div>
         </section>
 
+        <section className="py-20 bg-light">
+          <div className="container mx-auto px-4">
+            <div className="grid lg:grid-cols-2 gap-10 items-center max-w-6xl mx-auto">
+              <div className="rounded-3xl overflow-hidden shadow-xl border border-white bg-white">
+                <img
+                  src="/assets/qwentin-pfp.png"
+                  alt="Qwentin Blassingame"
+                  className="w-full h-[520px] object-cover"
+                />
+              </div>
+
+              <div>
+                <p className="text-primary font-bold uppercase tracking-widest mb-3">
+                  About the Founder
+                </p>
+
+                <h2 className="text-3xl md:text-5xl font-bold text-dark mb-6">
+                  Built by someone who understands what young creators are missing.
+                </h2>
+
+                <div className="space-y-5 text-lg text-medium">
+                  <p>
+                    CreatorLaunch was founded by Qwentin Blassingame, a young founder who
+                    wanted to create the kind of support system he wished more students had
+                    access to. The idea came from a real problem: young people often have
+                    creativity, ambition, and business ideas, but they are not always taken
+                    seriously or given practical tools to start.
+                  </p>
+
+                  <p>
+                    Qwentin started CreatorLaunch to help close that gap. Instead of waiting
+                    for students to become adults before they are taught entrepreneurship,
+                    CreatorLaunch helps them learn now through workshops, community partnerships,
+                    creator tools, and hands-on activities.
+                  </p>
+
+                  <p>
+                    His vision is for CreatorLaunch to become a place where youth can learn
+                    how to build brands, understand money, pitch ideas, create products and
+                    services, and see entrepreneurship as something they can actually do.
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                  <Link
+                    href="/about/team/qwentin-blassingame"
+                    className="bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors text-center"
+                  >
+                    Read Qwentin’s Bio
+                  </Link>
+
+                  <a
+                    href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+                      'Message for Qwentin'
+                    )}`}
+                    className="bg-white text-dark border border-gray-200 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-center"
+                  >
+                    Contact CreatorLaunch
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="py-20 bg-dark text-white">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-6">
