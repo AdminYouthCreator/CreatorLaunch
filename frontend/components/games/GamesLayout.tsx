@@ -2,6 +2,7 @@ import React, { ReactNode, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { ngpfDisclaimer } from '@/data/ngpfGames';
 
 interface GamesLayoutProps {
   children: ReactNode;
@@ -12,20 +13,22 @@ interface GamesLayoutProps {
 const GamesLayout: React.FC<GamesLayoutProps> = ({
   children,
   title = 'CreatorGames | CreatorLaunch',
-  description = 'Play simple entrepreneurship games by CreatorLaunch.',
+  description = 'Play entrepreneurship and financial learning games through CreatorGames by CreatorLaunch.',
 }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
 
   const navItems = [
     { label: 'Games Home', href: '/games' },
-    { label: 'Lemonade Stand', href: '/games/lemonade-stand' },
+    { label: 'Entrepreneurship', href: '/games/influencd' },
+    { label: 'Budgeting', href: '/games/money-magic' },
+    { label: 'Credit', href: '/games/credit-clash' },
     { label: 'Back to CreatorLaunch', href: '/' },
   ];
 
   const isActive = (href: string) => {
     if (href === '/games') return router.pathname === '/games';
-    return router.pathname.startsWith(href);
+    return router.asPath.startsWith(href);
   };
 
   return (
@@ -47,7 +50,7 @@ const GamesLayout: React.FC<GamesLayoutProps> = ({
                 <div>
                   <p className="text-xl font-black leading-tight">CreatorGames</p>
                   <p className="text-xs text-white/60">
-                    Entrepreneurship games by CreatorLaunch
+                    Financial games curated by CreatorLaunch
                   </p>
                 </div>
               </Link>
@@ -101,13 +104,22 @@ const GamesLayout: React.FC<GamesLayoutProps> = ({
 
         {children}
 
+        <section className="border-t border-white/10 bg-slate-900">
+          <div className="container mx-auto px-4 py-6">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
+              <p className="font-semibold text-white mb-1">Game Disclaimer</p>
+              <p>{ngpfDisclaimer}</p>
+            </div>
+          </div>
+        </section>
+
         <footer className="border-t border-white/10 bg-slate-950">
           <div className="container mx-auto px-4 py-8 flex flex-col md:flex-row gap-4 items-center justify-between">
             <p className="text-sm text-white/60">
               CreatorGames is part of CreatorLaunch’s youth entrepreneurship learning tools.
             </p>
 
-            <div className="flex gap-4 text-sm font-semibold">
+            <div className="flex flex-wrap justify-center gap-4 text-sm font-semibold">
               <Link href="/" className="text-white/70 hover:text-white">
                 Main Site
               </Link>
