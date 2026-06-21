@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { GetStaticPaths, GetStaticProps } from 'next';
 import Link from 'next/link';
 import GamesLayout from '@/components/games/GamesLayout';
@@ -9,6 +9,31 @@ interface GamePageProps {
 }
 
 const GamePage: React.FC<GamePageProps> = ({ game }) => {
+  const gameFrameWrapperRef = useRef<HTMLDivElement | null>(null);
+  const [hasStartedGame, setHasStartedGame] = useState(false);
+
+  const enterFullscreen = async () => {
+    setHasStartedGame(true);
+
+    const element = gameFrameWrapperRef.current;
+
+    if (!element) {
+      return;
+    }
+
+    try {
+      if (element.requestFullscreen) {
+        await element.requestFullscreen();
+      }
+    } catch (error) {
+      console.error('Fullscreen request failed:', error);
+    }
+  };
+
+  const startWithoutFullscreen = () => {
+    setHasStartedGame(true);
+  };
+
   return (
     <GamesLayout
       title={`${game.name} | CreatorGames`}
@@ -52,11 +77,19 @@ const GamePage: React.FC<GamePageProps> = ({ game }) => {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    type="button"
+                    onClick={enterFullscreen}
+                    className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-2xl font-black text-center transition-colors"
+                  >
+                    Start Fullscreen
+                  </button>
+
                   <a
                     href={game.embedUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-2xl font-black text-center transition-colors"
+                    className="bg-white/10 hover:bg-white/15 text-white px-6 py-3 rounded-2xl font-black text-center border border-white/10 transition-colors"
                   >
                     Open Game in New Tab
                   </a>
@@ -83,34 +116,87 @@ const GamePage: React.FC<GamePageProps> = ({ game }) => {
 
         <section className="bg-slate-900 py-6 md:py-8">
           <div className="container mx-auto px-2 md:px-4">
-            <div className="rounded-3xl overflow-hidden border border-white/10 bg-slate-950 shadow-2xl">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-4 border-b border-white/10">
+            <div
+              ref={gameFrameWrapperRef}
+              className="rounded-3xl overflow-hidden border border-white/10 bg-slate-950 shadow-2xl fullscreen:bg-slate-950 fullscreen:rounded-none fullscreen:border-0"
+            >
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 p-4 border-b border-white/10 bg-slate-950">
                 <div>
                   <p className="font-black">{game.name}</p>
                   <p className="text-sm text-white/50">
-                    If the game does not appear below, open it in a new tab.
+                    Click Start Fullscreen for the best experience. If you exit fullscreen,
+                    you can keep playing here.
                   </p>
                 </div>
 
-                <a
-                  href={game.embedUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white text-slate-950 px-4 py-2 rounded-xl font-black text-sm text-center hover:bg-slate-100 transition-colors"
-                >
-                  Open Game
-                </a>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <button
+                    type="button"
+                    onClick={enterFullscreen}
+                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl font-black text-sm text-center transition-colors"
+                  >
+                    Fullscreen
+                  </button>
+
+                  <a
+                    href={game.embedUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-white text-slate-950 px-4 py-2 rounded-xl font-black text-sm text-center hover:bg-slate-100 transition-colors"
+                  >
+                    Open Game
+                  </a>
+                </div>
               </div>
 
               <div className="relative bg-white" style={{ height: '80vh', minHeight: '620px' }}>
-                <iframe
-                  title={`${game.name} game`}
-                  src={game.embedUrl}
-                  className="absolute inset-0 w-full h-full border-0"
-                  allow="fullscreen; autoplay; encrypted-media"
-                  allowFullScreen
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
+                {!hasStartedGame ? (
+                  <div className="absolute inset-0 bg-slate-950 text-white flex items-center justify-center p-6">
+                    <div className="max-w-lg text-center">
+                      <div className="text-6xl mb-5">🎮</div>
+
+                      <p className="text-red-300 font-black uppercase tracking-widest mb-3">
+                        Ready to Play
+                      </p>
+
+                      <h2 className="text-3xl md:text-4xl font-black mb-4">
+                        Start {game.name}
+                      </h2>
+
+                      <p className="text-white/70 mb-8">
+                        For the best experience, start the game in fullscreen. You can exit
+                        fullscreen anytime and continue playing on the page.
+                      </p>
+
+                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <button
+                          type="button"
+                          onClick={enterFullscreen}
+                          className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-2xl font-black transition-colors"
+                        >
+                          Start Fullscreen
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={startWithoutFullscreen}
+                          className="bg-white/10 hover:bg-white/15 text-white px-6 py-3 rounded-2xl font-black border border-white/10 transition-colors"
+                        >
+                          Play on Page
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <iframe
+                    title={`${game.name} game`}
+                    src={game.embedUrl}
+                    className="absolute inset-0 w-full h-full border-0"
+                    allow="fullscreen; autoplay; encrypted-media"
+                    allowFullScreen
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                )}
               </div>
             </div>
           </div>
