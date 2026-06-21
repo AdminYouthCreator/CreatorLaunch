@@ -27,10 +27,10 @@
   },
   "hero": {
     "heading": "Building the Next Generation of Founders.",
-    "subheading": "CreatorLaunch is a youth-led nonprofit helping young entrepreneurs turn ideas into real ventures through workshops, pitch competitions, launch funding, and a digital platform built for youth creators.",
+    "subheading": "CreatorLaunch is a youth-led nonprofit helping young entrepreneurs turn ideas into real ventures through workshops, pitch competitions, launch funding, and practical digital tools.",
     "cta": {
-      "text": "Join The Waitlist",
-      "link": "/contact"
+      "text": "Bring CreatorLaunch to Your Community",
+      "link": "/partners"
     }
   },
   "footer": {
@@ -38,24 +38,36 @@
       "src": "/assets/footer-logo.png",
       "alt": "CreatorLaunch Logo"
     },
-    "description": "A St. Louis youth-led nonprofit helping young entrepreneurs build real ventures through workshops, launch capital, and digital tools.",
+    "description": "A nationally recognized 501(c)(3) nonprofit helping young entrepreneurs build real ventures through workshops, launch support, and practical tools.",
     "quickLinks": [
       { "label": "About", "link": "/about" },
       { "label": "Team", "link": "/about/team" },
       { "label": "Partners", "link": "/partners" },
-      { "label": "Contact", "link": "/contact" }
+      { "label": "Meet Mox", "link": "/meet-mox" }
     ],
     "resources": [
-      { "label": "Blog", "link": "/blog" },
+      { "label": "Creator Tools", "link": "/tools" },
+      { "label": "Verify Certificate", "link": "/verify-certificate" },
       { "label": "Donate", "link": "/donate" },
-      { "label": "Join Waitlist", "link": "/contact" },
-      { "label": "Launch App", "link": "/auth/login" }
+      { "label": "Blog", "link": "/blog" }
     ],
     "social": [
-      { "platform": "LinkedIn", "icon": "/assets/linkedin.svg", "link": "https://linkedin.com" },
-      { "platform": "Instagram", "icon": "/assets/instagram.svg", "link": "https://instagram.com" },
-      { "platform": "Facebook", "icon": "/assets/facebook.svg", "link": "https://facebook.com" }
+      {
+        "platform": "LinkedIn",
+        "icon": "/assets/linkedin.svg",
+        "link": "https://www.linkedin.com/company/the-young-ceo-launchpad"
+      },
+      {
+        "platform": "Instagram",
+        "icon": "/assets/instagram.svg",
+        "link": "https://www.instagram.com/thecreatorlaunch"
+      },
+      {
+        "platform": "Facebook",
+        "icon": "/assets/facebook.svg",
+        "link": "https://www.facebook.com/people/CreatorLaunch/61577895815824/"
+      }
     ],
-    "copyright": "© 2025 CreatorLaunch, NPO. Founded and run by youth."
+    "copyright": "CreatorLaunch is a nationally recognized 501(c)(3) nonprofit organization. EIN: 39-2689174 · © 2026 CreatorLaunch. All rights reserved."
   }
 }

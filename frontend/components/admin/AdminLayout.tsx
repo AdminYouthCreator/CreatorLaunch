@@ -16,7 +16,7 @@ import {
   FiTool,
   FiEdit3,
   FiSettings,
-  FiDollarSign,
+  FiAward,
 } from 'react-icons/fi';
 
 interface AdminLayoutProps {
@@ -61,10 +61,10 @@ const menuItems = [
     permission: 'settings.write',
   },
   {
-    href: '/admin/donations',
-    icon: FiDollarSign,
-    label: 'Donations',
-    permission: 'analytics.read',
+    href: '/admin/certificates',
+    icon: FiAward,
+    label: 'Certificates',
+    permission: 'settings.read',
   },
   {
     href: '/admin/security',
