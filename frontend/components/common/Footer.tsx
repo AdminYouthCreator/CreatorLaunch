@@ -65,6 +65,11 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link href="/support" className="footer-link">
+                  Ways to Support
+                </Link>
+              </li>
+              <li>
                 <a
                   href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
                     'Bring CreatorLaunch to our community'
@@ -83,18 +88,8 @@ export const Footer = () => {
           </div>
 
           <div className="footer-col">
-            <h3>About</h3>
+            <h3>Learning & Platform</h3>
             <ul className="footer-links">
-              <li>
-                <Link href="/about" className="footer-link">
-                  Our Story
-                </Link>
-              </li>
-              <li>
-                <Link href="/about/team" className="footer-link">
-                  Team
-                </Link>
-              </li>
               <li>
                 <Link href="/games" className="footer-link">
                   CreatorGames
@@ -106,49 +101,49 @@ export const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/faq" className="footer-link">
-                  FAQ
+                <Link href="/apply" className="footer-link">
+                  Program Application
                 </Link>
               </li>
               <li>
-                <Link href="/blog" className="footer-link">
-                  Blog
+                <Link href="/pitch" className="footer-link">
+                  Pitch Submission
                 </Link>
               </li>
             </ul>
           </div>
 
           <div className="footer-col">
-            <h3>Contact</h3>
+            <h3>Policies</h3>
             <ul className="footer-links">
               <li>
-                <a
-                  href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-                    'General CreatorLaunch Inquiry'
-                  )}`}
-                  className="footer-link"
-                >
-                  {CONTACT_EMAIL}
-                </a>
+                <Link href="/privacy-policy" className="footer-link">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/youth-safety" className="footer-link">
+                  Youth Safety
+                </Link>
+              </li>
+              <li>
+                <Link href="/donation-policy" className="footer-link">
+                  Donation Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/community-guidelines" className="footer-link">
+                  Community Guidelines
+                </Link>
               </li>
               <li>
                 <a
                   href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-                    'Partnership Inquiry'
+                    'CreatorLaunch Policy Question'
                   )}`}
                   className="footer-link"
                 >
-                  Partnership Inquiry
-                </a>
-              </li>
-              <li>
-                <a
-                  href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-                    'Donation Inquiry'
-                  )}`}
-                  className="footer-link"
-                >
-                  Donation Inquiry
+                  Policy Question
                 </a>
               </li>
             </ul>

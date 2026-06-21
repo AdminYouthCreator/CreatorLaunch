@@ -20,10 +20,12 @@ const Header: React.FC<HeaderProps> = ({
   const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(showAnnouncement);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showAboutMenu, setShowAboutMenu] = useState(false);
 
   const router = useRouter();
   const { user, logout, loading } = useAuthContext();
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const aboutMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsAnnouncementVisible(showAnnouncement);
@@ -34,16 +36,20 @@ const Header: React.FC<HeaderProps> = ({
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setShowUserMenu(false);
       }
+
+      if (aboutMenuRef.current && !aboutMenuRef.current.contains(event.target as Node)) {
+        setShowAboutMenu(false);
+      }
     };
 
-    if (showUserMenu) {
+    if (showUserMenu || showAboutMenu) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showUserMenu]);
+  }, [showUserMenu, showAboutMenu]);
 
   const handleLogout = async () => {
     try {
@@ -55,15 +61,20 @@ const Header: React.FC<HeaderProps> = ({
     }
   };
 
-  const navigation = [
+  const mainNavigation = [
     { name: 'Home', href: '/' },
     { name: 'Bring CreatorLaunch', href: '/bring-creatorlaunch' },
     { name: 'Games', href: '/games' },
-    { name: 'About', href: '/about' },
-    { name: 'Team', href: '/about/team' },
     { name: 'Partners', href: '/partners' },
+    { name: 'Support', href: '/support' },
+  ];
+
+  const aboutNavigation = [
+    { name: 'About CreatorLaunch', href: '/about' },
+    { name: 'Team', href: '/about/team' },
+    { name: 'FAQ', href: '/faq' },
     { name: 'Blog', href: '/blog' },
-    { name: 'Platform', href: '/progress' },
+    { name: 'Contact', href: '/contact' },
   ];
 
   const isActiveLink = (href: string) => {
@@ -71,6 +82,8 @@ const Header: React.FC<HeaderProps> = ({
     if (href !== '/' && router.pathname.startsWith(href)) return true;
     return false;
   };
+
+  const isAboutActive = aboutNavigation.some((item) => isActiveLink(item.href));
 
   return (
     <>
@@ -99,7 +112,7 @@ const Header: React.FC<HeaderProps> = ({
 
           <div className="flex-1 flex justify-center">
             <div className="hidden lg:flex items-center gap-5 font-semibold">
-              {navigation.map((item) => (
+              {mainNavigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
@@ -110,6 +123,54 @@ const Header: React.FC<HeaderProps> = ({
                   {item.name}
                 </Link>
               ))}
+
+              <div className="relative" ref={aboutMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setShowAboutMenu((prev) => !prev)}
+                  className={`nav-link text-medium hover:text-primary transition-colors flex items-center gap-1 ${
+                    isAboutActive ? 'active' : ''
+                  }`}
+                >
+                  About
+                  <svg
+                    className={`w-4 h-4 transition-transform ${
+                      showAboutMenu ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {showAboutMenu && (
+                  <div className="absolute top-full left-0 mt-3 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
+                    <div className="p-2">
+                      {aboutNavigation.map((item) => (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          onClick={() => setShowAboutMenu(false)}
+                          className={`block px-4 py-3 rounded-xl text-sm font-bold transition-colors ${
+                            isActiveLink(item.href)
+                              ? 'bg-red-50 text-primary'
+                              : 'text-gray-700 hover:bg-gray-50 hover:text-primary'
+                          }`}
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -137,7 +198,7 @@ const Header: React.FC<HeaderProps> = ({
 
             {loading ? (
               <div className="flex items-center space-x-3">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
               </div>
             ) : user ? (
               <div className="relative" ref={userMenuRef}>
@@ -277,7 +338,7 @@ const Header: React.FC<HeaderProps> = ({
         {isMobileMenuOpen && (
           <div className="lg:hidden mt-4 pb-4 border-t border-gray-200">
             <div className="flex flex-col space-y-4 pt-4">
-              {navigation.map((item) => (
+              {mainNavigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
@@ -289,6 +350,29 @@ const Header: React.FC<HeaderProps> = ({
                   {item.name}
                 </Link>
               ))}
+
+              <div className="border-t border-gray-100 pt-4">
+                <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3">
+                  About
+                </p>
+
+                <div className="grid gap-2">
+                  {aboutNavigation.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`px-4 py-3 rounded-xl text-sm font-bold transition-colors ${
+                        isActiveLink(item.href)
+                          ? 'bg-red-50 text-primary'
+                          : 'bg-gray-50 text-gray-700 hover:text-primary'
+                      }`}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
 
               <div className="flex flex-col space-y-3 pt-4 border-t border-gray-100">
                 <a
@@ -309,7 +393,7 @@ const Header: React.FC<HeaderProps> = ({
 
                 {loading ? (
                   <div className="flex justify-center py-4">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
                   </div>
                 ) : user ? (
                   <div className="flex flex-col space-y-3">
