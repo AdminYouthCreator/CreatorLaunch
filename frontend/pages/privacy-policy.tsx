@@ -125,8 +125,7 @@ const PrivacyPolicyPage = () => {
 
                 <div className="bg-red-50 border border-red-100 rounded-2xl p-5">
                   <p className="text-sm text-medium">
-                    This policy is a practical public-facing policy and should be reviewed by
-                    an adult nonprofit advisor or legal professional as CreatorLaunch grows.
+                    CreatorLaunch may update this policy as we grow.
                   </p>
                 </div>
               </div>

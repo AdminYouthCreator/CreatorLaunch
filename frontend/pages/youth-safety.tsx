@@ -122,9 +122,7 @@ const YouthSafetyPage = () => {
 
                 <div className="bg-red-50 border border-red-100 rounded-2xl p-5">
                   <p className="text-sm text-medium">
-                    This page is a public-facing safety commitment. As CreatorLaunch expands
-                    programming, it should be reviewed and strengthened with adult leadership,
-                    partner organizations, and appropriate legal or youth-safety guidance.
+                    CreatorLaunch may update this as we grow.
                   </p>
                 </div>
               </div>

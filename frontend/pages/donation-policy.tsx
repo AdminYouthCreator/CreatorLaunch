@@ -139,8 +139,7 @@ const DonationPolicyPage = () => {
 
                 <div className="bg-red-50 border border-red-100 rounded-2xl p-5">
                   <p className="text-sm text-medium">
-                    This policy should be reviewed by an adult nonprofit advisor, accountant,
-                    or legal professional as CreatorLaunch grows.
+                    CreatorLaunch may update this policy as we grow.
                   </p>
                 </div>
               </div>
