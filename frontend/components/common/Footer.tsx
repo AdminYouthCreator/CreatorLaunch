@@ -21,6 +21,20 @@ export const Footer = () => {
               community workshops, partnerships, and digital tools.
             </p>
 
+            <a
+              aria-label="Young CEO Launchpad Candid profile"
+              href="https://app.candid.org/profile/16387981/young-ceo-launchpad-39-2689174/?pkId=44192db8-d585-43ab-8759-0217c322caff"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block mt-4"
+            >
+              <img
+                alt="Candid transparency seal"
+                src="https://widgets.guidestar.org/prod/v1/pdp/transparency-seal/16387981/svg"
+                className="max-w-[170px] h-auto"
+              />
+            </a>
+
             <div className="footer-social">
               <a
                 href="https://www.linkedin.com/company/the-young-ceo-launchpad"
@@ -98,6 +112,16 @@ export const Footer = () => {
               <li>
                 <Link href="/progress" className="footer-link">
                   Digital Platform
+                </Link>
+              </li>
+              <li>
+                <Link href="/verify-certificate" className="footer-link">
+                  Verify Certificate
+                </Link>
+              </li>
+              <li>
+                <Link href="/meet-mox" className="footer-link">
+                  Meet Mox
                 </Link>
               </li>
             </ul>
