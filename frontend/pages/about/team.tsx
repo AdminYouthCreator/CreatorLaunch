@@ -72,6 +72,43 @@ const TeamPage = () => {
           </div>
         </section>
 
+        <section className="py-20 bg-slate-50">
+          <div className="container mx-auto px-4">
+            <div className="max-w-5xl mx-auto">
+              <div className="text-center mb-10">
+                <p className="text-primary font-bold uppercase tracking-widest mb-3">
+                  Leadership &amp; Governance
+                </p>
+
+                <h2 className="text-3xl md:text-5xl font-bold text-dark mb-4">
+                  Board of Directors
+                </h2>
+              </div>
+
+              <div className="relative overflow-hidden rounded-3xl border border-red-100 bg-gradient-to-br from-white via-red-50 to-blue-50 px-6 py-14 text-center shadow-sm md:px-12">
+                <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/10 blur-2xl" />
+                <div className="absolute -bottom-20 -left-16 h-52 w-52 rounded-full bg-blue-500/10 blur-2xl" />
+
+                <div className="relative mx-auto max-w-2xl">
+                  <span className="inline-flex rounded-full border border-primary/20 bg-white px-4 py-2 text-xs font-bold uppercase tracking-[0.18em] text-primary shadow-sm">
+                    Coming Soon
+                  </span>
+
+                  <h3 className="mt-6 text-2xl md:text-3xl font-bold text-dark">
+                    We are forming our inaugural board.
+                  </h3>
+
+                  <p className="mt-4 text-base md:text-lg leading-relaxed text-medium">
+                    CreatorLaunch is currently building its first Board of Directors. Our board
+                    will help guide the organization, strengthen community partnerships, and
+                    support our mission as we grow.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="py-20 bg-dark text-white">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
