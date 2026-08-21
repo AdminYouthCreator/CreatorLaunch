@@ -39,6 +39,32 @@ const MoxSurprise = () => {
   };
 
   useEffect(() => {
+    const summonMox = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const isTyping = target && (
+        target.isContentEditable
+        || target.tagName === 'INPUT'
+        || target.tagName === 'TEXTAREA'
+        || target.tagName === 'SELECT'
+      );
+      const routeIsExcluded = excludedRoutes.some(
+        (route) => router.pathname === route || router.pathname.startsWith(`${route}/`),
+      );
+
+      if (event.key.toLowerCase() !== 'm' || event.repeat || isTyping || routeIsExcluded) return;
+
+      clearTimer();
+      setMessage(messages[Math.floor(Math.random() * messages.length)]);
+      setSide(Math.random() > 0.5 ? 'right' : 'left');
+      setVisible(true);
+      timer.current = setTimeout(dismiss, 12_000);
+    };
+
+    window.addEventListener('keydown', summonMox);
+    return () => window.removeEventListener('keydown', summonMox);
+  }, [router.pathname]);
+
+  useEffect(() => {
     if (isExcludedRoute) {
       clearTimer();
       setVisible(false);
@@ -98,6 +124,9 @@ const MoxSurprise = () => {
           >
             Meet Mox
           </Link>
+          <p className="mt-2 text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+            Press M anytime
+          </p>
         </div>
       </div>
     </aside>
