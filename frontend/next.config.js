@@ -14,7 +14,7 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
+        source: '/api/:path((?!boardapplication-proxy(?:/|$)).*)',
         destination: `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/:path*`,
       },
     ];
