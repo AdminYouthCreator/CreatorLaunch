@@ -1260,7 +1260,11 @@ body {
   }
 
   .display-heading {
-    font-size: clamp(3.05rem, 15vw, 4.5rem);
+    font-size: clamp(2.85rem, 14vw, 4.2rem);
+  }
+
+  .marker-word {
+    display: inline;
   }
 
   .hero-trust-grid {
