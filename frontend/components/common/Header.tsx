@@ -10,7 +10,7 @@ interface HeaderProps {
 
 const CONTACT_EMAIL = 'qwentin@youthcreatorlaunch.org';
 const contactHref = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-  'CreatorLaunch Inquiry'
+  'CreatorLaunch Inquiry',
 )}`;
 
 const Header: React.FC<HeaderProps> = ({
@@ -32,6 +32,12 @@ const Header: React.FC<HeaderProps> = ({
   }, [showAnnouncement, announcementText]);
 
   useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setShowAboutMenu(false);
+    setShowUserMenu(false);
+  }, [router.asPath]);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setShowUserMenu(false);
@@ -46,9 +52,7 @@ const Header: React.FC<HeaderProps> = ({
       document.addEventListener('mousedown', handleClickOutside);
     }
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showUserMenu, showAboutMenu]);
 
   const handleLogout = async () => {
@@ -71,7 +75,7 @@ const Header: React.FC<HeaderProps> = ({
 
   const aboutNavigation = [
     { name: 'About CreatorLaunch', href: '/about' },
-    { name: 'Team', href: '/about/team' },
+    { name: 'Team & Board', href: '/about/team' },
     { name: 'FAQ', href: '/faq' },
     { name: 'Blog', href: '/blog' },
     { name: 'Contact', href: '/contact' },
@@ -79,360 +83,220 @@ const Header: React.FC<HeaderProps> = ({
 
   const isActiveLink = (href: string) => {
     if (href === '/' && router.pathname === '/') return true;
-    if (href !== '/' && router.pathname.startsWith(href)) return true;
-    return false;
+    return href !== '/' && router.pathname.startsWith(href);
   };
 
   const isAboutActive = aboutNavigation.some((item) => isActiveLink(item.href));
+  const initials = user ? (user.name || user.email).charAt(0).toUpperCase() : '';
 
   return (
     <>
       {isAnnouncementVisible && announcementText && (
-        <div className="announcement-banner show">
-          <p>{announcementText}</p>
+        <div className="site-announcement">
+          <div className="site-announcement-inner">
+            <span className="site-announcement-badge">Let&apos;s launch</span>
+            <p>{announcementText}</p>
+            <Link href="/bring-creatorlaunch" className="site-announcement-link">
+              Start here →
+            </Link>
+          </div>
+
           <button
-            className="announcement-close-btn"
+            type="button"
+            className="site-announcement-close"
             onClick={() => setIsAnnouncementVisible(false)}
             aria-label="Close announcement"
           >
-            &times;
+            ×
           </button>
         </div>
       )}
 
-      <header className="p-4 glass-nav shadow-sm sticky top-0 z-50">
-        <nav className="container mx-auto flex items-center">
+      <header className="site-header">
+        <nav className="site-nav" aria-label="Main navigation">
           <Link href="/" aria-label="CreatorLaunch home">
             <img
               src="/assets/header-logo.png"
               alt="CreatorLaunch Logo"
-              className="h-12"
+              className="site-logo"
             />
           </Link>
 
-          <div className="flex-1 flex justify-center">
-            <div className="hidden lg:flex items-center gap-5 font-semibold">
-              {mainNavigation.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`nav-link text-medium hover:text-primary transition-colors ${
-                    isActiveLink(item.href) ? 'active' : ''
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
+          <div className="site-nav-links">
+            {mainNavigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`site-nav-link ${isActiveLink(item.href) ? 'active' : ''}`}
+              >
+                {item.name}
+              </Link>
+            ))}
 
-              <div className="relative" ref={aboutMenuRef}>
-                <button
-                  type="button"
-                  onClick={() => setShowAboutMenu((prev) => !prev)}
-                  className={`nav-link text-medium hover:text-primary transition-colors flex items-center gap-1 ${
-                    isAboutActive ? 'active' : ''
-                  }`}
+            <div className="relative" ref={aboutMenuRef}>
+              <button
+                type="button"
+                onClick={() => setShowAboutMenu((current) => !current)}
+                className={`site-nav-link ${isAboutActive ? 'active' : ''}`}
+                aria-expanded={showAboutMenu}
+              >
+                About
+                <svg
+                  className={`h-4 w-4 transition-transform ${showAboutMenu ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
-                  About
-                  <svg
-                    className={`w-4 h-4 transition-transform ${
-                      showAboutMenu ? 'rotate-180' : ''
-                    }`}
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.3} d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
 
-                {showAboutMenu && (
-                  <div className="absolute top-full left-0 mt-3 w-64 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
-                    <div className="p-2">
-                      {aboutNavigation.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={() => setShowAboutMenu(false)}
-                          className={`block px-4 py-3 rounded-xl text-sm font-bold transition-colors ${
-                            isActiveLink(item.href)
-                              ? 'bg-red-50 text-primary'
-                              : 'text-gray-700 hover:bg-gray-50 hover:text-primary'
-                          }`}
-                        >
-                          {item.name}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+              {showAboutMenu && (
+                <div className="site-menu">
+                  {aboutNavigation.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`site-menu-link ${isActiveLink(item.href) ? 'active' : ''}`}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="hidden lg:flex items-center gap-2 ml-4">
-            <a
-              href={contactHref}
-              className="px-3 py-2 rounded-lg font-bold text-sm whitespace-nowrap transition-colors border border-gray-200 hover:border-primary hover:text-primary"
-            >
+          <div className="site-nav-actions">
+            <a href={contactHref} className="site-nav-action site-nav-contact">
               Contact
             </a>
 
-            <Link
-              href="/donate"
-              className="px-3 py-2 rounded-lg font-bold text-sm whitespace-nowrap transition-colors"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                height: '40px',
-                backgroundColor: 'var(--color-primary)',
-                color: 'white',
-              }}
-            >
+            <Link href="/donate" className="site-nav-action site-nav-donate">
               Donate
             </Link>
 
             {loading ? (
-              <div className="flex items-center space-x-3">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
-              </div>
+              <div className="mx-3 h-5 w-5 animate-spin rounded-full border-2 border-cyan-100 border-t-accent" />
             ) : user ? (
               <div className="relative" ref={userMenuRef}>
                 <button
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                  className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  type="button"
+                  onClick={() => setShowUserMenu((current) => !current)}
+                  className="site-user-button"
+                  aria-expanded={showUserMenu}
                 >
-                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                    {user.name
-                      ? user.name.charAt(0).toUpperCase()
-                      : user.email.charAt(0).toUpperCase()}
-                  </div>
-
-                  <span className="font-medium text-gray-700 hidden sm:block">
+                  <span className="site-user-avatar">{initials}</span>
+                  <span className="max-w-[100px] truncate text-xs font-bold">
                     {user.name || user.email.split('@')[0]}
                   </span>
-
-                  <svg
-                    className="w-4 h-4 text-gray-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m6 9 6 6 6-6" />
                   </svg>
                 </button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-                    <div className="px-4 py-3 border-b border-gray-200">
-                      <p className="text-sm font-medium text-gray-700">
-                        {user.name || 'User'}
-                      </p>
-                      <p className="text-sm text-gray-500">{user.email}</p>
+                  <div className="site-menu right-0 left-auto">
+                    <div className="border-b border-slate-100 px-3 py-3">
+                      <p className="text-sm font-bold text-dark">{user.name || 'Creator'}</p>
+                      <p className="mt-1 truncate text-xs text-medium">{user.email}</p>
                     </div>
 
-                    <div className="py-1">
-                      <Link
-                        href="/dashboard"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                        onClick={() => setShowUserMenu(false)}
-                      >
-                        Dashboard
-                      </Link>
-
-                      <Link
-                        href="/products"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                        onClick={() => setShowUserMenu(false)}
-                      >
-                        Products
-                      </Link>
-
-                      <Link
-                        href="/profile"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                        onClick={() => setShowUserMenu(false)}
-                      >
-                        Profile
-                      </Link>
-
-                      <Link
-                        href="/onboarding"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                        onClick={() => setShowUserMenu(false)}
-                      >
-                        Onboarding
-                      </Link>
-
+                    <div className="pt-1">
+                      <Link href="/dashboard" className="site-menu-link">Dashboard</Link>
+                      <Link href="/products" className="site-menu-link">Products</Link>
+                      <Link href="/profile" className="site-menu-link">Profile</Link>
+                      <Link href="/onboarding" className="site-menu-link">Onboarding</Link>
                       <button
+                        type="button"
                         onClick={handleLogout}
-                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        className="site-menu-link w-full text-left text-red-600"
                       >
-                        Logout
+                        Log out
                       </button>
                     </div>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="flex items-center space-x-3">
-                <Link
-                  href="/auth/login"
-                  className="px-3 py-2 rounded-lg font-bold text-sm transition-colors whitespace-nowrap"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    height: '40px',
-                    border: '2px solid var(--color-accent)',
-                    color: 'var(--color-accent)',
-                    backgroundColor: 'white',
-                  }}
-                >
-                  Login
-                </Link>
-              </div>
+              <Link href="/auth/login" className="site-nav-action site-nav-login">
+                Login
+              </Link>
             )}
           </div>
 
-          <div className="lg:hidden ml-auto">
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-medium hover:text-primary transition-colors"
-              aria-label="Toggle mobile menu"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                {isMobileMenuOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                )}
-              </svg>
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen((current) => !current)}
+            className="site-mobile-toggle lg:hidden"
+            aria-label="Toggle mobile menu"
+            aria-expanded={isMobileMenuOpen}
+          >
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              {isMobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.3} d="M6 18 18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.3} d="M4 7h16M4 12h16M4 17h16" />
+              )}
+            </svg>
+          </button>
         </nav>
 
         {isMobileMenuOpen && (
-          <div className="lg:hidden mt-4 pb-4 border-t border-gray-200">
-            <div className="flex flex-col space-y-4 pt-4">
+          <div className="site-mobile-menu lg:hidden">
+            <div className="grid gap-1">
               {mainNavigation.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`nav-link text-medium hover:text-primary transition-colors ${
-                    isActiveLink(item.href) ? 'active' : ''
-                  }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`site-nav-link ${isActiveLink(item.href) ? 'active' : ''}`}
+                >
+                  {item.name}<span aria-hidden="true">→</span>
+                </Link>
+              ))}
+            </div>
+
+            <div className="my-3 h-px bg-slate-100" />
+            <p className="px-3 pb-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-slate-400">
+              About
+            </p>
+
+            <div className="grid grid-cols-2 gap-1">
+              {aboutNavigation.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`site-menu-link ${isActiveLink(item.href) ? 'active' : ''}`}
                 >
                   {item.name}
                 </Link>
               ))}
-
-              <div className="border-t border-gray-100 pt-4">
-                <p className="text-xs font-black uppercase tracking-widest text-gray-400 mb-3">
-                  About
-                </p>
-
-                <div className="grid gap-2">
-                  {aboutNavigation.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`px-4 py-3 rounded-xl text-sm font-bold transition-colors ${
-                        isActiveLink(item.href)
-                          ? 'bg-red-50 text-primary'
-                          : 'bg-gray-50 text-gray-700 hover:text-primary'
-                      }`}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex flex-col space-y-3 pt-4 border-t border-gray-100">
-                <a
-                  href={contactHref}
-                  className="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-bold text-center transition-colors"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Contact
-                </a>
-
-                <Link
-                  href="/donate"
-                  className="px-5 py-2 rounded-lg btn-primary-solid font-bold text-center"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Donate
-                </Link>
-
-                {loading ? (
-                  <div className="flex justify-center py-4">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600" />
-                  </div>
-                ) : user ? (
-                  <div className="flex flex-col space-y-3">
-                    <div className="px-5 py-3 bg-gray-50 rounded-lg">
-                      <p className="font-medium text-gray-700">
-                        {user.name || 'User'}
-                      </p>
-                      <p className="text-sm text-gray-500">{user.email}</p>
-                    </div>
-
-                    <Link
-                      href="/dashboard"
-                      className="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-bold text-center transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Dashboard
-                    </Link>
-
-                    <button
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        handleLogout();
-                      }}
-                      className="px-5 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 font-bold text-center transition-colors"
-                    >
-                      Logout
-                    </button>
-                  </div>
-                ) : (
-                  <Link
-                    href="/auth/login"
-                    className="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-bold text-center transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    Login
-                  </Link>
-                )}
-              </div>
             </div>
+
+            <div className="my-3 h-px bg-slate-100" />
+            <div className="grid grid-cols-2 gap-2">
+              <a href={contactHref} className="site-button site-button-secondary min-h-[46px] px-4 py-2">
+                Contact
+              </a>
+              <Link href="/donate" className="site-button site-button-primary min-h-[46px] px-4 py-2">
+                Donate
+              </Link>
+            </div>
+
+            {user ? (
+              <div className="mt-2 grid gap-2 rounded-2xl bg-slate-50 p-3">
+                <p className="text-sm font-bold text-dark">{user.name || user.email}</p>
+                <Link href="/dashboard" className="site-menu-link bg-white">Dashboard</Link>
+                <button type="button" onClick={handleLogout} className="site-menu-link bg-white text-left text-red-600">
+                  Log out
+                </button>
+              </div>
+            ) : (
+              <Link href="/auth/login" className="site-menu-link mt-2 bg-cyan-50 text-center text-cyan-800">
+                Creator login
+              </Link>
+            )}
           </div>
         )}
       </header>
