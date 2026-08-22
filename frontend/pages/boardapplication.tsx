@@ -12,7 +12,7 @@ const BoardApplicationPage = () => {
       </Head>
 
       <iframe
-        src="https://creatorlaunchforms.qwentin-856.workers.dev/"
+        src="/api/boardapplication-proxy"
         title="CreatorLaunch Board Application"
         loading="eager"
         style={{
