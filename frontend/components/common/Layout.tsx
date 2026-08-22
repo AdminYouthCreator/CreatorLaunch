@@ -38,13 +38,13 @@ const Layout: React.FC<LayoutProps> = ({
         <link rel="icon" type="image/png" href="/assets/images/favicon.png" />
       </Head>
 
-      <div className="text-dark">
+      <div className="public-shell text-dark">
         <Header 
           showAnnouncement={showAnnouncement}
           announcementText={announcementText}
         />
         
-        <main>
+        <main className="site-main">
           {children}
         </main>
         

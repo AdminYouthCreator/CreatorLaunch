@@ -1,15 +1,75 @@
 import React from 'react';
 import Link from 'next/link';
+import { FiArrowUpRight, FiCheck, FiChevronRight, FiPlay, FiStar } from 'react-icons/fi';
 import Layout from '@/components/common/Layout';
 import MoxMascot from '@/components/common/MoxMascot';
 
 const CONTACT_EMAIL = 'qwentin@youthcreatorlaunch.org';
 
 const bringHref = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-  'Bring CreatorLaunch to our community'
+  'Bring CreatorLaunch to our community',
 )}&body=${encodeURIComponent(
-  'Hello CreatorLaunch,\n\nWe are interested in bringing CreatorLaunch entrepreneurship workshops to our community.\n\nOrganization name:\nCommunity served:\nBest contact person:\nPreferred timeline:\n\nMessage:\n'
+  'Hello CreatorLaunch,\n\nWe are interested in bringing CreatorLaunch entrepreneurship workshops to our community.\n\nOrganization name:\nCommunity served:\nBest contact person:\nPreferred timeline:\n\nMessage:\n',
 )}`;
+
+const workshopCards = [
+  {
+    number: '01',
+    icon: '✦',
+    title: 'Spot the spark',
+    description:
+      'Students find problems worth solving, explore possible customers, and choose an idea they care about.',
+  },
+  {
+    number: '02',
+    icon: '✎',
+    title: 'Shape the idea',
+    description:
+      'They create a name, brand, offer, price, and simple plan that turns a thought into something tangible.',
+  },
+  {
+    number: '03',
+    icon: '↗',
+    title: 'Share the launch',
+    description:
+      'Students practice a real pitch, get encouraging feedback, and leave knowing their next move.',
+  },
+];
+
+const audiences = [
+  'Summer programs',
+  'Afterschool programs',
+  'Schools',
+  'Community centers',
+  'Youth nonprofits',
+  'Libraries',
+  'Churches',
+  'Local organizations',
+];
+
+const gameTopics = [
+  ['🚀', 'Entrepreneurship'],
+  ['💸', 'Budgeting'],
+  ['💳', 'Credit'],
+  ['📈', 'Investing'],
+  ['🛡️', 'Insurance'],
+  ['🧭', 'Careers'],
+];
+
+const processSteps = [
+  {
+    title: 'Tell us about your community',
+    description: 'Share your organization, group, age range, and the experience you want to create.',
+  },
+  {
+    title: 'We shape the right workshop',
+    description: 'We align the format, activities, timing, and goals around your students.',
+  },
+  {
+    title: 'Young creators build',
+    description: 'Students make decisions, create something real, and finish with a clear next step.',
+  },
+];
 
 const Homepage = () => {
   return (
@@ -18,388 +78,282 @@ const Homepage = () => {
       description="CreatorLaunch is a youth-led 501(c)(3) nonprofit helping schools, summer programs, afterschool programs, and community organizations bring no-cost entrepreneurship workshops to students and families."
       announcementText="Bring CreatorLaunch workshops to your school, summer program, afterschool program, or community organization."
     >
-      <main className="min-h-screen bg-white">
-        <section className="relative overflow-hidden bg-gradient-to-br from-white via-red-50 to-blue-50">
-          <div className="absolute inset-0 opacity-40">
-            <div className="absolute -top-24 -right-24 w-80 h-80 bg-red-200 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 -left-24 w-80 h-80 bg-blue-200 rounded-full blur-3xl" />
-          </div>
+      <div className="min-h-screen bg-white">
+        <section className="playful-hero">
+          <div className="hero-orb hero-orb-one" />
+          <div className="hero-orb hero-orb-two" />
 
-          <div className="container mx-auto px-4 py-20 md:py-28 relative">
-            <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
-              <div>
-                <div className="inline-flex items-center bg-white border border-red-100 rounded-full px-4 py-2 mb-6 shadow-sm">
-                  <span className="text-sm font-semibold text-primary">
-                    Youth-led nonprofit entrepreneurship workshops
-                  </span>
+          <div className="container relative mx-auto px-4 py-16 md:py-24 lg:py-28">
+            <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.08fr_0.92fr] lg:gap-8">
+              <div className="relative z-10">
+                <div className="hero-kicker mb-7">
+                  <span className="hero-kicker-dot" />
+                  Youth-led entrepreneurship workshops
                 </div>
 
-                <h1 className="text-4xl md:text-6xl font-bold text-dark leading-tight mb-6">
-                  Bring CreatorLaunch to your community.
+                <h1 className="display-heading text-dark">
+                  Big ideas belong in{' '}
+                  <span className="marker-word">every community.</span>
                 </h1>
 
-                <p className="text-lg md:text-xl text-medium max-w-2xl mb-8">
-                  CreatorLaunch partners with schools, summer programs, afterschool programs,
-                  nonprofits, and community organizations to bring hands-on entrepreneurship
-                  workshops to students at no cost to students or families.
+                <p className="mt-7 max-w-2xl text-base font-medium leading-8 text-medium md:text-lg">
+                  CreatorLaunch brings playful, hands-on entrepreneurship workshops to
+                  schools and community organizations—at no cost to students or families.
+                  Young people do more than listen. They imagine, build, and pitch.
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <a
-                    href={bringHref}
-                    className="bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors text-center"
-                  >
-                    Request a Workshop
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                  <a href={bringHref} className="site-button site-button-primary">
+                    Request a workshop <FiArrowUpRight aria-hidden="true" />
                   </a>
-
-                  <Link
-                    href="/partners"
-                    className="bg-white text-dark border border-gray-200 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-center"
-                  >
-                    Partner With Us
+                  <Link href="/bring-creatorlaunch" className="site-button site-button-secondary">
+                    See how it works <FiPlay className="text-accent" aria-hidden="true" />
                   </Link>
                 </div>
 
-                <div className="grid grid-cols-3 gap-4 mt-10 max-w-xl">
-                  <div>
-                    <p className="text-2xl font-black text-dark">No-cost</p>
-                    <p className="text-sm text-medium">for students/families</p>
+                <div className="hero-trust-grid mt-9">
+                  <div className="trust-chip">
+                    <strong>No-cost</strong>
+                    <span>for students and families</span>
                   </div>
-                  <div>
-                    <p className="text-2xl font-black text-dark">Youth-led</p>
-                    <p className="text-sm text-medium">real founder energy</p>
+                  <div className="trust-chip">
+                    <strong>Youth-led</strong>
+                    <span>with real founder energy</span>
                   </div>
-                  <div>
-                    <p className="text-2xl font-black text-dark">Hands-on</p>
-                    <p className="text-sm text-medium">business learning</p>
+                  <div className="trust-chip">
+                    <strong>Hands-on</strong>
+                    <span>made for active learning</span>
                   </div>
                 </div>
               </div>
 
-              <div className="relative">
-                <div className="rounded-3xl overflow-hidden shadow-2xl border border-white bg-white">
+              <div className="hero-visual">
+                <div className="hero-note">
+                  Ideas do not have to be perfect to be worth starting.
+                  <small>A note from Mox</small>
+                </div>
+
+                <span className="hero-spark" aria-hidden="true">✦</span>
+
+                <div className="hero-photo-panel">
                   <img
-                    src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80"
-                    alt="Workshop table with notebooks and planning materials"
-                    className="w-full h-[420px] object-cover"
+                    src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1400&q=85"
+                    alt="Young people collaborating around a workshop table"
+                    className="hero-photo"
                   />
                 </div>
 
-                <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl border border-gray-100 p-5 max-w-xs hidden md:block">
-                  <p className="text-primary font-bold mb-1">Built for action</p>
-                  <p className="text-sm text-medium">
-                    Students learn entrepreneurship by creating real ideas, brands,
-                    products, services, and pitch plans.
+                <div className="hero-mox-card">
+                  <p className="mb-1 text-center text-[10px] font-extrabold uppercase tracking-[0.16em] text-violet-600">
+                    Your idea buddy
                   </p>
+                  <MoxMascot className="mx-auto w-full" />
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="py-20 bg-white">
+        <section className="bg-white py-20 md:py-28">
           <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto text-center mb-14">
-              <p className="text-primary font-bold uppercase tracking-widest mb-3">
-                What We Bring
-              </p>
-              <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">
-                Entrepreneurship workshops that feel real.
+            <div className="mx-auto mb-14 max-w-3xl text-center">
+              <span className="section-kicker">What students actually do</span>
+              <h2 className="mt-6 text-4xl font-bold leading-tight text-dark md:text-6xl">
+                A workshop with momentum.
               </h2>
-              <p className="text-lg text-medium">
-                CreatorLaunch is designed for young people who need more than lectures.
-                We help students build confidence, ideas, and practical skills they can
-                use right away.
+              <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-medium md:text-lg">
+                No long lectures. No pretending there is only one right answer. Every
+                activity moves a young creator from curiosity toward action.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
-              <div className="bg-light rounded-2xl p-6 border border-gray-100">
-                <div className="text-3xl mb-4">💡</div>
-                <h3 className="text-xl font-bold text-dark mb-3">Idea to Action</h3>
-                <p className="text-medium">
-                  Students identify problems, explore business ideas, understand customers,
-                  and learn how ideas become real ventures.
-                </p>
-              </div>
+            <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
+              {workshopCards.map((card) => (
+                <article key={card.number} className="play-card">
+                  <span className="play-card-number">{card.number}</span>
+                  <span className="play-card-icon" aria-hidden="true">{card.icon}</span>
+                  <h3 className="text-2xl font-bold text-dark">{card.title}</h3>
+                  <p className="mt-3 text-sm font-medium leading-7 text-medium">
+                    {card.description}
+                  </p>
+                </article>
+              ))}
+            </div>
 
-              <div className="bg-light rounded-2xl p-6 border border-gray-100">
-                <div className="text-3xl mb-4">🎨</div>
-                <h3 className="text-xl font-bold text-dark mb-3">Brand & Product Basics</h3>
-                <p className="text-medium">
-                  Students learn naming, branding, pricing, products, services, and how to
-                  communicate what they are building.
-                </p>
-              </div>
-
-              <div className="bg-light rounded-2xl p-6 border border-gray-100">
-                <div className="text-3xl mb-4">🚀</div>
-                <h3 className="text-xl font-bold text-dark mb-3">Pitch & Launch Skills</h3>
-                <p className="text-medium">
-                  Students practice pitching, planning next steps, and thinking like founders
-                  with support from a youth-led team.
-                </p>
-              </div>
+            <div className="mx-auto mt-16 flex max-w-4xl flex-wrap items-center justify-center gap-x-8 gap-y-3 rounded-3xl border border-slate-100 bg-slate-50 px-6 py-5">
+              {['Built for participation', 'Flexible formats', 'Practical next steps'].map((item) => (
+                <span key={item} className="flex items-center gap-2 text-xs font-extrabold text-dark md:text-sm">
+                  <span className="grid h-6 w-6 place-items-center rounded-full bg-cyan-100 text-cyan-800">
+                    <FiCheck aria-hidden="true" />
+                  </span>
+                  {item}
+                </span>
+              ))}
             </div>
           </div>
         </section>
 
-        <section className="py-20 bg-slate-950 text-white overflow-hidden">
-          <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-2 gap-10 max-w-6xl mx-auto items-center">
+        <section className="bg-white px-4 pb-20 md:pb-28">
+          <div className="games-stage mx-auto max-w-7xl px-6 py-12 md:px-12 md:py-16 lg:px-16">
+            <div className="relative z-10 grid items-center gap-12 lg:grid-cols-[1fr_0.95fr]">
               <div>
-                <p className="text-red-300 font-bold uppercase tracking-widest mb-3">
+                <span className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-[11px] font-extrabold uppercase tracking-[0.18em] text-cyan-200">
                   CreatorGames
-                </p>
-
-                <h2 className="text-3xl md:text-5xl font-bold mb-6">
-                  Students can practice money and business decisions through games.
+                </span>
+                <h2 className="mt-6 max-w-2xl text-4xl font-bold leading-tight md:text-6xl">
+                  Money skills meet game night.
                 </h2>
-
-                <p className="text-white/75 text-lg mb-6">
-                  CreatorGames is our learning arcade with curated financial and
-                  entrepreneurship games. Students can explore budgeting, credit, investing,
-                  careers, insurance, and entrepreneurship in a fun, interactive way.
+                <p className="mt-5 max-w-xl text-base font-medium leading-8 text-white/70 md:text-lg">
+                  Our learning arcade lets students practice business and financial
+                  decisions through play—during workshops, in classrooms, or on their own.
                 </p>
 
-                <p className="text-white/60 mb-8">
-                  It is a great add-on for workshops, classrooms, afterschool programs,
-                  and students who want to keep learning outside of a live session.
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link
-                    href="/games"
-                    className="bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors text-center"
-                  >
-                    Explore CreatorGames
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                  <Link href="/games" className="site-button bg-primary text-white hover:bg-red-600">
+                    Explore CreatorGames <FiArrowUpRight aria-hidden="true" />
                   </Link>
-
-                  <Link
-                    href="/bring-creatorlaunch"
-                    className="bg-white/10 text-white border border-white/10 px-8 py-4 rounded-lg font-semibold hover:bg-white/15 transition-colors text-center"
-                  >
-                    Use Games in a Workshop
+                  <Link href="/bring-creatorlaunch" className="site-button border border-white/15 bg-white/10 text-white hover:bg-white/15">
+                    Add games to a workshop
                   </Link>
                 </div>
               </div>
 
-              <div className="relative">
-                <div className="absolute -top-20 -right-20 w-72 h-72 bg-red-500/25 rounded-full blur-3xl" />
-                <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-blue-500/25 rounded-full blur-3xl" />
-
-                <div className="relative bg-white/10 border border-white/10 rounded-3xl p-6 shadow-2xl">
-                  <div className="grid gap-4">
-                    <div className="bg-white text-slate-950 rounded-2xl p-5">
-                      <div className="flex items-center gap-4">
-                        <div className="text-4xl">🎮</div>
-                        <div>
-                          <p className="font-black text-lg">CreatorGames Arcade</p>
-                          <p className="text-sm text-slate-600">
-                            Financial learning games curated by CreatorLaunch.
-                          </p>
-                        </div>
-                      </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {gameTopics.map(([icon, topic]) => (
+                  <div key={topic} className="game-chip">
+                    <div>
+                      <span className="text-2xl" aria-hidden="true">{icon}</span>
+                      <p className="mt-2 text-sm font-extrabold">{topic}</p>
                     </div>
-
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      {[
-                        'Entrepreneurship',
-                        'Budgeting',
-                        'Credit',
-                        'Investing',
-                        'Insurance',
-                        'Careers',
-                      ].map((item) => (
-                        <div
-                          key={item}
-                          className="bg-white/10 border border-white/10 rounded-2xl p-4"
-                        >
-                          <p className="font-bold">{item}</p>
-                          <p className="text-sm text-white/60 mt-1">
-                            Learn by playing
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-
-                    <Link
-                      href="/games/influencd"
-                      className="block bg-red-500 hover:bg-red-600 text-white text-center rounded-2xl p-4 font-black transition-colors"
-                    >
-                      Featured Game: Influenc’d →
-                    </Link>
+                    <FiChevronRight className="text-white/40" aria-hidden="true" />
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-20 bg-violet-50">
-          <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-2 gap-10 max-w-6xl mx-auto items-center">
-              <div className="bg-white rounded-3xl border border-violet-100 p-6 md:p-10 shadow-sm">
-                <MoxMascot showWordmark className="max-w-[360px] mx-auto" />
-              </div>
-
-              <div>
-                <p className="text-primary font-bold uppercase tracking-widest mb-3">
-                  Meet Mox
-                </p>
-
-                <h2 className="text-3xl md:text-5xl font-bold text-dark mb-6">
-                  Our tiny creative spark.
-                </h2>
-
-                <p className="text-lg text-medium mb-5">
-                  Mox is the creative idea buddy inside the CreatorLaunch idea box. He pops
-                  out whenever a young creator has a new idea, starts a project, makes a plan,
-                  or launches something into the world.
-                </p>
-
-                <p className="text-lg text-medium mb-8">
-                  He keeps the brand playful, youth-friendly, and memorable while still
-                  connecting back to action: think it, sketch it, build it, launch it.
-                </p>
+                ))}
 
                 <Link
-                  href="/meet-mox"
-                  className="inline-block bg-dark text-white px-8 py-4 rounded-lg font-semibold hover:opacity-90 transition-opacity"
+                  href="/games/influencd"
+                  className="game-chip border-primary/40 bg-primary text-white sm:col-span-2"
                 >
-                  Meet Mox
+                  <span>
+                    <span className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-white/70">
+                      Featured game
+                    </span>
+                    <strong className="mt-1 block font-[var(--font-display)] text-xl">
+                      Influenc&apos;d
+                    </strong>
+                  </span>
+                  <FiArrowUpRight className="text-xl" aria-hidden="true" />
                 </Link>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="py-20 bg-dark text-white">
-          <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-2 gap-10 max-w-6xl mx-auto items-center">
-              <div>
-                <p className="text-red-300 font-bold uppercase tracking-widest mb-3">
-                  For Schools, Programs & Organizations
-                </p>
+        <section className="bg-[#fffdf9] px-4 py-20 md:py-28">
+          <div className="mox-stage mx-auto max-w-7xl px-6 py-12 md:px-12 md:py-16">
+            <div className="relative z-10 grid items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+              <div className="rounded-[32px] border border-white/70 bg-white/80 p-5 shadow-xl shadow-violet-900/5 backdrop-blur md:p-9">
+                <MoxMascot showWordmark className="mx-auto max-w-[390px]" />
+              </div>
 
-                <h2 className="text-3xl md:text-5xl font-bold mb-6">
+              <div>
+                <span className="section-kicker border-violet-200 text-violet-700">Meet Mox</span>
+                <h2 className="mt-6 text-4xl font-bold leading-tight text-dark md:text-6xl">
+                  The tiny spark behind every “what if?”
+                </h2>
+                <p className="mt-5 text-base font-medium leading-8 text-medium md:text-lg">
+                  Mox is CreatorLaunch&apos;s interactive idea buddy. He shows up when a
+                  young creator starts thinking, sketching, building, or getting brave
+                  enough to share.
+                </p>
+                <p className="mt-4 text-sm font-semibold leading-7 text-violet-700">
+                  Try clicking Mox—or press <kbd className="rounded-lg border border-violet-200 bg-white px-2 py-1 font-bold shadow-sm">M</kbd> anywhere on the site.
+                </p>
+                <Link href="/meet-mox" className="site-button mt-8 bg-dark text-white hover:bg-slate-800">
+                  Meet Mox properly <FiStar className="text-sun" aria-hidden="true" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-white py-20 md:py-28">
+          <div className="container mx-auto px-4">
+            <div className="mx-auto grid max-w-7xl items-start gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+              <div className="lg:sticky lg:top-32">
+                <span className="section-kicker">Built for communities</span>
+                <h2 className="mt-6 text-4xl font-bold leading-tight text-dark md:text-6xl">
                   We meet young people where they already are.
                 </h2>
-
-                <p className="text-gray-200 text-lg mb-6">
-                  CreatorLaunch works with summer programs, afterschool programs, schools,
-                  libraries, nonprofits, churches, community centers, youth organizations,
-                  and local partners who want to bring practical entrepreneurship learning
-                  to their community.
+                <p className="mt-5 max-w-xl text-base font-medium leading-8 text-medium md:text-lg">
+                  CreatorLaunch works with the organizations young people already know
+                  and trust. We shape the workshop around your schedule, setting, and group.
                 </p>
-
-                <a
-                  href={bringHref}
-                  className="inline-block bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors"
-                >
-                  Bring CreatorLaunch to Your Community
+                <a href={bringHref} className="site-button site-button-primary mt-8">
+                  Bring us to your community <FiArrowUpRight aria-hidden="true" />
                 </a>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-4">
-                {[
-                  'Summer programs',
-                  'Afterschool programs',
-                  'Schools',
-                  'Community centers',
-                  'Youth nonprofits',
-                  'Libraries',
-                  'Churches',
-                  'Local organizations',
-                ].map((item) => (
-                  <div
-                    key={item}
-                    className="bg-white/10 rounded-2xl p-5 border border-white/10"
-                  >
-                    <p className="font-bold">{item}</p>
-                  </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {audiences.map((audience) => (
+                  <div key={audience} className="audience-pill">{audience}</div>
+                ))}
+
+                <div className="mt-3 rounded-[28px] bg-dark p-7 text-white sm:col-span-2">
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.18em] text-cyan-300">
+                    A flexible partner
+                  </p>
+                  <h3 className="mt-3 text-2xl font-bold">
+                    Your community already has the young creators. We bring the launch energy.
+                  </h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-light py-20 md:py-28">
+          <div className="container mx-auto px-4">
+            <div className="mx-auto max-w-7xl">
+              <div className="mx-auto mb-12 max-w-3xl text-center">
+                <span className="section-kicker">Simple from the start</span>
+                <h2 className="mt-6 text-4xl font-bold leading-tight text-dark md:text-5xl">
+                  From first hello to first pitch.
+                </h2>
+              </div>
+
+              <div className="grid gap-5 md:grid-cols-3">
+                {processSteps.map((step, index) => (
+                  <article key={step.title} className="process-card">
+                    <span className="number-bubble">{index + 1}</span>
+                    <h3 className="text-xl font-bold text-dark">{step.title}</h3>
+                    <p className="mt-3 text-sm font-medium leading-7 text-medium">
+                      {step.description}
+                    </p>
+                  </article>
                 ))}
               </div>
-            </div>
-          </div>
-        </section>
 
-        <section className="py-20 bg-light">
-          <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-2 gap-10 max-w-6xl mx-auto items-center">
-              <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
-                <img
-                  src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1200&q=80"
-                  alt="Planning board with notes and strategy"
-                  className="w-full h-72 object-cover rounded-2xl mb-6"
-                />
-
-                <div className="space-y-4">
-                  <div className="flex gap-3">
-                    <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                      1
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-dark">Partner requests a workshop</h3>
-                      <p className="text-sm text-medium">
-                        Tell us about your organization, community, and students.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                      2
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-dark">We plan the right fit</h3>
-                      <p className="text-sm text-medium">
-                        We align the workshop format with your schedule and group.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                      3
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-dark">Students build and pitch</h3>
-                      <p className="text-sm text-medium">
-                        Youth leave with practical skills, ideas, and next steps.
-                      </p>
-                    </div>
-                  </div>
+              <div className="platform-card mt-12 grid items-center gap-8 p-7 md:grid-cols-[1fr_auto] md:p-12">
+                <div className="relative z-10">
+                  <p className="text-[11px] font-extrabold uppercase tracking-[0.18em] text-white/75">
+                    The bigger vision
+                  </p>
+                  <h2 className="mt-3 text-3xl font-bold md:text-5xl">
+                    Workshops first. A digital launchpad alongside them.
+                  </h2>
+                  <p className="mt-4 max-w-3xl text-sm font-medium leading-7 text-white/80 md:text-base">
+                    CreatorLaunch is growing a digital platform where young creators can
+                    develop products, services, stores, and launch plans. Right now, our
+                    public focus is building thoughtful workshops and community partnerships.
+                  </p>
                 </div>
-              </div>
 
-              <div>
-                <p className="text-primary font-bold uppercase tracking-widest mb-3">
-                  Digital Platform Still Growing
-                </p>
-                <h2 className="text-3xl md:text-4xl font-bold text-dark mb-4">
-                  Workshops first. Platform alongside it.
-                </h2>
-                <p className="text-lg text-medium mb-6">
-                  The CreatorLaunch digital platform is still part of the vision. It will help
-                  young creators build stores, products, services, and launch pathways online.
-                  But our public focus right now is community partnerships, workshops, and
-                  donor support that make youth entrepreneurship more accessible.
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link
-                    href="/progress"
-                    className="bg-white text-dark border border-gray-200 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-center"
-                  >
-                    View Platform Progress
+                <div className="relative z-10 flex flex-col gap-3">
+                  <Link href="/progress" className="site-button bg-white text-primary hover:bg-amber-50">
+                    Follow our progress
                   </Link>
-
-                  <Link
-                    href="/donate"
-                    className="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition-colors text-center"
-                  >
-                    Support the Mission
+                  <Link href="/donate" className="site-button border border-white/20 bg-white/10 text-white hover:bg-white/15">
+                    Support the vision
                   </Link>
                 </div>
               </div>
@@ -407,39 +361,32 @@ const Homepage = () => {
           </div>
         </section>
 
-        <section className="py-20 bg-primary text-white">
-          <div className="container mx-auto px-4 text-center">
-            <p className="font-bold uppercase tracking-widest text-white/80 mb-3">
-              Ready to start?
-            </p>
+        <section className="bg-white px-4 py-20 md:py-28">
+          <div className="final-cta mx-auto max-w-7xl px-6 py-14 text-center text-white md:px-12 md:py-20">
+            <div className="relative z-10 mx-auto max-w-3xl">
+              <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-white/75">
+                Ready when you are
+              </p>
+              <h2 className="mt-4 text-4xl font-bold leading-tight md:text-6xl">
+                Let&apos;s give young ideas somewhere to go.
+              </h2>
+              <p className="mx-auto mt-5 max-w-2xl text-base font-medium leading-8 text-white/85 md:text-lg">
+                Tell us about your school, program, or organization. We&apos;ll start
+                with your community and build the right experience together.
+              </p>
 
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">
-              Bring youth entrepreneurship to your community.
-            </h2>
-
-            <p className="text-lg max-w-2xl mx-auto mb-8 text-white/90">
-              If you run a school, summer program, afterschool program, nonprofit,
-              or youth-serving organization, we would love to hear from you.
-            </p>
-
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <a
-                href={bringHref}
-                className="bg-white text-primary px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-              >
-                Request CreatorLaunch
-              </a>
-
-              <Link
-                href="/donate"
-                className="bg-red-700 text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-800 transition-colors"
-              >
-                Donate
-              </Link>
+              <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+                <a href={bringHref} className="site-button bg-white text-primary hover:bg-amber-50">
+                  Request CreatorLaunch <FiArrowUpRight aria-hidden="true" />
+                </a>
+                <Link href="/donate" className="site-button border border-white/20 bg-white/10 text-white hover:bg-white/15">
+                  Donate to the mission
+                </Link>
+              </div>
             </div>
           </div>
         </section>
-      </main>
+      </div>
     </Layout>
   );
 };
