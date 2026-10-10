@@ -14,16 +14,17 @@ const DonatePage: React.FC = () => {
         />
       </Head>
 
+      <div className="public-shell">
       <Header />
 
-      <main>
-        <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">
+      <main className="site-main">
+        <section className="page-hero py-16 md:py-24">
           <div className="container mx-auto px-4 text-center">
-            <p className="text-primary font-bold uppercase tracking-widest mb-3">
+            <p className="section-kicker mb-5">
               Support CreatorLaunch
             </p>
 
-            <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
+            <h1 className="page-title mx-auto text-dark mb-6">
               Help Young Founders Launch.
             </h1>
 
@@ -39,8 +40,8 @@ const DonatePage: React.FC = () => {
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
               <div className="lg:col-span-2">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-8">
-                  <p className="text-primary font-bold uppercase tracking-widest mb-3">
+                <div className="soft-card mb-8 p-8">
+                  <p className="section-kicker mb-5">
                     Donation Progress
                   </p>
 
@@ -81,8 +82,8 @@ const DonatePage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-                  <p className="text-primary font-bold uppercase tracking-widest mb-3">
+                <div className="soft-card p-8">
+                  <p className="section-kicker mb-5">
                     Make a Donation
                   </p>
 
@@ -116,7 +117,7 @@ const DonatePage: React.FC = () => {
               </div>
 
               <aside className="space-y-6">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div className="soft-card p-6">
                   <h3 className="text-xl font-bold text-dark mb-4">
                     What Your Support Helps Fund
                   </h3>
@@ -144,7 +145,7 @@ const DonatePage: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div className="soft-card p-6">
                   <h3 className="text-xl font-bold text-dark mb-4">
                     Why Zeffy?
                   </h3>
@@ -155,7 +156,7 @@ const DonatePage: React.FC = () => {
                   </p>
                 </div>
 
-                <div className="bg-primary text-white rounded-2xl shadow-sm p-6">
+                <div className="accent-note p-6">
                   <h3 className="text-xl font-bold mb-3">
                     Founded by youth. Built for youth.
                   </h3>
@@ -172,6 +173,7 @@ const DonatePage: React.FC = () => {
       </main>
 
       <Footer />
+      </div>
     </>
   );
 };

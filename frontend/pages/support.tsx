@@ -62,13 +62,13 @@ const SupportPage = () => {
       description="Support CreatorLaunch through donations, sponsorships, partnerships, volunteering, hosting workshops, and sharing the mission."
     >
       <main className="min-h-screen bg-white">
-        <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">
+        <section className="page-hero py-16 md:py-24">
           <div className="container mx-auto px-4 text-center">
-            <p className="text-primary font-bold uppercase tracking-widest mb-3">
+            <p className="section-kicker mb-5">
               Ways to Support
             </p>
 
-            <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
+            <h1 className="page-title mx-auto text-dark mb-6">
               Help young founders get real support.
             </h1>
 
@@ -86,7 +86,7 @@ const SupportPage = () => {
                 const isExternal = option.href.startsWith('mailto:');
 
                 const cardContent = (
-                  <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 h-full hover:-translate-y-1 transition-transform">
+                  <div className="soft-card h-full p-6 transition-transform hover:-translate-y-1">
                     <div className="w-12 h-12 rounded-2xl bg-red-50 text-primary flex items-center justify-center font-black text-xl mb-5">
                       +
                     </div>
@@ -127,7 +127,7 @@ const SupportPage = () => {
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-10 items-center max-w-6xl mx-auto">
               <div>
-                <p className="text-primary font-bold uppercase tracking-widest mb-3">
+                <p className="section-kicker mb-5">
                   Donation Impact
                 </p>
 
@@ -149,14 +149,14 @@ const SupportPage = () => {
                     '$250 can help support a youth entrepreneurship session.',
                     '$500 can help sponsor a community workshop experience.',
                   ].map((item) => (
-                    <div key={item} className="bg-light rounded-2xl p-5 border border-gray-100">
+                    <div key={item} className="soft-card bg-light p-5">
                       <p className="font-semibold text-dark">{item}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="rounded-3xl overflow-hidden shadow-xl border border-white bg-white">
+              <div className="story-frame">
                 <img
                   src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=80"
                   alt="Community planning and support materials"
@@ -167,9 +167,9 @@ const SupportPage = () => {
           </div>
         </section>
 
-        <section className="py-20 bg-dark text-white">
+        <section className="py-20 band-dark">
           <div className="container mx-auto px-4 text-center">
-            <p className="text-red-300 font-bold uppercase tracking-widest mb-3">
+            <p className="mb-5 text-xs font-extrabold uppercase tracking-[0.18em] text-cyan-300">
               Not sure where to start?
             </p>
 
@@ -187,14 +187,14 @@ const SupportPage = () => {
                 href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
                   'I want to support CreatorLaunch'
                 )}`}
-                className="bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors"
+                className="site-button site-button-primary"
               >
                 Contact CreatorLaunch
               </a>
 
               <Link
                 href="/donate"
-                className="bg-white/10 text-white border border-white/10 px-8 py-4 rounded-lg font-semibold hover:bg-white/15 transition-colors"
+                className="site-button border border-white/15 bg-white/10 text-white hover:bg-white/15"
               >
                 Donate
               </Link>

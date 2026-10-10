@@ -84,10 +84,10 @@ const VerifyCertificatePage = () => {
   return (
     <Layout title="Verify a CreatorLaunch Certificate" description="Verify whether a certificate code was officially issued by CreatorLaunch.">
       <main className="min-h-screen bg-white">
-        <section className="bg-gradient-to-br from-white via-red-50 to-orange-50 py-20">
+        <section className="page-hero py-16 md:py-24">
           <div className="container mx-auto px-4 text-center">
-            <p className="text-primary font-semibold mb-3">CreatorLaunch Certificate Verification</p>
-            <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">Verify a Certificate</h1>
+            <p className="section-kicker mb-5">CreatorLaunch Certificate Verification</p>
+            <h1 className="page-title mx-auto mb-6 text-dark">Verify a Certificate</h1>
             <p className="text-lg md:text-xl text-medium max-w-3xl mx-auto">
               Enter the certificate code to confirm whether it is an official CreatorLaunch certificate.
             </p>
@@ -97,7 +97,7 @@ const VerifyCertificatePage = () => {
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto grid lg:grid-cols-[0.95fr_1.05fr] gap-8">
-              <div className="bg-light rounded-3xl p-8 border border-gray-100 shadow-sm">
+              <div className="soft-card site-form bg-light p-8">
                 <h2 className="text-2xl font-bold text-dark mb-4">Enter Certificate Code</h2>
                 <form onSubmit={handleVerify} className="space-y-4">
                   <input
@@ -106,7 +106,7 @@ const VerifyCertificatePage = () => {
                     onChange={(e) => setCode(e.target.value.toUpperCase())}
                     placeholder="Example: CL-2026-ABC123"
                   />
-                  <button type="submit" disabled={loading} className="w-full bg-primary text-white px-6 py-4 rounded-xl font-semibold hover:bg-red-600 transition-colors disabled:opacity-70">
+                  <button type="submit" disabled={loading} className="site-button site-button-primary w-full disabled:opacity-70">
                     {loading ? 'Verifying...' : 'Verify Certificate'}
                   </button>
                 </form>
@@ -118,7 +118,7 @@ const VerifyCertificatePage = () => {
                 ) : null}
               </div>
 
-              <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm">
+              <div className="soft-card p-8">
                 <h2 className="text-2xl font-bold text-dark mb-4">Verification Result</h2>
                 {!certificate ? (
                   <p className="text-medium">When a valid code is entered, the certificate details will appear here.</p>

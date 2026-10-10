@@ -32,13 +32,13 @@ const ContactPage = () => {
       description="Contact CreatorLaunch about partnerships, donations, workshops, media, volunteering, and bringing entrepreneurship programming to your community."
     >
       <main className="min-h-screen bg-light">
-        <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">
+        <section className="page-hero py-16 md:py-24">
           <div className="container mx-auto px-4 text-center">
-            <p className="text-primary font-bold uppercase tracking-widest mb-3">
+            <p className="section-kicker mb-5">
               Contact CreatorLaunch
             </p>
 
-            <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
+            <h1 className="page-title mx-auto text-dark mb-6">
               Let’s build something for young founders.
             </h1>
 
@@ -52,8 +52,8 @@ const ContactPage = () => {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
-                <div className="space-y-6">
+              <div className="soft-card p-8 lg:col-span-2">
+                <div className="site-form space-y-6">
                   <div>
                     <label className="block text-sm font-semibold text-dark mb-2">
                       Name
@@ -117,7 +117,7 @@ const ContactPage = () => {
 
                   <a
                     href={mailtoHref}
-                    className="block w-full text-center bg-primary text-white py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors"
+                    className="site-button site-button-primary w-full"
                   >
                     Send Message
                   </a>
@@ -129,7 +129,7 @@ const ContactPage = () => {
               </div>
 
               <aside className="space-y-6">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div className="soft-card p-6">
                   <h3 className="text-xl font-bold text-dark mb-4">
                     Direct Email
                   </h3>
@@ -142,7 +142,7 @@ const ContactPage = () => {
                   </a>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div className="soft-card p-6">
                   <h3 className="text-xl font-bold text-dark mb-4">
                     Common Requests
                   </h3>
@@ -156,7 +156,7 @@ const ContactPage = () => {
                   </div>
                 </div>
 
-                <div className="bg-primary text-white rounded-2xl shadow-sm p-6">
+                <div className="accent-note p-6">
                   <h3 className="text-xl font-bold mb-3">
                     Built for community.
                   </h3>

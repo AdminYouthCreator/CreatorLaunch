@@ -43,13 +43,13 @@ const PartnersPage = () => {
       description="CreatorLaunch partners with schools, programs, nonprofits, donors, sponsors, and community organizations to bring entrepreneurship workshops to young people."
     >
       <main className="min-h-screen bg-white">
-        <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">
+        <section className="page-hero py-16 md:py-24">
           <div className="container mx-auto px-4 text-center">
-            <p className="text-primary font-bold uppercase tracking-widest mb-3">
+            <p className="section-kicker mb-5">
               Our Partners
             </p>
 
-            <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
+            <h1 className="page-title mx-auto text-dark mb-6">
               Building youth entrepreneurship with community.
             </h1>
 
@@ -72,7 +72,7 @@ const PartnersPage = () => {
               </p>
             </div>
 
-            <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border border-gray-100 bg-white shadow-sm rounded-3xl overflow-hidden">
+            <div className="soft-card mx-auto grid max-w-6xl grid-cols-1 overflow-hidden sm:grid-cols-2 lg:grid-cols-3">
               {partners.map((partner) => (
                 <a
                   key={partner.name}
@@ -114,7 +114,7 @@ const PartnersPage = () => {
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-10 items-center max-w-6xl mx-auto">
               <div>
-                <p className="text-primary font-bold uppercase tracking-widest mb-3">
+                <p className="section-kicker mb-5">
                   Partnership Opportunities
                 </p>
 
@@ -130,7 +130,7 @@ const PartnersPage = () => {
 
                 <a
                   href={partnerHref}
-                  className="inline-block bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors"
+                  className="site-button site-button-primary"
                 >
                   Become a Partner
                 </a>
@@ -147,7 +147,7 @@ const PartnersPage = () => {
                 ].map((item) => (
                   <div
                     key={item}
-                    className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm"
+                    className="soft-card p-6"
                   >
                     <p className="font-bold text-dark">{item}</p>
                   </div>
@@ -157,8 +157,9 @@ const PartnersPage = () => {
           </div>
         </section>
 
-        <section className="py-20 bg-primary text-white">
-          <div className="container mx-auto px-4 text-center">
+        <section className="px-4 py-16 md:py-20">
+          <div className="final-cta mx-auto max-w-6xl px-6 py-14 text-center text-white md:px-12 md:py-16">
+          <div className="relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Partner with CreatorLaunch.
             </h2>
@@ -171,7 +172,7 @@ const PartnersPage = () => {
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <a
                 href={partnerHref}
-                className="bg-white text-primary px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                className="site-button bg-white text-primary hover:bg-amber-50"
               >
                 Start a Partnership
               </a>
@@ -180,11 +181,12 @@ const PartnersPage = () => {
                 href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
                   'CreatorLaunch Donation or Sponsorship Inquiry'
                 )}`}
-                className="bg-red-700 text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-800 transition-colors"
+                className="site-button border border-white/20 bg-white/10 text-white hover:bg-white/15"
               >
                 Sponsor the Mission
               </a>
             </div>
+          </div>
           </div>
         </section>
       </main>

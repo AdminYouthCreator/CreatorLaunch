@@ -48,15 +48,15 @@ ${form.message}`
       announcementText="CreatorLaunch workshops are designed to be no-cost for students and families."
     >
       <main className="min-h-screen bg-white">
-        <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">
+        <section className="page-hero py-16 md:py-24">
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
               <div>
-                <p className="text-primary font-bold uppercase tracking-widest mb-3">
+                <p className="section-kicker mb-5">
                   Bring CreatorLaunch
                 </p>
 
-                <h1 className="text-4xl md:text-6xl font-bold text-dark leading-tight mb-6">
+                <h1 className="page-title text-dark mb-6">
                   Request entrepreneurship workshops for your community.
                 </h1>
 
@@ -67,28 +67,28 @@ ${form.message}`
                 </p>
 
                 <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                  <div className="soft-card p-5">
                     <p className="font-bold text-dark mb-1">Hands-on learning</p>
                     <p className="text-sm text-medium">
                       Students build ideas, brands, products, and pitches.
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                  <div className="soft-card p-5">
                     <p className="font-bold text-dark mb-1">Youth-led energy</p>
                     <p className="text-sm text-medium">
                       Students learn from a team that understands young founders.
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                  <div className="soft-card p-5">
                     <p className="font-bold text-dark mb-1">Flexible format</p>
                     <p className="text-sm text-medium">
                       Built for summer, school, afterschool, and community settings.
                     </p>
                   </div>
 
-                  <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                  <div className="soft-card p-5">
                     <p className="font-bold text-dark mb-1">No-cost for youth</p>
                     <p className="text-sm text-medium">
                       Students and families should not have to pay to participate.
@@ -97,7 +97,7 @@ ${form.message}`
                 </div>
               </div>
 
-              <div className="rounded-3xl overflow-hidden shadow-2xl border border-white bg-white">
+              <div className="story-frame">
                 <img
                   src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80"
                   alt="Community workshop planning table"
@@ -111,7 +111,7 @@ ${form.message}`
         <section className="py-20 bg-light">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+              <div className="soft-card site-form p-8 lg:col-span-2">
                 <h2 className="text-3xl font-bold text-dark mb-3">
                   Request CreatorLaunch
                 </h2>
@@ -251,14 +251,14 @@ ${form.message}`
 
                 <a
                   href={mailtoHref}
-                  className="block w-full text-center bg-primary text-white py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors mt-6"
+                  className="site-button site-button-primary mt-6 w-full"
                 >
                   Send Request
                 </a>
               </div>
 
               <aside className="space-y-6">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div className="soft-card p-6">
                   <h3 className="text-xl font-bold text-dark mb-4">
                     Best Fit For
                   </h3>
@@ -273,7 +273,7 @@ ${form.message}`
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div className="soft-card p-6">
                   <h3 className="text-xl font-bold text-dark mb-4">
                     Workshop Topics
                   </h3>
@@ -288,7 +288,7 @@ ${form.message}`
                   </div>
                 </div>
 
-                <div className="bg-primary text-white rounded-2xl shadow-sm p-6">
+                <div className="accent-note p-6">
                   <h3 className="text-xl font-bold mb-3">
                     Students should not have to pay to start.
                   </h3>

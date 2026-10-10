@@ -10,13 +10,13 @@ const TeamPage = () => {
       description="Meet the youth-led CreatorLaunch team building entrepreneurship workshops, partnerships, and digital tools for young founders."
     >
       <main className="min-h-screen bg-white">
-        <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">
+        <section className="page-hero py-16 md:py-24">
           <div className="container mx-auto px-4 text-center">
-            <p className="text-primary font-bold uppercase tracking-widest mb-3">
+            <p className="section-kicker mb-5">
               The Team
             </p>
 
-            <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
+            <h1 className="page-title mx-auto text-dark mb-6">
               The people building CreatorLaunch.
             </h1>
 
@@ -36,7 +36,7 @@ const TeamPage = () => {
                   href={`/about/team/${member.slug}`}
                   className="group block"
                 >
-                  <div className="relative rounded-3xl overflow-hidden shadow-sm border border-gray-100 bg-light min-h-[420px]">
+                  <div className="story-frame relative min-h-[420px] border-0">
                     <img
                       src={member.image}
                       alt={member.name}
@@ -76,7 +76,7 @@ const TeamPage = () => {
           <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-10">
-                <p className="text-primary font-bold uppercase tracking-widest mb-3">
+                <p className="section-kicker mb-5">
                   Leadership &amp; Governance
                 </p>
 
@@ -85,7 +85,7 @@ const TeamPage = () => {
                 </h2>
               </div>
 
-              <div className="relative overflow-hidden rounded-3xl border border-red-100 bg-gradient-to-br from-white via-red-50 to-blue-50 px-6 py-14 text-center shadow-sm md:px-12">
+              <div className="soft-card relative overflow-hidden px-6 py-14 text-center md:px-12">
                 <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-primary/10 blur-2xl" />
                 <div className="absolute -bottom-20 -left-16 h-52 w-52 rounded-full bg-blue-500/10 blur-2xl" />
 
@@ -109,7 +109,7 @@ const TeamPage = () => {
           </div>
         </section>
 
-        <section className="py-20 bg-dark text-white">
+        <section className="py-20 band-dark">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">

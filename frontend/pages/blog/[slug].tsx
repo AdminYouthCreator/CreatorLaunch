@@ -122,13 +122,15 @@ const BlogPostPage: React.FC = () => {
           <title>Loading Blog Post | CreatorLaunch</title>
         </Head>
 
+        <div className="public-shell">
         <PublicHeader />
 
-        <main className="min-h-screen flex items-center justify-center bg-light">
+        <main className="site-main flex min-h-screen items-center justify-center bg-light">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </main>
 
         <Footer />
+        </div>
       </>
     );
   }
@@ -140,23 +142,25 @@ const BlogPostPage: React.FC = () => {
           <title>Blog Post Not Found | CreatorLaunch</title>
         </Head>
 
+        <div className="public-shell">
         <PublicHeader />
 
-        <main className="min-h-screen flex items-center justify-center bg-light">
-          <div className="text-center px-4">
-            <h1 className="text-4xl font-bold text-dark mb-4">
+        <main className="site-main flex min-h-screen items-center justify-center bg-light">
+          <div className="px-4 text-center">
+            <h1 className="page-title mb-4 text-dark">
               Blog Post Not Found
             </h1>
 
             <p className="text-medium mb-6">{error}</p>
 
-            <Link href="/blog" className="bg-primary text-white px-6 py-3 rounded-lg font-bold">
+            <Link href="/blog" className="site-button site-button-primary">
               Back to Blog
             </Link>
           </div>
         </main>
 
         <Footer />
+        </div>
       </>
     );
   }
@@ -168,21 +172,22 @@ const BlogPostPage: React.FC = () => {
         <meta name="description" content={post.seoDescription || post.excerpt} />
       </Head>
 
+      <div className="public-shell">
       <PublicHeader />
 
-      <main>
-        <article className="bg-white">
-          <section className="py-16 border-b">
-            <div className="container mx-auto px-4 max-w-4xl">
-              <Link href="/blog" className="text-primary font-bold hover:text-red-600">
+      <main className="site-main">
+        <article>
+          <section className="page-hero py-16 md:py-20">
+            <div className="container mx-auto max-w-4xl px-4">
+              <Link href="/blog" className="text-sm font-extrabold text-primary hover:text-red-600">
                 ← Back to Blog
               </Link>
 
-              <p className="text-primary font-bold uppercase tracking-widest mt-8 mb-3">
+              <p className="section-kicker mt-8 mb-5">
                 CreatorLaunch Blog
               </p>
 
-              <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
+              <h1 className="page-title mb-6 text-dark">
                 {post.title}
               </h1>
 
@@ -202,7 +207,7 @@ const BlogPostPage: React.FC = () => {
                   {post.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium"
+                      className="tag-pill"
                     >
                       {tag}
                     </span>
@@ -217,7 +222,7 @@ const BlogPostPage: React.FC = () => {
               <img
                 src={post.coverImageUrl}
                 alt={post.title}
-                className="w-full rounded-2xl shadow-sm object-cover max-h-[500px]"
+                className="story-frame max-h-[500px] w-full object-cover"
               />
             </div>
           )}
@@ -231,6 +236,7 @@ const BlogPostPage: React.FC = () => {
       </main>
 
       <Footer />
+      </div>
     </>
   );
 };

@@ -26,14 +26,14 @@ const MeetMoxPage = () => {
       description="Meet Mox, the playful CreatorLaunch mascot who represents ideas coming to life."
     >
       <main className="min-h-screen bg-white">
-        <section className="bg-gradient-to-br from-white via-violet-50 to-cyan-50 py-20">
+        <section className="page-hero py-16 md:py-24">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-[1.05fr_0.95fr] gap-10 items-center">
               <div>
-                <p className="text-primary font-bold uppercase tracking-widest mb-3">
+                <p className="section-kicker mb-5">
                   Our Mascot
                 </p>
-                <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
+                <h1 className="page-title text-dark mb-6">
                   Meet Mox
                 </h1>
                 <p className="text-lg md:text-xl text-medium max-w-2xl mb-6">
@@ -48,7 +48,7 @@ const MeetMoxPage = () => {
                 </p>
               </div>
 
-              <div className="bg-white rounded-3xl border border-violet-100 shadow-sm p-6 md:p-10">
+              <div className="mox-stage p-6 md:p-10">
                 <MoxMascot showWordmark className="max-w-[420px] mx-auto" />
               </div>
             </div>
@@ -58,7 +58,7 @@ const MeetMoxPage = () => {
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-6">
-              <div className="bg-light rounded-3xl p-8 border border-gray-100">
+              <div className="soft-card bg-light p-8">
                 <h2 className="text-2xl font-bold text-dark mb-4">
                   What Mox Represents
                 </h2>
@@ -80,7 +80,7 @@ const MeetMoxPage = () => {
                 </ul>
               </div>
 
-              <div className="bg-light rounded-3xl p-8 border border-gray-100">
+              <div className="soft-card bg-light p-8">
                 <h2 className="text-2xl font-bold text-dark mb-4">
                   Visual Language
                 </h2>
@@ -94,7 +94,7 @@ const MeetMoxPage = () => {
                 </ul>
               </div>
 
-              <div className="bg-slate-900 text-white rounded-3xl p-8">
+              <div className="band-dark rounded-[28px] p-8">
                 <h2 className="text-2xl font-bold mb-4">Catchphrases</h2>
                 <ul className="space-y-3 text-white/85">
                   {catchphrases.map((line) => (
@@ -121,7 +121,7 @@ const MeetMoxPage = () => {
 
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {traits.map(([title, description]) => (
-                  <div key={title} className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                  <div key={title} className="soft-card p-6">
                     <h3 className="text-xl font-bold text-dark mb-3">{title}</h3>
                     <p className="text-medium">{description}</p>
                   </div>
