@@ -14,15 +14,15 @@ const AboutPage = () => {
       description="Learn about CreatorLaunch, a youth-led nonprofit making entrepreneurship education more accessible through workshops, community partnerships, and digital tools."
     >
       <main className="min-h-screen bg-white">
-        <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">
+        <section className="page-hero py-16 md:py-24">
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
               <div>
-                <p className="text-primary font-bold uppercase tracking-widest mb-3">
+                <p className="section-kicker mb-5">
                   Our Story
                 </p>
 
-                <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6 leading-tight">
+                <h1 className="page-title text-dark mb-6">
                   CreatorLaunch started with a simple frustration.
                 </h1>
 
@@ -33,7 +33,7 @@ const AboutPage = () => {
                 </p>
               </div>
 
-              <div className="rounded-3xl overflow-hidden shadow-2xl border border-white bg-white">
+              <div className="story-frame">
                 <img
                   src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80"
                   alt="Creative workspace with laptops and planning materials"
@@ -47,8 +47,8 @@ const AboutPage = () => {
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto">
-              <div className="bg-light rounded-3xl p-8 md:p-12 border border-gray-100">
-                <p className="text-primary font-bold uppercase tracking-widest mb-3">
+              <div className="soft-card bg-light p-8 md:p-12">
+                <p className="section-kicker mb-5">
                   Why We Exist
                 </p>
 
@@ -86,7 +86,7 @@ const AboutPage = () => {
         <section className="py-20 bg-light">
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-10 items-center max-w-6xl mx-auto">
-              <div className="rounded-3xl overflow-hidden shadow-xl border border-white bg-white">
+              <div className="story-frame">
                 <img
                   src="/assets/qwentin-pfp.png"
                   alt="Qwentin Blassingame"
@@ -95,7 +95,7 @@ const AboutPage = () => {
               </div>
 
               <div>
-                <p className="text-primary font-bold uppercase tracking-widest mb-3">
+                <p className="section-kicker mb-5">
                   About the Founder
                 </p>
 
@@ -129,7 +129,7 @@ const AboutPage = () => {
                 <div className="flex flex-col sm:flex-row gap-4 mt-8">
                   <Link
                     href="/about/team/qwentin-blassingame"
-                    className="bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors text-center"
+                    className="site-button site-button-primary text-center"
                   >
                     Read Qwentin’s Bio
                   </Link>
@@ -138,7 +138,7 @@ const AboutPage = () => {
                     href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
                       'Message for Qwentin'
                     )}`}
-                    className="bg-white text-dark border border-gray-200 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-center"
+                    className="site-button site-button-secondary text-center"
                   >
                     Contact CreatorLaunch
                   </a>
@@ -148,10 +148,10 @@ const AboutPage = () => {
           </div>
         </section>
 
-        <section className="py-20 bg-dark text-white">
+        <section className="py-20 band-dark">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-6">
-              <div className="bg-white/10 rounded-2xl p-6 border border-white/10">
+              <div className="rounded-[28px] border border-white/10 bg-white/10 p-6">
                 <div className="text-4xl mb-4">🎯</div>
                 <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
                 <p className="text-gray-200">
@@ -160,7 +160,7 @@ const AboutPage = () => {
                 </p>
               </div>
 
-              <div className="bg-white/10 rounded-2xl p-6 border border-white/10">
+              <div className="rounded-[28px] border border-white/10 bg-white/10 p-6">
                 <div className="text-4xl mb-4">🤝</div>
                 <h2 className="text-2xl font-bold mb-4">Our Model</h2>
                 <p className="text-gray-200">
@@ -169,7 +169,7 @@ const AboutPage = () => {
                 </p>
               </div>
 
-              <div className="bg-white/10 rounded-2xl p-6 border border-white/10">
+              <div className="rounded-[28px] border border-white/10 bg-white/10 p-6">
                 <div className="text-4xl mb-4">🚀</div>
                 <h2 className="text-2xl font-bold mb-4">Our Future</h2>
                 <p className="text-gray-200">
@@ -185,7 +185,7 @@ const AboutPage = () => {
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-10 items-center max-w-6xl mx-auto">
               <div>
-                <p className="text-primary font-bold uppercase tracking-widest mb-3">
+                <p className="section-kicker mb-5">
                   What Makes Us Different
                 </p>
 
@@ -201,14 +201,14 @@ const AboutPage = () => {
                     'We work with community partners who already serve youth.',
                     'We are building a digital platform, but community impact comes first.',
                   ].map((item) => (
-                    <div key={item} className="bg-white rounded-2xl p-5 border border-gray-100">
+                    <div key={item} className="soft-card p-5">
                       <p className="text-medium">{item}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="rounded-3xl overflow-hidden shadow-xl border border-white bg-white">
+              <div className="story-frame">
                 <img
                   src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80"
                   alt="Team planning around laptops"
@@ -219,8 +219,9 @@ const AboutPage = () => {
           </div>
         </section>
 
-        <section className="py-20 bg-primary text-white">
-          <div className="container mx-auto px-4 text-center">
+        <section className="px-4 py-16 md:py-20">
+          <div className="final-cta mx-auto max-w-6xl px-6 py-14 text-center text-white md:px-12 md:py-16">
+          <div className="relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Help us make entrepreneurship real for more young people.
             </h2>
@@ -233,18 +234,19 @@ const AboutPage = () => {
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <a
                 href={bringHref}
-                className="bg-white text-primary px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                className="site-button bg-white text-primary hover:bg-amber-50"
               >
                 Bring CreatorLaunch
               </a>
 
               <Link
                 href="/donate"
-                className="bg-red-700 text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-800 transition-colors"
+                className="site-button border border-white/20 bg-white/10 text-white hover:bg-white/15"
               >
                 Donate
               </Link>
             </div>
+          </div>
           </div>
         </section>
       </main>

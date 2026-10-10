@@ -24,10 +24,10 @@ const TeamBioPage: React.FC<TeamBioPageProps> = ({ member }) => {
   return (
     <Layout title={`${member.name} | CreatorLaunch Team`}>
       <main className="min-h-screen bg-white">
-        <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">
+        <section className="page-hero py-16 md:py-24">
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
-              <div className="rounded-3xl overflow-hidden shadow-xl border border-white bg-white">
+              <div className="story-frame">
                 <img
                   src={member.image}
                   alt={member.name}
@@ -43,11 +43,11 @@ const TeamBioPage: React.FC<TeamBioPageProps> = ({ member }) => {
                   ← Back to Team
                 </Link>
 
-                <p className="text-primary font-bold uppercase tracking-widest mt-8 mb-3">
+                <p className="section-kicker mt-8 mb-5">
                   {member.role}
                 </p>
 
-                <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
+                <h1 className="page-title text-dark mb-6">
                   {member.name}
                 </h1>
 
@@ -58,14 +58,14 @@ const TeamBioPage: React.FC<TeamBioPageProps> = ({ member }) => {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <a
                     href={emailHref}
-                    className="bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors text-center"
+                    className="site-button site-button-primary text-center"
                   >
                     Email {member.name.split(' ')[0]}
                   </a>
 
                   <Link
                     href="/about"
-                    className="bg-white text-dark border border-gray-200 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-center"
+                    className="site-button site-button-secondary text-center"
                   >
                     About CreatorLaunch
                   </Link>

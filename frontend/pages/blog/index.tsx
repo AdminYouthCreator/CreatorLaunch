@@ -69,16 +69,17 @@ const BlogPage: React.FC = () => {
         />
       </Head>
 
+      <div className="public-shell">
       <PublicHeader />
 
-      <main>
-        <section className="bg-white py-20">
+      <main className="site-main">
+        <section className="page-hero py-16 md:py-24">
           <div className="container mx-auto px-4 text-center">
-            <p className="text-primary font-bold uppercase tracking-widest mb-3">
+            <p className="section-kicker mb-5">
               CreatorLaunch Blog
             </p>
 
-            <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
+            <h1 className="page-title mx-auto text-dark mb-6">
               Stories, Updates, and Founder Notes
             </h1>
 
@@ -111,7 +112,7 @@ const BlogPage: React.FC = () => {
                 {posts.map((post) => (
                   <article
                     key={post.id}
-                    className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                    className="soft-card overflow-hidden transition-transform hover:-translate-y-1"
                   >
                     {post.coverImageUrl ? (
                       <img
@@ -120,7 +121,7 @@ const BlogPage: React.FC = () => {
                         className="w-full h-48 object-cover"
                       />
                     ) : (
-                      <div className="w-full h-48 bg-gradient-to-br from-blue-100 to-red-100 flex items-center justify-center">
+                      <div className="flex h-48 w-full items-center justify-center bg-[#fff1e9]">
                         <span className="text-4xl">🚀</span>
                       </div>
                     )}
@@ -143,7 +144,7 @@ const BlogPage: React.FC = () => {
                           {post.tags.slice(0, 3).map((tag) => (
                             <span
                               key={tag}
-                              className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium"
+                              className="tag-pill"
                             >
                               {tag}
                             </span>
@@ -167,6 +168,7 @@ const BlogPage: React.FC = () => {
       </main>
 
       <Footer />
+      </div>
     </>
   );
 };

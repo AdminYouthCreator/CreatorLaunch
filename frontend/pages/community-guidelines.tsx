@@ -10,13 +10,13 @@ const CommunityGuidelinesPage = () => {
       description="CreatorLaunch community guidelines for workshops, CreatorGames, digital tools, programs, and youth entrepreneurship spaces."
     >
       <main className="min-h-screen bg-white">
-        <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">
+        <section className="page-hero py-16 md:py-24">
           <div className="container mx-auto px-4 text-center">
-            <p className="text-primary font-bold uppercase tracking-widest mb-3">
+            <p className="section-kicker mb-5">
               Community Guidelines
             </p>
 
-            <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
+            <h1 className="page-title mx-auto text-dark mb-6">
               A respectful space for young creators.
             </h1>
 
@@ -30,7 +30,7 @@ const CommunityGuidelinesPage = () => {
 
         <section className="py-20 bg-light">
           <div className="container mx-auto px-4">
-            <div className="max-w-5xl mx-auto bg-white rounded-3xl border border-gray-100 shadow-sm p-8 md:p-12">
+            <div className="soft-card mx-auto max-w-5xl p-8 md:p-12">
               <p className="text-sm text-medium mb-8">
                 Last updated: 2026
               </p>

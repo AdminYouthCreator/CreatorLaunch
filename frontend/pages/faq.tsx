@@ -103,13 +103,13 @@ const FAQPage = () => {
       description="Frequently asked questions about CreatorLaunch workshops, partnerships, donations, CreatorGames, and youth entrepreneurship programming."
     >
       <main className="min-h-screen bg-white">
-        <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">
+        <section className="page-hero py-16 md:py-24">
           <div className="container mx-auto px-4 text-center">
-            <p className="text-primary font-bold uppercase tracking-widest mb-3">
+            <p className="section-kicker mb-5">
               Frequently Asked Questions
             </p>
 
-            <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
+            <h1 className="page-title mx-auto text-dark mb-6">
               Questions about CreatorLaunch?
             </h1>
 
@@ -126,7 +126,7 @@ const FAQPage = () => {
               {faqSections.map((section) => (
                 <div
                   key={section.title}
-                  className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 md:p-8"
+                  className="soft-card p-6 md:p-8"
                 >
                   <h2 className="text-2xl md:text-3xl font-bold text-dark mb-6">
                     {section.title}
@@ -136,7 +136,7 @@ const FAQPage = () => {
                     {section.questions.map((item) => (
                       <details
                         key={item.question}
-                        className="group rounded-2xl border border-gray-100 bg-light p-5"
+                        className="group rounded-[20px] border border-slate-100 bg-[#fff8f1] p-5"
                       >
                         <summary className="cursor-pointer list-none flex items-start justify-between gap-4">
                           <span className="font-bold text-dark text-lg">
@@ -160,10 +160,10 @@ const FAQPage = () => {
           </div>
         </section>
 
-        <section className="py-20 bg-dark text-white">
+        <section className="py-20 band-dark">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
-              <p className="text-red-300 font-bold uppercase tracking-widest mb-3">
+              <p className="mb-5 text-xs font-extrabold uppercase tracking-[0.18em] text-cyan-300">
                 Still have a question?
               </p>
 
@@ -179,14 +179,14 @@ const FAQPage = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
                   href={bringHref}
-                  className="bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors text-center"
+                  className="site-button site-button-primary text-center"
                 >
                   Email CreatorLaunch
                 </a>
 
                 <Link
                   href="/bring-creatorlaunch"
-                  className="bg-white/10 text-white border border-white/10 px-8 py-4 rounded-lg font-semibold hover:bg-white/15 transition-colors text-center"
+                  className="site-button border border-white/15 bg-white/10 text-white hover:bg-white/15 text-center"
                 >
                   Bring CreatorLaunch
                 </Link>
