@@ -7,7 +7,7 @@ const ContactPage = () => {
   const [form, setForm] = useState({
     name: '',
     email: '',
-    interest: 'Bring CreatorLaunch to our community',
+    interest: 'Student Business Program updates',
     message: '',
   });
 
@@ -29,7 +29,7 @@ const ContactPage = () => {
   return (
     <Layout
       title="Contact | CreatorLaunch"
-      description="Contact CreatorLaunch about partnerships, donations, workshops, media, volunteering, and bringing entrepreneurship programming to your community."
+      description="Contact CreatorLaunch with questions about the Student Business Program, eligibility, upcoming groups, partnerships, or supporting young entrepreneurs."
     >
       <main className="min-h-screen bg-light">
         <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">
@@ -39,12 +39,12 @@ const ContactPage = () => {
             </p>
 
             <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
-              Let’s build something for young founders.
+              Questions? We&apos;re here to help.
             </h1>
 
             <p className="text-lg md:text-xl text-medium max-w-3xl mx-auto">
-              Interested in bringing CreatorLaunch to your community, partnering, donating,
-              volunteering, or learning more? Send us a message.
+              Students and families can ask about eligibility, upcoming program groups,
+              schedules, project purchases, or anything else they want to understand.
             </p>
           </div>
         </section>
@@ -92,12 +92,13 @@ const ContactPage = () => {
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-primary focus:outline-none"
                     >
-                      <option>Bring CreatorLaunch to our community</option>
+                      <option>Student Business Program updates</option>
+                      <option>Student eligibility question</option>
+                      <option>Parent or family question</option>
+                      <option>Program schedule or location question</option>
                       <option>Partnership Inquiry</option>
                       <option>Donation or Sponsorship Inquiry</option>
-                      <option>Volunteer Inquiry</option>
                       <option>Media / General Question</option>
-                      <option>Digital Platform Question</option>
                     </select>
                   </div>
 
@@ -148,22 +149,22 @@ const ContactPage = () => {
                   </h3>
 
                   <div className="space-y-3 text-medium">
-                    <p>Bring workshops to a school or program</p>
-                    <p>Partner with CreatorLaunch</p>
-                    <p>Donate or sponsor youth programming</p>
-                    <p>Ask about the digital platform</p>
-                    <p>Invite CreatorLaunch to a community event</p>
+                    <p>Get updates about upcoming groups</p>
+                    <p>Ask if a student is eligible</p>
+                    <p>Understand approved project purchases</p>
+                    <p>Explore a school or organization partnership</p>
+                    <p>Support the Student Business Program</p>
                   </div>
                 </div>
 
                 <div className="bg-primary text-white rounded-2xl shadow-sm p-6">
                   <h3 className="text-xl font-bold mb-3">
-                    Built for community.
+                    Questions are welcome.
                   </h3>
 
                   <p className="text-white/90">
-                    CreatorLaunch works best when schools, programs, donors, and community
-                    partners come together around young founders.
+                    Students do not need to have a business idea or previous experience
+                    before asking about the program.
                   </p>
                 </div>
               </aside>

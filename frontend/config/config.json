@@ -6,13 +6,14 @@
       "alt": "CreatorLaunch Logo"
     },
     "announcementBar": {
-      "message": "CreatorLaunch is building the next generation of founders.",
+      "message": "Upcoming groups are being planned for the free CreatorLaunch Student Business Program.",
       "backgroundColor": "#3367d6",
       "textColor": "#ffffff",
       "closeIcon": true
     },
     "navigation": [
       { "label": "Home", "link": "/" },
+      { "label": "Student Business Program", "link": "/student-business-program" },
       { "label": "About", "link": "/about" },
       { "label": "Team", "link": "/about/team" },
       { "label": "Partners", "link": "/partners" },
@@ -26,11 +27,11 @@
     }
   },
   "hero": {
-    "heading": "Building the Next Generation of Founders.",
-    "subheading": "CreatorLaunch is a youth-led nonprofit helping young entrepreneurs turn ideas into real ventures through workshops, pitch competitions, launch funding, and practical digital tools.",
+    "heading": "Build an idea. Learn the business. Take your next step.",
+    "subheading": "CreatorLaunch gives St. Louis County students ages 14–18 the opportunity to explore entrepreneurship through a free, 12-week business program with coaching, laptops, and project support.",
     "cta": {
-      "text": "Bring CreatorLaunch to Your Community",
-      "link": "/partners"
+      "text": "Explore the Student Business Program",
+      "link": "/student-business-program"
     }
   },
   "footer": {
@@ -38,12 +39,12 @@
       "src": "/assets/footer-logo.png",
       "alt": "CreatorLaunch Logo"
     },
-    "description": "A nationally recognized 501(c)(3) nonprofit helping young entrepreneurs build real ventures through workshops, launch support, and practical tools.",
+    "description": "A nationally recognized 501(c)(3) nonprofit helping young people explore entrepreneurship, develop business ideas, and practice real-world skills.",
     "quickLinks": [
+      { "label": "Student Business Program", "link": "/student-business-program" },
       { "label": "About", "link": "/about" },
       { "label": "Team", "link": "/about/team" },
-      { "label": "Partners", "link": "/partners" },
-      { "label": "Meet Mox", "link": "/meet-mox" }
+      { "label": "Partners", "link": "/partners" }
     ],
     "resources": [
       { "label": "Verify Certificate", "link": "/verify-certificate" },

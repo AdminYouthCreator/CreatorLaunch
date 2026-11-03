@@ -22,10 +22,10 @@ interface LayoutProps {
 // ################################################################
 const Layout: React.FC<LayoutProps> = ({
   children,
-  title = 'CreatorLaunch | Hands-On Workshops for Young Entrepreneurs',
-  description = 'CreatorLaunch offers free, hands-on workshops in St. Louis for teens ready to launch their first venture. Learn real-world business skills with seed funding and mentorship.',
+  title = 'CreatorLaunch | Student Business Program',
+  description = 'CreatorLaunch helps St. Louis County students ages 14–18 explore entrepreneurship through a free, 12-week business program with coaching, laptops, and project support.',
   showAnnouncement = true,
-  announcementText = 'Welcome to our new website!'
+  announcementText = 'Upcoming groups are being planned for the free CreatorLaunch Student Business Program.'
 }) => {
   // Initialize AOS (Animate On Scroll) library
   useAOS();

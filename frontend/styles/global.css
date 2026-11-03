@@ -765,19 +765,52 @@ body {
   background: linear-gradient(to top, rgba(23, 32, 51, 0.35), transparent 52%);
 }
 
-.hero-mox-card {
+.program-fact-card {
   position: absolute;
   z-index: 3;
-  right: -0.35rem;
-  bottom: 0.1rem;
-  width: 235px;
-  padding: 1rem 1rem 0.7rem;
-  border: 1px solid rgba(119, 86, 232, 0.15);
-  border-radius: 30px;
+  right: -0.25rem;
+  bottom: 0.35rem;
+  display: flex;
+  width: min(315px, 78%);
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid rgba(19, 181, 209, 0.18);
+  border-radius: 24px;
   background: rgba(255, 255, 255, 0.94);
   box-shadow: 0 24px 55px rgba(23, 32, 51, 0.2);
-  transform: rotate(-3deg);
+  transform: rotate(-2deg);
   backdrop-filter: blur(16px);
+}
+
+.program-fact-icon {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 18px;
+  color: var(--color-dark);
+  background: var(--color-sun);
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 700;
+}
+
+.program-fact-card p {
+  color: var(--color-dark);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.program-fact-card small {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--color-medium);
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.45;
 }
 
 .hero-note {
@@ -886,6 +919,85 @@ body {
   box-shadow: 0 9px 20px rgba(255, 196, 61, 0.22);
 }
 
+.program-metric {
+  min-height: 190px;
+  padding: 1.5rem;
+  border: 1px solid rgba(23, 32, 51, 0.08);
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: 0 14px 36px rgba(23, 32, 51, 0.06);
+}
+
+.program-metric:nth-child(1) { background: #fff1e9; }
+.program-metric:nth-child(2) { background: #eafaff; }
+.program-metric:nth-child(3) { background: #fff8d9; }
+.program-metric:nth-child(4) { background: #eefaf5; }
+
+.program-metric strong {
+  display: block;
+  color: var(--color-dark);
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.program-metric p {
+  margin-top: 1.2rem;
+  color: var(--color-medium);
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1.65;
+}
+
+.learning-card {
+  position: relative;
+  min-height: 245px;
+  padding: 1.55rem;
+  border: 1px solid rgba(23, 32, 51, 0.08);
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: 0 14px 36px rgba(23, 32, 51, 0.06);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.learning-card:hover {
+  box-shadow: 0 22px 45px rgba(23, 32, 51, 0.11);
+  transform: translateY(-5px);
+}
+
+.learning-card > span:first-child {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 17px;
+  background: #fff3ec;
+  font-size: 1.5rem;
+}
+
+.learning-card h3 {
+  margin-top: 1.2rem;
+  color: var(--color-dark);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.learning-card p {
+  margin-top: 0.65rem;
+  color: var(--color-medium);
+  font-size: 0.83rem;
+  font-weight: 550;
+  line-height: 1.75;
+}
+
+.learning-card .learning-number {
+  color: var(--color-primary);
+  background: #fff1e9;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
 .games-stage {
   position: relative;
   overflow: hidden;
@@ -929,26 +1041,122 @@ body {
   transform: translateX(4px);
 }
 
-.mox-stage {
+.program-stage {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(119, 86, 232, 0.12);
-  border-radius: 42px;
+  border-radius: 44px;
+  color: #fff;
   background:
-    radial-gradient(circle at 14% 20%, rgba(255, 196, 61, 0.28), transparent 16rem),
-    radial-gradient(circle at 92% 82%, rgba(19, 181, 209, 0.22), transparent 18rem),
-    #f3efff;
+    radial-gradient(circle at 92% 8%, rgba(19, 181, 209, 0.42), transparent 24rem),
+    radial-gradient(circle at 8% 92%, rgba(255, 196, 61, 0.18), transparent 22rem),
+    #172033;
+  box-shadow: 0 34px 80px rgba(16, 23, 42, 0.22);
 }
 
-.mox-stage::before {
+.program-stage::before {
   position: absolute;
-  top: -55px;
-  right: -30px;
-  width: 170px;
-  height: 170px;
-  border: 30px solid rgba(119, 86, 232, 0.08);
-  border-radius: 999px;
+  inset: 0;
+  pointer-events: none;
   content: '';
+  opacity: 0.08;
+  background-image: radial-gradient(circle, #fff 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.program-support-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  padding: 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.program-support-card > svg {
+  width: 42px;
+  height: 42px;
+  padding: 0.65rem;
+  border-radius: 14px;
+  color: var(--color-dark);
+  background: var(--color-sun);
+}
+
+.program-support-card h3 {
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.program-support-card p {
+  margin-top: 0.25rem;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.76rem;
+  font-weight: 550;
+  line-height: 1.6;
+}
+
+.program-page-hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 88% 8%, rgba(19, 181, 209, 0.18), transparent 28rem),
+    radial-gradient(circle at 6% 92%, rgba(255, 196, 61, 0.22), transparent 24rem),
+    #fff8f1;
+}
+
+.program-page-hero::before {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  content: '';
+  opacity: 0.32;
+  background-image: radial-gradient(rgba(23, 32, 51, 0.14) 1px, transparent 1px);
+  background-size: 26px 26px;
+  mask-image: linear-gradient(to bottom, #000, transparent 88%);
+}
+
+.program-overview-panel {
+  position: relative;
+  padding: 2rem;
+  border: 1px solid rgba(23, 32, 51, 0.08);
+  border-radius: 34px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 28px 70px rgba(23, 32, 51, 0.13);
+  backdrop-filter: blur(12px);
+  transform: rotate(1deg);
+}
+
+.program-detail-card {
+  min-height: 220px;
+  padding: 1.5rem;
+  border: 1px solid rgba(23, 32, 51, 0.08);
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: 0 14px 36px rgba(23, 32, 51, 0.06);
+}
+
+.program-detail-card > svg {
+  width: 50px;
+  height: 50px;
+  padding: 0.75rem;
+  border-radius: 16px;
+  color: #087f96;
+  background: #e8fbff;
+}
+
+.program-detail-card h2 {
+  margin-top: 1.2rem;
+  color: var(--color-dark);
+  font-size: 1.35rem;
+}
+
+.program-detail-card p {
+  margin-top: 0.65rem;
+  color: var(--color-medium);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.65;
 }
 
 .audience-pill {
@@ -1290,9 +1498,9 @@ body {
     font-size: 0.82rem;
   }
 
-  .hero-mox-card {
+  .program-fact-card {
     right: -0.15rem;
-    width: 180px;
+    width: min(275px, 88%);
   }
 
   .play-card:nth-child(1),
@@ -1302,7 +1510,7 @@ body {
   }
 
   .games-stage,
-  .mox-stage,
+  .program-stage,
   .platform-card,
   .final-cta {
     border-radius: 28px;

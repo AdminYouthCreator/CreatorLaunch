@@ -4,68 +4,98 @@ import Layout from '@/components/common/Layout';
 
 const CONTACT_EMAIL = 'qwentin@youthcreatorlaunch.org';
 
-const bringHref = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-  'CreatorLaunch Question'
+const questionHref = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+  'CreatorLaunch Student Business Program Question',
 )}`;
 
 const faqSections = [
   {
-    title: 'General Questions',
+    title: 'About the Program',
     questions: [
       {
-        question: 'What is CreatorLaunch?',
+        question: 'What is the CreatorLaunch Student Business Program?',
         answer:
-          'CreatorLaunch is a youth-led 501(c)(3) nonprofit that helps young people learn entrepreneurship through workshops, community partnerships, creator tools, and practical learning experiences.',
+          'It is a free, 12-week program where students explore entrepreneurship, develop a business idea, and practice making real business decisions with coaching, equipment, and project support.',
       },
       {
-        question: 'Who does CreatorLaunch serve?',
+        question: 'Who can participate?',
         answer:
-          'CreatorLaunch serves young people who want to learn entrepreneurship, explore business ideas, build confidence, and practice real-world skills. We work through schools, summer programs, afterschool programs, nonprofits, and community organizations.',
+          'The program is designed for students ages 14–18 who live in St. Louis County.',
       },
       {
-        question: 'Is CreatorLaunch only a digital platform?',
+        question: 'Does a student need a business idea or previous experience?',
         answer:
-          'No. The digital platform is part of the long-term vision, but CreatorLaunch is currently focused on community workshops, partnerships, donor support, and youth entrepreneurship programming. The platform supports the mission, but it is not the only part of CreatorLaunch.',
+          'No. Students can join with an idea, a hobby they may want to grow, or no idea yet. Previous business experience is not required.',
+      },
+      {
+        question: 'How much does the program cost?',
+        answer:
+          'There is no cost to students or families. Instruction, coaching, program materials, laptops used during sessions, and approved project purchases are provided at no cost.',
       },
     ],
   },
   {
-    title: 'Workshops and Programs',
+    title: 'Schedule and Sessions',
     questions: [
       {
-        question: 'Can CreatorLaunch come to our school, program, or organization?',
+        question: 'How long is the program?',
         answer:
-          'Yes. CreatorLaunch works with schools, summer programs, afterschool programs, nonprofits, libraries, community centers, churches, and youth-serving organizations that want to bring entrepreneurship workshops to their community.',
+          'The program lasts 12 weeks. Students meet twice a week for two-hour sessions, for a total of 24 sessions.',
       },
       {
-        question: 'Do students or families have to pay?',
+        question: 'How large is each group?',
         answer:
-          'CreatorLaunch is designed so students and families do not have to pay to participate in community workshops hosted through partner organizations.',
+          'Each group is designed for eight students so there is time for coaching, questions, independent project work, and learning from one another.',
       },
       {
-        question: 'What do students learn in a CreatorLaunch workshop?',
+        question: 'When and where will sessions take place?',
         answer:
-          'Students can learn entrepreneurship basics, idea development, branding, product and service planning, pricing, customers, budgeting, pitching, and launch planning. Workshops are hands-on and built around helping students create something real.',
+          'CreatorLaunch is currently developing upcoming program groups. Dates, locations, and enrollment details will be announced after arrangements are finalized.',
       },
       {
-        question: 'What ages are CreatorLaunch workshops for?',
+        question: 'Does a student need to bring a laptop?',
         answer:
-          'CreatorLaunch is mainly designed for youth and students. The exact age range can depend on the partner organization, workshop format, and student group.',
+          'No. Laptops are provided for use during program sessions, so students do not need to own a computer to participate.',
       },
     ],
   },
   {
-    title: 'Partners and Donors',
+    title: 'Project Purchases and Outcomes',
     questions: [
       {
-        question: 'How can an organization partner with CreatorLaunch?',
+        question: 'How does the “up to $500” support work?',
         answer:
-          'Organizations can partner with CreatorLaunch by requesting workshops, sponsoring youth programming, helping host community sessions, connecting students to opportunities, or supporting supplies and launch resources.',
+          'Students can submit requests for business purchases and explain how each item supports their project. CreatorLaunch reviews the request and purchases approved items directly. This support is not a cash payment.',
       },
       {
-        question: 'How do donations help?',
+        question: 'What kinds of purchases may be approved?',
         answer:
-          'Donations help support workshop materials, student creator tools, program supplies, platform development, youth launch support, and the overall mission of making entrepreneurship education more accessible.',
+          'Depending on the business, approved purchases may include supplies, materials, a website domain, or other tools needed to develop and test the idea.',
+      },
+      {
+        question: 'What will students leave with?',
+        answer:
+          'Students work toward a business plan, a project budget, experience making business decisions, a presentation of their work, and a clearer understanding of their next steps.',
+      },
+      {
+        question: 'Does a student have to start a profitable business to succeed?',
+        answer:
+          'No. Starting a profitable business is not required. Progress, learning, thoughtful effort, and following through on responsibilities are what matter.',
+      },
+    ],
+  },
+  {
+    title: 'Other Ways to Explore',
+    questions: [
+      {
+        question: 'What is CreatorGames?',
+        answer:
+          'CreatorGames is a free learning arcade with financial and entrepreneurship games that help students practice money and business decisions in an interactive way.',
+      },
+      {
+        question: 'How can a school or organization work with CreatorLaunch?',
+        answer:
+          'Schools, youth organizations, sponsors, and community supporters can visit the Partners page to explore ways to host a future group, support student projects, or share useful experience.',
       },
       {
         question: 'Is CreatorLaunch a nonprofit?',
@@ -74,61 +104,41 @@ const faqSections = [
       },
     ],
   },
-  {
-    title: 'CreatorGames',
-    questions: [
-      {
-        question: 'What is CreatorGames?',
-        answer:
-          'CreatorGames is a learning arcade on the CreatorLaunch website with curated financial and entrepreneurship games. It helps students practice money and business decisions in a more interactive way.',
-      },
-      {
-        question: 'Did CreatorLaunch create every game in CreatorGames?',
-        answer:
-          'No. Some games are embedded or linked from educational partners and outside creators. Each game page includes a disclaimer and credit when a game comes from another organization.',
-      },
-      {
-        question: 'Can CreatorGames be used during workshops?',
-        answer:
-          'Yes. CreatorGames can be used as a workshop activity, classroom extension, or independent learning tool for students who want to keep exploring business and financial topics.',
-      },
-    ],
-  },
 ];
 
 const FAQPage = () => {
   return (
     <Layout
-      title="FAQ | CreatorLaunch"
-      description="Frequently asked questions about CreatorLaunch workshops, partnerships, donations, CreatorGames, and youth entrepreneurship programming."
+      title="Student Business Program FAQ | CreatorLaunch"
+      description="Answers for students and families about eligibility, schedules, costs, laptops, approved project purchases, and upcoming CreatorLaunch program groups."
+      announcementText="Upcoming program dates, locations, and enrollment details will be announced when arrangements are finalized."
     >
       <main className="min-h-screen bg-white">
-        <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">
-          <div className="container mx-auto px-4 text-center">
-            <p className="text-primary font-bold uppercase tracking-widest mb-3">
-              Frequently Asked Questions
-            </p>
-
-            <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
-              Questions about CreatorLaunch?
+        <section className="program-page-hero py-20 md:py-28">
+          <div className="container relative mx-auto px-4 text-center">
+            <span className="hero-kicker">
+              <span className="hero-kicker-dot" />
+              Student and family FAQ
+            </span>
+            <h1 className="mx-auto mt-7 max-w-4xl text-5xl font-bold leading-tight text-dark md:text-7xl">
+              Questions are part of building something new.
             </h1>
-
-            <p className="text-lg md:text-xl text-medium max-w-3xl mx-auto">
-              Learn more about our workshops, community partnerships, donations,
-              CreatorGames, and the CreatorLaunch mission.
+            <p className="mx-auto mt-6 max-w-3xl text-lg font-medium leading-8 text-medium md:text-xl">
+              Find clear answers about the Student Business Program, who can join, what
+              is included, and what students will work toward.
             </p>
           </div>
         </section>
 
-        <section className="py-20 bg-light">
+        <section className="bg-light py-20">
           <div className="container mx-auto px-4">
-            <div className="max-w-5xl mx-auto space-y-10">
+            <div className="mx-auto max-w-5xl space-y-10">
               {faqSections.map((section) => (
                 <div
                   key={section.title}
-                  className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 md:p-8"
+                  className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm md:p-8"
                 >
-                  <h2 className="text-2xl md:text-3xl font-bold text-dark mb-6">
+                  <h2 className="mb-6 text-2xl font-bold text-dark md:text-3xl">
                     {section.title}
                   </h2>
 
@@ -138,19 +148,11 @@ const FAQPage = () => {
                         key={item.question}
                         className="group rounded-2xl border border-gray-100 bg-light p-5"
                       >
-                        <summary className="cursor-pointer list-none flex items-start justify-between gap-4">
-                          <span className="font-bold text-dark text-lg">
-                            {item.question}
-                          </span>
-
-                          <span className="text-primary font-black text-xl group-open:rotate-45 transition-transform">
-                            +
-                          </span>
+                        <summary className="flex cursor-pointer list-none items-start justify-between gap-4">
+                          <span className="text-lg font-bold text-dark">{item.question}</span>
+                          <span className="text-xl font-black text-primary transition-transform group-open:rotate-45">+</span>
                         </summary>
-
-                        <p className="text-medium mt-4 leading-relaxed">
-                          {item.answer}
-                        </p>
+                        <p className="mt-4 leading-relaxed text-medium">{item.answer}</p>
                       </details>
                     ))}
                   </div>
@@ -160,35 +162,25 @@ const FAQPage = () => {
           </div>
         </section>
 
-        <section className="py-20 bg-dark text-white">
+        <section className="bg-dark py-20 text-white">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto text-center">
-              <p className="text-red-300 font-bold uppercase tracking-widest mb-3">
+            <div className="mx-auto max-w-4xl text-center">
+              <p className="mb-3 font-bold uppercase tracking-widest text-cyan-300">
                 Still have a question?
               </p>
-
-              <h2 className="text-3xl md:text-5xl font-bold mb-4">
-                We would love to hear from you.
+              <h2 className="mb-4 text-3xl font-bold md:text-5xl">
+                Students and families are welcome to ask.
               </h2>
-
-              <p className="text-white/75 text-lg mb-8">
-                Whether you are a school, donor, sponsor, parent, student, or community
-                organization, you can reach out directly.
+              <p className="mb-8 text-lg text-white/75">
+                Contact CreatorLaunch for program updates, eligibility questions, or help
+                understanding how the program works.
               </p>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href={bringHref}
-                  className="bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors text-center"
-                >
+              <div className="flex flex-col justify-center gap-4 sm:flex-row">
+                <a href={questionHref} className="site-button bg-primary text-white hover:bg-red-600">
                   Email CreatorLaunch
                 </a>
-
-                <Link
-                  href="/bring-creatorlaunch"
-                  className="bg-white/10 text-white border border-white/10 px-8 py-4 rounded-lg font-semibold hover:bg-white/15 transition-colors text-center"
-                >
-                  Bring CreatorLaunch
+                <Link href="/student-business-program" className="site-button border border-white/10 bg-white/10 text-white hover:bg-white/15">
+                  Explore the Program
                 </Link>
               </div>
             </div>
