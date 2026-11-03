@@ -1,8 +1,21 @@
-export const teamMembers = [
+export interface CreatorLaunchPerson {
+  slug: string;
+  name: string;
+  role: string;
+  organizationTitle?: string;
+  email?: string;
+  image: string;
+  shortDescription: string;
+  extendedDescription: string;
+  group: 'team' | 'board';
+}
+
+export const teamMembers: CreatorLaunchPerson[] = [
   {
     slug: 'qwentin-blassingame',
     name: 'Qwentin Blassingame',
     role: 'Founder & Executive Director',
+    group: 'team',
     email: 'qwentin@youthcreatorlaunch.org',
     image: '/assets/qwentin-pfp.png',
     shortDescription:
@@ -14,6 +27,7 @@ export const teamMembers = [
     slug: 'aereon-robinson',
     name: 'Aereon Robinson',
     role: 'Co-Founder & Executive Manager',
+    group: 'team',
     email: 'aereon@youthcreatorlaunch.org',
     image: '/assets/aereon-pfp.jpeg',
     shortDescription:
@@ -25,6 +39,7 @@ export const teamMembers = [
     slug: 'rose-blassingame',
     name: 'Rose Blassingame',
     role: 'Financial Manager',
+    group: 'team',
     email: 'rose@youthcreatorlaunch.org',
     image: '/assets/rose-pfp.png',
     shortDescription:
@@ -33,3 +48,21 @@ export const teamMembers = [
       'Rose Blassingame supports the financial side of CreatorLaunch, helping the organization think carefully about sustainability, budgeting, responsible spending, and long-term impact. As Financial Manager, Rose helps keep CreatorLaunch grounded as it grows, making sure resources are used to support the mission and expand opportunities for young entrepreneurs.',
   },
 ];
+
+export const boardMembers: CreatorLaunchPerson[] = [
+  {
+    slug: 'jack-krewson',
+    name: 'Jack Krewson',
+    role: 'Board Member',
+    organizationTitle: 'Founder & CEO, Kairos Academies',
+    group: 'board',
+    image:
+      'https://static.wixstatic.com/media/07d0bd_4c4ee9b7adce46dbab8ad2e33241549b~mv2.jpg/v1/fill/w_544,h_544,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Image-empty-state_edited.jpg',
+    shortDescription:
+      'Founder and CEO of Kairos Academies, with 10 years in education and experience building a St. Louis nonprofit charter school from the ground up.',
+    extendedDescription:
+      'Jack Krewson is the Founder and CEO of Kairos Academies and a lifelong St. Louis resident. Over 10 years in education, he built a nonprofit charter school from the ground up. He brings experience in entrepreneurship, nonprofit leadership, finance, fundraising, governance, communications, and program design. On the CreatorLaunch board, Jack focuses on clear governance and a practical strategic plan that keeps programming and fundraising aligned. He is drawn to CreatorLaunch’s belief that students can build and lead organizations of their own.',
+  },
+];
+
+export const creatorLaunchPeople = [...teamMembers, ...boardMembers];

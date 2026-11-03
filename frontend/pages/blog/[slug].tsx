@@ -8,6 +8,8 @@ interface BlogPost {
   title: string;
   slug: string;
   excerpt: string;
+  coverImageUrl?: string;
+  coverImageIsPersonFree?: boolean;
   content: string;
   authorName: string;
   authorTitle?: string;
@@ -87,6 +89,9 @@ const BlogPostPage: React.FC = () => {
                 {post.authorTitle ? `, ${post.authorTitle}` : ''}
               </p>
               {post.tags?.length > 0 && <p className="article-tags">{post.tags.join(' · ')}</p>}
+              {post.coverImageUrl && post.coverImageIsPersonFree && (
+                <img src={post.coverImageUrl} alt="" className="article-cover article-hero-cover" />
+              )}
             </div>
           </header>
           <section className="article-body">

@@ -39,6 +39,11 @@ const blogPostSchema = new mongoose.Schema(
       trim: true,
     },
 
+    coverImageIsPersonFree: {
+      type: Boolean,
+      default: false,
+    },
+
     authorName: {
       type: String,
       required: [true, 'Author name is required'],

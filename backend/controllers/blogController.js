@@ -10,6 +10,7 @@ const normalizePublicPost = (post, includeContent = false) => {
     slug: obj.slug,
     excerpt: obj.excerpt,
     coverImageUrl: obj.coverImageUrl || '',
+    coverImageIsPersonFree: Boolean(obj.coverImageIsPersonFree),
     authorName: obj.authorName,
     authorTitle: obj.authorTitle || '',
     status: obj.status,
