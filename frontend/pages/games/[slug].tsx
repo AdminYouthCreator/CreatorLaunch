@@ -1,8 +1,13 @@
-import React, { useRef, useState } from 'react';
-import { GetStaticPaths, GetStaticProps } from 'next';
-import Link from 'next/link';
-import GamesLayout from '@/components/games/GamesLayout';
-import { NgpfGame, getNgpfGameBySlug, ngpfGames, ngpfDisclaimer } from '@/data/ngpfGames';
+import React, { useRef, useState } from "react";
+import { GetStaticPaths, GetStaticProps } from "next";
+import Link from "next/link";
+import GamesLayout from "@/components/games/GamesLayout";
+import {
+  NgpfGame,
+  getNgpfGameBySlug,
+  ngpfGames,
+  ngpfDisclaimer,
+} from "@/data/ngpfGames";
 
 interface GamePageProps {
   game: NgpfGame;
@@ -26,7 +31,7 @@ const GamePage: React.FC<GamePageProps> = ({ game }) => {
         await element.requestFullscreen();
       }
     } catch (error) {
-      console.error('Fullscreen request failed:', error);
+      console.error("Fullscreen request failed:", error);
     }
   };
 
@@ -40,19 +45,17 @@ const GamePage: React.FC<GamePageProps> = ({ game }) => {
       description={game.description}
     >
       <main>
-        <section className="relative overflow-hidden border-b border-white/10">
-          <div className="absolute inset-0">
-            <div className="absolute -top-40 -right-40 w-96 h-96 bg-red-500/20 rounded-full blur-3xl" />
-            <div className="absolute top-40 -left-40 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl" />
-          </div>
-
-          <div className="container mx-auto px-4 py-10 md:py-14 relative">
-            <Link href="/games" className="text-red-300 font-bold hover:text-red-200">
+        <section className="game-detail-intro">
+          <div className="container mx-auto px-4 py-10 md:py-14">
+            <Link
+              href="/games"
+              className="text-red-300 font-bold hover:text-red-200"
+            >
               ← Back to Games
             </Link>
 
-            <div className="grid lg:grid-cols-3 gap-8 mt-6 items-center">
-              <div className="lg:col-span-2">
+            <div className="mt-8 max-w-4xl">
+              <div>
                 <span className="inline-flex bg-red-500 text-white text-xs font-black uppercase tracking-widest rounded-full px-3 py-1 mb-4">
                   {game.activity}
                 </span>
@@ -72,7 +75,9 @@ const GamePage: React.FC<GamePageProps> = ({ game }) => {
                 )}
 
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70 mb-6">
-                  <p className="font-semibold text-white mb-1">Game Disclaimer</p>
+                  <p className="font-semibold text-white mb-1">
+                    Game Disclaimer
+                  </p>
                   <p>{ngpfDisclaimer}</p>
                 </div>
 
@@ -102,14 +107,6 @@ const GamePage: React.FC<GamePageProps> = ({ game }) => {
                   </Link>
                 </div>
               </div>
-
-              <div className="rounded-3xl overflow-hidden border border-white/10 bg-white/5 shadow-2xl">
-                <img
-                  src={game.thumbnailUrl}
-                  alt={`${game.name} thumbnail`}
-                  className="w-full h-72 object-cover"
-                />
-              </div>
             </div>
           </div>
         </section>
@@ -124,8 +121,8 @@ const GamePage: React.FC<GamePageProps> = ({ game }) => {
                 <div>
                   <p className="font-black">{game.name}</p>
                   <p className="text-sm text-white/50">
-                    Click Start Fullscreen for the best experience. If you exit fullscreen,
-                    you can keep playing here.
+                    Click Start Fullscreen for the best experience. If you exit
+                    fullscreen, you can keep playing here.
                   </p>
                 </div>
 
@@ -149,23 +146,21 @@ const GamePage: React.FC<GamePageProps> = ({ game }) => {
                 </div>
               </div>
 
-              <div className="relative bg-white" style={{ height: '80vh', minHeight: '620px' }}>
+              <div
+                className="relative bg-white"
+                style={{ height: "80vh", minHeight: "620px" }}
+              >
                 {!hasStartedGame ? (
                   <div className="absolute inset-0 bg-slate-950 text-white flex items-center justify-center p-6">
                     <div className="max-w-lg text-center">
-                      <div className="text-6xl mb-5">🎮</div>
-
-                      <p className="text-red-300 font-black uppercase tracking-widest mb-3">
-                        Ready to Play
-                      </p>
-
                       <h2 className="text-3xl md:text-4xl font-black mb-4">
                         Start {game.name}
                       </h2>
 
                       <p className="text-white/70 mb-8">
-                        For the best experience, start the game in fullscreen. You can exit
-                        fullscreen anytime and continue playing on the page.
+                        For the best experience, start the game in fullscreen.
+                        You can exit fullscreen anytime and continue playing on
+                        the page.
                       </p>
 
                       <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -217,8 +212,10 @@ export const getStaticPaths: GetStaticPaths = async () => {
   };
 };
 
-export const getStaticProps: GetStaticProps<GamePageProps> = async ({ params }) => {
-  const game = getNgpfGameBySlug(String(params?.slug || ''));
+export const getStaticProps: GetStaticProps<GamePageProps> = async ({
+  params,
+}) => {
+  const game = getNgpfGameBySlug(String(params?.slug || ""));
 
   return {
     props: {

@@ -4,7 +4,7 @@ import Layout from '@/components/common/Layout';
 
 const CONTACT_EMAIL = 'qwentin@youthcreatorlaunch.org';
 const programHref = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-  'CreatorLaunch Student Business Program Updates'
+  'CreatorLaunch Student Business Program Updates',
 )}`;
 
 const AboutPage = () => {
@@ -13,237 +13,119 @@ const AboutPage = () => {
       title="About | CreatorLaunch"
       description="Learn about CreatorLaunch, a youth-led nonprofit helping students explore entrepreneurship, develop business ideas, and practice real-world skills."
     >
-      <main className="min-h-screen bg-white">
-        <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">
+      <main>
+        <section className="page-intro">
           <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
-              <div>
-                <p className="text-primary font-bold uppercase tracking-widest mb-3">
-                  Our Story
-                </p>
-
-                <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6 leading-tight">
-                  CreatorLaunch started with a simple frustration.
-                </h1>
-
-                <p className="text-lg md:text-xl text-medium">
-                  Young people are told to dream big, but too often they are not given the
-                  tools, support, funding, or real-world spaces to actually build. CreatorLaunch
-                  exists to change that.
-                </p>
-              </div>
-
-              <div className="rounded-3xl overflow-hidden shadow-2xl border border-white bg-white">
-                <img
-                  src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1200&q=80"
-                  alt="Creative workspace with laptops and planning materials"
-                  className="w-full h-[430px] object-cover"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-20 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-5xl mx-auto">
-              <div className="bg-light rounded-3xl p-8 md:p-12 border border-gray-100">
-                <p className="text-primary font-bold uppercase tracking-widest mb-3">
-                  Why We Exist
-                </p>
-
-                <h2 className="text-3xl md:text-4xl font-bold text-dark mb-6">
-                  We believe young people should not have to wait until adulthood to build.
-                </h2>
-
-                <div className="space-y-5 text-lg text-medium">
-                  <p>
-                    CreatorLaunch was founded by Qwentin Blassingame, a young entrepreneur who
-                    saw how hard it can be for students to access real entrepreneurship support.
-                    A lot of programs talk about leadership and business, but not enough give
-                    students practical ways to create, test, pitch, and launch.
-                  </p>
-
-                  <p>
-                    We are building CreatorLaunch to be more than a class. It is a launchpad:
-                    a place where students can learn by doing, families can understand the
-                    process, and young founders can get practical support to move forward.
-                  </p>
-
-                  <p>
-                    Our work is personal because we know what it feels like to be young and
-                    serious about an idea. CreatorLaunch is here for the student with a business
-                    idea in their notes app, the kid who wants to sell something but does not
-                    know where to start, and the community that wants to give youth something
-                    real to build.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-20 bg-light">
-          <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-2 gap-10 items-center max-w-6xl mx-auto">
-              <div className="rounded-3xl overflow-hidden shadow-xl border border-white bg-white">
-                <img
-                  src="/assets/qwentin-pfp.png"
-                  alt="Qwentin Blassingame"
-                  className="w-full h-[520px] object-cover"
-                />
-              </div>
-
-              <div>
-                <p className="text-primary font-bold uppercase tracking-widest mb-3">
-                  About the Founder
-                </p>
-
-                <h2 className="text-3xl md:text-5xl font-bold text-dark mb-6">
-                  Built by someone who understands what young creators are missing.
-                </h2>
-
-                <div className="space-y-5 text-lg text-medium">
-                  <p>
-                    CreatorLaunch was founded by Qwentin Blassingame, a young founder who
-                    wanted to create the kind of support system he wished more students had
-                    access to. The idea came from a real problem: young people often have
-                    creativity, ambition, and business ideas, but they are not always taken
-                    seriously or given practical tools to start.
-                  </p>
-
-                  <p>
-                    Qwentin started CreatorLaunch to help close that gap. Instead of waiting
-                    for students to become adults before they are taught entrepreneurship,
-                    CreatorLaunch helps them learn now through a structured business program,
-                    coaching, creator tools, and hands-on project work.
-                  </p>
-
-                  <p>
-                    His vision is for CreatorLaunch to become a place where youth can learn
-                    how to build brands, understand money, pitch ideas, create products and
-                    services, and see entrepreneurship as something they can actually do.
-                  </p>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4 mt-8">
-                  <Link
-                    href="/about/team/qwentin-blassingame"
-                    className="bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors text-center"
-                  >
-                    Read Qwentin’s Bio
-                  </Link>
-
-                  <a
-                    href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-                      'Message for Qwentin'
-                    )}`}
-                    className="bg-white text-dark border border-gray-200 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 transition-colors text-center"
-                  >
-                    Contact CreatorLaunch
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-20 bg-dark text-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-6">
-              <div className="bg-white/10 rounded-2xl p-6 border border-white/10">
-                <div className="text-4xl mb-4">🎯</div>
-                <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
-                <p className="text-gray-200">
-                  To make entrepreneurship education more accessible by helping young people
-                  build real ideas, skills, confidence, and launch-ready ventures.
-                </p>
-              </div>
-
-              <div className="bg-white/10 rounded-2xl p-6 border border-white/10">
-                <div className="text-4xl mb-4">🤝</div>
-                <h2 className="text-2xl font-bold mb-4">Our Model</h2>
-                <p className="text-gray-200">
-                  We bring students together in a free, 12-week program with small-group
-                  coaching, laptops, project work, and approved business purchases.
-                </p>
-              </div>
-
-              <div className="bg-white/10 rounded-2xl p-6 border border-white/10">
-                <div className="text-4xl mb-4">🚀</div>
-                <h2 className="text-2xl font-bold mb-4">Our Future</h2>
-                <p className="text-gray-200">
-                  We are also building a digital platform where young creators can create
-                  stores, products, services, and launch pathways online.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-20 bg-light">
-          <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-2 gap-10 items-center max-w-6xl mx-auto">
-              <div>
-                <p className="text-primary font-bold uppercase tracking-widest mb-3">
-                  What Makes Us Different
-                </p>
-
-                <h2 className="text-3xl md:text-4xl font-bold text-dark mb-6">
-                  CreatorLaunch is built from the student perspective.
-                </h2>
-
-                <div className="space-y-4">
-                  {[
-                    'We focus on practical, hands-on entrepreneurship instead of theory-only learning.',
-                    'We make the Student Business Program free for students and families.',
-                    'We are youth-led, so students see entrepreneurship modeled by people closer to their own experience.',
-                    'We keep groups small so students have room to ask questions and get support.',
-                    'We provide laptops and can approve up to $500 in direct project purchases.',
-                  ].map((item) => (
-                    <div key={item} className="bg-white rounded-2xl p-5 border border-gray-100">
-                      <p className="text-medium">{item}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="rounded-3xl overflow-hidden shadow-xl border border-white bg-white">
-                <img
-                  src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=80"
-                  alt="Team planning around laptops"
-                  className="w-full h-[520px] object-cover"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-20 bg-primary text-white">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Help us make entrepreneurship real for more young people.
-            </h2>
-
-            <p className="text-white/90 text-lg max-w-2xl mx-auto mb-8">
-              Students and families can learn about the program now and request updates as
-              dates, locations, and enrollment details are finalized.
+            <p className="eyebrow">About CreatorLaunch</p>
+            <h1>Young people deserve a practical place to learn how business works.</h1>
+            <p>
+              CreatorLaunch is a youth-led nonprofit that helps students explore
+              entrepreneurship, develop an idea, and practice making real business decisions.
             </p>
+          </div>
+        </section>
 
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <a
-                href={programHref}
-                className="bg-white text-primary px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-              >
-                Get Program Updates
-              </a>
+        <section className="editorial-section">
+          <div className="container mx-auto px-4">
+            <div className="content-split align-start">
+              <div className="section-heading">
+                <p className="eyebrow">Why we exist</p>
+                <h2>Business education should include time to build.</h2>
+              </div>
+              <div className="body-copy">
+                <p>
+                  Students are often encouraged to be creative and ambitious without
+                  being given the tools, guidance, or room to test an idea. CreatorLaunch
+                  was created to help close that gap.
+                </p>
+                <p>
+                  Our work combines instruction with project time. Students can ask
+                  questions, make decisions, revise an idea, and explain what they learned.
+                  Families get clear information about the process and what support is included.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
 
-              <Link
-                href="/student-business-program"
-                className="bg-red-700 text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-800 transition-colors"
-              >
-                Explore the Program
-              </Link>
+        <section className="editorial-section section-tint">
+          <div className="container mx-auto px-4">
+            <div className="founder-layout">
+              <img src="/assets/qwentin-pfp.png" alt="Qwentin Blassingame" />
+              <div className="section-heading">
+                <p className="eyebrow">Founder</p>
+                <h2>Qwentin Blassingame</h2>
+                <div className="body-copy">
+                  <p>
+                    Qwentin founded CreatorLaunch after seeing how difficult it can be for
+                    students to find serious, practical entrepreneurship support. Young
+                    people may have strong ideas and the motivation to work, but still lack
+                    access to equipment, guidance, or startup materials.
+                  </p>
+                  <p>
+                    He created CreatorLaunch to give students structured time to learn,
+                    work on a project, and make decisions with support close by.
+                  </p>
+                </div>
+                <div className="button-row">
+                  <Link href="/about/team/qwentin-blassingame" className="site-button site-button-primary">Read Qwentin’s bio</Link>
+                  <a href={`mailto:${CONTACT_EMAIL}`} className="site-button site-button-secondary">Contact CreatorLaunch</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="editorial-section">
+          <div className="container mx-auto px-4">
+            <div className="section-heading split-heading">
+              <div><p className="eyebrow">The organization</p><h2>What CreatorLaunch is building.</h2></div>
+              <p>Our current focus is the Student Business Program and accessible learning resources.</p>
+            </div>
+            <div className="three-column-rules">
+              <div>
+                <h3>Mission</h3>
+                <p>Help young people learn entrepreneurship by developing and testing their own ideas.</p>
+              </div>
+              <div>
+                <h3>Program model</h3>
+                <p>A free, 12-week small-group program with coaching, laptops, and approved project purchases.</p>
+              </div>
+              <div>
+                <h3>Learning resources</h3>
+                <p>Free games and practical tools that help students understand business and financial decisions.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="editorial-section section-ink">
+          <div className="container mx-auto px-4">
+            <div className="content-split align-start">
+              <div className="section-heading">
+                <p className="eyebrow">Our approach</p>
+                <h2>Clear expectations, small groups, and useful support.</h2>
+              </div>
+              <ul className="plain-list ruled">
+                <li>Students spend time working on their own project.</li>
+                <li>The Student Business Program is free for students and families.</li>
+                <li>Groups are kept small so students can ask questions.</li>
+                <li>Laptops are available during program sessions.</li>
+                <li>Students may receive up to $500 in approved direct purchases.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section className="quiet-cta">
+          <div className="container mx-auto px-4">
+            <div>
+              <p className="eyebrow">Student Business Program</p>
+              <h2>Learn what students will do during the 12-week program.</h2>
+            </div>
+            <div className="button-row">
+              <Link href="/student-business-program" className="site-button site-button-primary">Program details</Link>
+              <a href={programHref} className="site-button site-button-secondary">Request updates</a>
             </div>
           </div>
         </section>

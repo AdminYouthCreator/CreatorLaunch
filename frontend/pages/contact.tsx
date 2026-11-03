@@ -32,17 +32,11 @@ const ContactPage = () => {
       description="Contact CreatorLaunch with questions about the Student Business Program, eligibility, upcoming groups, partnerships, or supporting young entrepreneurs."
     >
       <main className="min-h-screen bg-light">
-        <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">
-          <div className="container mx-auto px-4 text-center">
-            <p className="text-primary font-bold uppercase tracking-widest mb-3">
-              Contact CreatorLaunch
-            </p>
-
-            <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
-              Questions? We&apos;re here to help.
-            </h1>
-
-            <p className="text-lg md:text-xl text-medium max-w-3xl mx-auto">
+        <section className="page-intro">
+          <div className="container mx-auto px-4">
+            <p className="eyebrow">Contact</p>
+            <h1>Ask a question about CreatorLaunch.</h1>
+            <p>
               Students and families can ask about eligibility, upcoming program groups,
               schedules, project purchases, or anything else they want to understand.
             </p>
@@ -52,7 +46,7 @@ const ContactPage = () => {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm p-8 border border-gray-100">
+              <div className="lg:col-span-2 form-panel">
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-semibold text-dark mb-2">
@@ -130,7 +124,7 @@ const ContactPage = () => {
               </div>
 
               <aside className="space-y-6">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div className="aside-panel">
                   <h3 className="text-xl font-bold text-dark mb-4">
                     Direct Email
                   </h3>
@@ -143,7 +137,7 @@ const ContactPage = () => {
                   </a>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div className="aside-panel">
                   <h3 className="text-xl font-bold text-dark mb-4">
                     Common Requests
                   </h3>
@@ -157,7 +151,7 @@ const ContactPage = () => {
                   </div>
                 </div>
 
-                <div className="bg-primary text-white rounded-2xl shadow-sm p-6">
+                <div className="aside-panel aside-panel-accent">
                   <h3 className="text-xl font-bold mb-3">
                     Questions are welcome.
                   </h3>

@@ -66,11 +66,9 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const mainNavigation = [
-    { name: 'Home', href: '/' },
-    { name: 'Student Business Program', href: '/student-business-program' },
+    { name: 'Program', href: '/student-business-program' },
     { name: 'Games', href: '/games' },
     { name: 'Partners', href: '/partners' },
-    { name: 'Support', href: '/support' },
   ];
 
   const aboutNavigation = [
@@ -78,6 +76,7 @@ const Header: React.FC<HeaderProps> = ({
     { name: 'Team & Board', href: '/about/team' },
     { name: 'FAQ', href: '/faq' },
     { name: 'Blog', href: '/blog' },
+    { name: 'Ways to support', href: '/support' },
     { name: 'Contact', href: '/contact' },
   ];
 
@@ -94,10 +93,9 @@ const Header: React.FC<HeaderProps> = ({
       {isAnnouncementVisible && announcementText && (
         <div className="site-announcement">
           <div className="site-announcement-inner">
-            <span className="site-announcement-badge">New program</span>
             <p>{announcementText}</p>
             <Link href="/student-business-program" className="site-announcement-link">
-              Learn more →
+              Program details
             </Link>
           </div>
 

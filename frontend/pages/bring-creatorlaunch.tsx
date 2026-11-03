@@ -48,70 +48,22 @@ ${form.message}`
       announcementText="CreatorLaunch workshops are designed to be no-cost for students and families."
     >
       <main className="min-h-screen bg-white">
-        <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">
+        <section className="page-intro">
           <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
-              <div>
-                <p className="text-primary font-bold uppercase tracking-widest mb-3">
-                  Bring CreatorLaunch
-                </p>
-
-                <h1 className="text-4xl md:text-6xl font-bold text-dark leading-tight mb-6">
-                  Request entrepreneurship workshops for your community.
-                </h1>
-
-                <p className="text-lg md:text-xl text-medium mb-8">
-                  CreatorLaunch partners with schools, summer programs, afterschool programs,
-                  nonprofits, and community organizations to bring practical, hands-on
-                  entrepreneurship education to young people at no cost to students or families.
-                </p>
-
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-                    <p className="font-bold text-dark mb-1">Hands-on learning</p>
-                    <p className="text-sm text-medium">
-                      Students build ideas, brands, products, and pitches.
-                    </p>
-                  </div>
-
-                  <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-                    <p className="font-bold text-dark mb-1">Youth-led energy</p>
-                    <p className="text-sm text-medium">
-                      Students learn from a team that understands young founders.
-                    </p>
-                  </div>
-
-                  <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-                    <p className="font-bold text-dark mb-1">Flexible format</p>
-                    <p className="text-sm text-medium">
-                      Built for summer, school, afterschool, and community settings.
-                    </p>
-                  </div>
-
-                  <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-                    <p className="font-bold text-dark mb-1">No-cost for youth</p>
-                    <p className="text-sm text-medium">
-                      Students and families should not have to pay to participate.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-3xl overflow-hidden shadow-2xl border border-white bg-white">
-                <img
-                  src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80"
-                  alt="Community workshop planning table"
-                  className="w-full h-[460px] object-cover"
-                />
-              </div>
-            </div>
+            <p className="eyebrow">Bring CreatorLaunch</p>
+            <h1>Ask about entrepreneurship programming for your students.</h1>
+            <p>
+              Schools, summer programs, afterschool programs, nonprofits, and community
+              organizations can contact CreatorLaunch to discuss a program or workshop.
+              Participation should remain free for students and families.
+            </p>
           </div>
         </section>
 
-        <section className="py-20 bg-light">
+        <section className="editorial-section section-tint">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+              <div className="lg:col-span-2 form-panel">
                 <h2 className="text-3xl font-bold text-dark mb-3">
                   Request CreatorLaunch
                 </h2>
@@ -253,12 +205,12 @@ ${form.message}`
                   href={mailtoHref}
                   className="block w-full text-center bg-primary text-white py-4 rounded-lg font-semibold hover:bg-red-600 transition-colors mt-6"
                 >
-                  Send Request
+                    Open email request
                 </a>
               </div>
 
               <aside className="space-y-6">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div className="aside-panel">
                   <h3 className="text-xl font-bold text-dark mb-4">
                     Best Fit For
                   </h3>
@@ -273,7 +225,7 @@ ${form.message}`
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                <div className="aside-panel">
                   <h3 className="text-xl font-bold text-dark mb-4">
                     Workshop Topics
                   </h3>
@@ -288,14 +240,13 @@ ${form.message}`
                   </div>
                 </div>
 
-                <div className="bg-primary text-white rounded-2xl shadow-sm p-6">
+                <div className="aside-panel aside-panel-accent">
                   <h3 className="text-xl font-bold mb-3">
-                    Students should not have to pay to start.
+                    Program questions are welcome.
                   </h3>
 
                   <p className="text-white/90">
-                    CreatorLaunch is built to make entrepreneurship education more accessible
-                    for young people and communities.
+                    Share your group, goals, schedule, and what kind of support you need.
                   </p>
                 </div>
               </aside>

@@ -114,29 +114,24 @@ const FAQPage = () => {
       announcementText="Upcoming program dates, locations, and enrollment details will be announced when arrangements are finalized."
     >
       <main className="min-h-screen bg-white">
-        <section className="program-page-hero py-20 md:py-28">
-          <div className="container relative mx-auto px-4 text-center">
-            <span className="hero-kicker">
-              <span className="hero-kicker-dot" />
-              Student and family FAQ
-            </span>
-            <h1 className="mx-auto mt-7 max-w-4xl text-5xl font-bold leading-tight text-dark md:text-7xl">
-              Questions are part of building something new.
-            </h1>
-            <p className="mx-auto mt-6 max-w-3xl text-lg font-medium leading-8 text-medium md:text-xl">
+        <section className="page-intro">
+          <div className="container mx-auto px-4">
+            <p className="eyebrow">Student and family FAQ</p>
+            <h1>Answers about the Student Business Program.</h1>
+            <p>
               Find clear answers about the Student Business Program, who can join, what
               is included, and what students will work toward.
             </p>
           </div>
         </section>
 
-        <section className="bg-light py-20">
+        <section className="editorial-section section-tint">
           <div className="container mx-auto px-4">
             <div className="mx-auto max-w-5xl space-y-10">
               {faqSections.map((section) => (
                 <div
                   key={section.title}
-                  className="rounded-3xl border border-gray-100 bg-white p-6 shadow-sm md:p-8"
+                  className="faq-section"
                 >
                   <h2 className="mb-6 text-2xl font-bold text-dark md:text-3xl">
                     {section.title}
@@ -146,7 +141,7 @@ const FAQPage = () => {
                     {section.questions.map((item) => (
                       <details
                         key={item.question}
-                        className="group rounded-2xl border border-gray-100 bg-light p-5"
+                        className="faq-item group"
                       >
                         <summary className="flex cursor-pointer list-none items-start justify-between gap-4">
                           <span className="text-lg font-bold text-dark">{item.question}</span>
@@ -162,7 +157,7 @@ const FAQPage = () => {
           </div>
         </section>
 
-        <section className="bg-dark py-20 text-white">
+        <section className="quiet-cta section-ink">
           <div className="container mx-auto px-4">
             <div className="mx-auto max-w-4xl text-center">
               <p className="mb-3 font-bold uppercase tracking-widest text-cyan-300">

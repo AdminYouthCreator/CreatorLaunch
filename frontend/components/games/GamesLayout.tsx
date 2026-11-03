@@ -39,11 +39,11 @@ const GamesLayout: React.FC<GamesLayoutProps> = ({
       </Head>
 
       <div className="min-h-screen bg-slate-950 text-white">
-        <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/90 backdrop-blur-xl">
+        <header className="games-header">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between gap-4">
               <Link href="/games" className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-red-500 to-blue-600 flex items-center justify-center font-black text-xl shadow-lg">
+                <div className="games-mark" aria-hidden="true">
                   G
                 </div>
 
@@ -60,11 +60,7 @@ const GamesLayout: React.FC<GamesLayoutProps> = ({
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors ${
-                      isActive(item.href)
-                        ? 'bg-white text-slate-950'
-                        : 'text-white/80 hover:bg-white/10 hover:text-white'
-                    }`}
+                    className={`games-nav-link ${isActive(item.href) ? 'active' : ''}`}
                   >
                     {item.label}
                   </Link>
@@ -74,7 +70,7 @@ const GamesLayout: React.FC<GamesLayoutProps> = ({
               <button
                 type="button"
                 onClick={() => setMobileOpen((prev) => !prev)}
-                className="md:hidden border border-white/15 rounded-xl px-3 py-2 text-sm font-bold"
+                className="games-menu-button"
                 aria-label="Toggle games menu"
               >
                 Menu
@@ -88,11 +84,7 @@ const GamesLayout: React.FC<GamesLayoutProps> = ({
                     key={item.href}
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
-                    className={`px-4 py-3 rounded-xl text-sm font-bold transition-colors ${
-                      isActive(item.href)
-                        ? 'bg-white text-slate-950'
-                        : 'text-white/80 bg-white/5 hover:bg-white/10 hover:text-white'
-                    }`}
+                    className={`games-nav-link ${isActive(item.href) ? 'active' : ''}`}
                   >
                     {item.label}
                   </Link>
@@ -106,7 +98,7 @@ const GamesLayout: React.FC<GamesLayoutProps> = ({
 
         <section className="border-t border-white/10 bg-slate-900">
           <div className="container mx-auto px-4 py-6">
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-white/70">
+            <div className="border-l-2 border-white/20 pl-4 text-sm text-white/70">
               <p className="font-semibold text-white mb-1">Game Disclaimer</p>
               <p>{ngpfDisclaimer}</p>
             </div>
