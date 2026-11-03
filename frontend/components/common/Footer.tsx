@@ -10,8 +10,8 @@ export const Footer = () => {
           <div>
             <img src="/assets/footer-logo.png" alt="CreatorLaunch" className="footer-logo" />
             <p className="footer-desc">
-              A youth-led nonprofit offering practical entrepreneurship education for
-              young people.
+              A St. Louis youth-led nonprofit helping students turn ideas into practical
+              projects.
             </p>
           </div>
 

@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { FiArrowUpRight, FiCheck } from 'react-icons/fi';
 import Layout from '@/components/common/Layout';
+import { ngpfGames } from '@/data/ngpfGames';
 
 const CONTACT_EMAIL = 'qwentin@youthcreatorlaunch.org';
 
@@ -33,7 +34,10 @@ const Homepage = () => {
             <div className="hero-layout">
               <div className="hero-copy">
                 <p className="eyebrow">Free · Ages 14–18 · St. Louis County</p>
-                <h1>A business program where students build their own idea.</h1>
+                <h1>
+                  Build an idea.
+                  <span className="hero-emphasis">Make it real.</span>
+                </h1>
                 <p className="hero-lede">
                   CreatorLaunch is a free, 12-week program with coaching, project time,
                   laptops, and approved business purchases. Students can arrive with an
@@ -50,6 +54,9 @@ const Homepage = () => {
               </div>
 
               <aside className="program-brief" aria-label="Program summary">
+                <div className="program-path" aria-label="Program path">
+                  <span>Idea</span><b aria-hidden="true">→</b><span>Build</span><b aria-hidden="true">→</b><span>Share</span>
+                </div>
                 <p className="program-brief-title">Program summary</p>
                 <dl>
                   <div><dt>Length</dt><dd>12 weeks</dd></div>
@@ -149,7 +156,7 @@ const Homepage = () => {
           </div>
         </section>
 
-        <section className="compact-feature">
+        <section className="compact-feature home-games">
           <div className="container mx-auto px-4">
             <div className="compact-feature-inner">
               <div>
@@ -163,6 +170,15 @@ const Homepage = () => {
                 </p>
                 <Link href="/games" className="text-link">Browse the games <FiArrowUpRight aria-hidden="true" /></Link>
               </div>
+            </div>
+            <div className="game-showcase" aria-label="Featured CreatorGames">
+              {ngpfGames.slice(0, 3).map((game, index) => (
+                <Link key={game.slug} href={`/games/${game.slug}`} className="game-showcase-card">
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                  <img src={game.thumbnailUrl} alt={`${game.name} game thumbnail`} loading="lazy" />
+                  <div><p>{game.activity}</p><h3>{game.name}</h3></div>
+                </Link>
+              ))}
             </div>
           </div>
         </section>
