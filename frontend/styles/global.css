@@ -3383,7 +3383,7 @@ body {
 .games-main h3 {
   font-family: var(--font-display);
   font-variation-settings: 'wdth' 92;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.02em;
 }
 
 .public-shell a:focus-visible,
@@ -3663,8 +3663,8 @@ body {
   font-variation-settings: 'wdth' 82;
   font-weight: 800;
   line-height: 0.85;
-  letter-spacing: -0.07em;
-  word-spacing: 0.08em;
+  letter-spacing: -0.035em;
+  word-spacing: 0.1em;
 }
 
 .program-hero .hero-copy h1 {
@@ -3830,7 +3830,7 @@ body {
   font-size: clamp(3rem, 5.4vw, 5.2rem);
   font-weight: 800;
   line-height: 0.94;
-  letter-spacing: -0.06em;
+  letter-spacing: -0.03em;
 }
 
 .section-heading > p:not(.eyebrow),
@@ -3910,7 +3910,7 @@ body {
   color: var(--color-dark);
   font-size: 1.45rem;
   font-weight: 800;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.015em;
 }
 
 .numbered-list p {
@@ -3936,7 +3936,7 @@ body {
   color: var(--color-dark);
   font-size: 1.18rem;
   font-weight: 800;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.01em;
 }
 
 .ruled-list p {
@@ -3975,6 +3975,11 @@ body {
 
 .section-ink .check-list li {
   border-color: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.section-ink .section-heading h2 {
+  color: #fff;
 }
 
 .fact-strip {
@@ -4338,7 +4343,7 @@ body {
   font-family: var(--font-display);
   font-size: 1.45rem;
   font-weight: 800;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.02em;
 }
 
 .team-grid p {
@@ -4540,8 +4545,8 @@ body {
   font-size: clamp(4rem, 7vw, 7rem);
   font-weight: 800;
   line-height: 0.86;
-  letter-spacing: -0.07em;
-  word-spacing: 0.08em;
+  letter-spacing: -0.035em;
+  word-spacing: 0.1em;
 }
 
 .games-library {
@@ -4637,7 +4642,7 @@ body {
   color: var(--color-dark);
   font-size: 1.65rem;
   font-weight: 800;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.02em;
 }
 
 .games-list p:not(.games-topic) {
