@@ -2,7 +2,6 @@ import React from 'react';
 import Head from 'next/head';
 import Header from './Header';
 import {Footer} from './Footer';
-import { useAOS } from '@/hooks/useAOS';
 
 // ################## ----- LAYOUT PROPS INTERFACE ----- ##################
 // Props interface for the main layout component
@@ -27,8 +26,6 @@ const Layout: React.FC<LayoutProps> = ({
   showAnnouncement = true,
   announcementText = 'Upcoming groups are being planned for the free CreatorLaunch Student Business Program.'
 }) => {
-  // Initialize AOS (Animate On Scroll) library
-  useAOS();
   return (
     <>
       <Head>

@@ -1,20 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import Head from 'next/head';
 import Link from 'next/link';
-import PublicHeader from '@/components/public/PublicHeader';
-import { Footer } from '@/components/common/Footer';
+import Layout from '@/components/common/Layout';
 
 interface BlogPost {
   id: string;
   title: string;
   slug: string;
   excerpt: string;
-  coverImageUrl?: string;
   authorName: string;
-  authorTitle?: string;
   publishedAt?: string;
   scheduledFor?: string;
-  displayOrder?: number;
   tags: string[];
 }
 
@@ -26,138 +21,55 @@ const BlogPage: React.FC = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const response = await fetch(`${API_BASE_URL}/api/blog?sort=custom`);
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Failed to load blog posts.');
+        setPosts(data.posts || []);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load blog posts.');
+      } finally {
+        setLoading(false);
+      }
+    };
     loadPosts();
   }, []);
 
-  const loadPosts = async () => {
-    try {
-      setLoading(true);
-      setError('');
-
-      const response = await fetch(`${API_BASE_URL}/api/blog?sort=custom`);
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to load blog posts.');
-      }
-
-      setPosts(data.posts || []);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load blog posts.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const formatDate = (date?: string) => {
-    if (!date) return '';
-
-    return new Date(date).toLocaleDateString(undefined, {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    });
-  };
+  const formatDate = (date?: string) => date
+    ? new Date(date).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })
+    : '';
 
   return (
-    <>
-      <Head>
-        <title>Blog | CreatorLaunch</title>
-        <meta
-          name="description"
-          content="Stories, updates, and founder notes from CreatorLaunch."
-        />
-      </Head>
-
-      <PublicHeader />
-
+    <Layout title="Blog | CreatorLaunch" description="Program updates and notes from CreatorLaunch.">
       <main>
-        <section className="bg-white py-20">
-          <div className="container mx-auto px-4 text-center">
-            <p className="text-primary font-bold uppercase tracking-widest mb-3">
-              CreatorLaunch Blog
-            </p>
-
-            <h1 className="text-4xl md:text-6xl font-bold text-dark mb-6">
-              Stories, Updates, and Founder Notes
-            </h1>
-
-            <p className="text-xl text-medium max-w-3xl mx-auto">
-              Follow our journey as we build a youth-led platform helping students launch real businesses.
-            </p>
+        <section className="page-intro">
+          <div className="container mx-auto px-4">
+            <p className="eyebrow">Blog</p>
+            <h1>Updates from CreatorLaunch.</h1>
+            <p>Program news, organizational updates, and notes from the team.</p>
           </div>
         </section>
 
-        <section className="bg-light py-16 min-h-screen">
+        <section className="editorial-section">
           <div className="container mx-auto px-4">
             {loading ? (
-              <div className="text-center py-16">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                <p className="text-medium mt-4">Loading posts...</p>
-              </div>
+              <p className="status-message">Loading posts…</p>
             ) : error ? (
-              <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-6 max-w-2xl mx-auto">
-                {error}
-              </div>
+              <p className="status-message error">{error}</p>
             ) : posts.length === 0 ? (
-              <div className="text-center py-16">
-                <h2 className="text-2xl font-bold text-dark mb-3">
-                  More insights coming soon.
-                </h2>
-                <p className="text-medium">No blog posts have been published yet.</p>
-              </div>
+              <div className="empty-state"><h2>No posts have been published yet.</h2><p>Check back for program updates.</p></div>
             ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="article-list">
                 {posts.map((post) => (
-                  <article
-                    key={post.id}
-                    className="bg-white rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
-                  >
-                    {post.coverImageUrl ? (
-                      <img
-                        src={post.coverImageUrl}
-                        alt={post.title}
-                        className="w-full h-48 object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-48 bg-gradient-to-br from-blue-100 to-red-100 flex items-center justify-center">
-                        <span className="text-4xl">🚀</span>
-                      </div>
-                    )}
-
-                    <div className="p-6">
-                      <p className="text-sm text-medium mb-3">
-                        {formatDate(post.publishedAt || post.scheduledFor)} | {post.authorName}
-                      </p>
-
-                      <h2 className="text-2xl font-bold text-dark mb-3">
-                        {post.title}
-                      </h2>
-
-                      <p className="text-medium mb-5">
-                        {post.excerpt}
-                      </p>
-
-                      {post.tags?.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mb-5">
-                          {post.tags.slice(0, 3).map((tag) => (
-                            <span
-                              key={tag}
-                              className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-
-                      <Link
-                        href={`/blog/${post.slug}`}
-                        className="font-bold text-primary hover:text-red-600"
-                      >
-                        Read More →
-                      </Link>
-                    </div>
+                  <article key={post.id}>
+                    <p className="article-meta">{formatDate(post.publishedAt || post.scheduledFor)} · {post.authorName}</p>
+                    <h2><Link href={`/blog/${post.slug}`}>{post.title}</Link></h2>
+                    <p>{post.excerpt}</p>
+                    {post.tags?.length > 0 && <p className="article-tags">{post.tags.slice(0, 3).join(' · ')}</p>}
+                    <Link href={`/blog/${post.slug}`} className="text-link">Read post →</Link>
                   </article>
                 ))}
               </div>
@@ -165,9 +77,7 @@ const BlogPage: React.FC = () => {
           </div>
         </section>
       </main>
-
-      <Footer />
-    </>
+    </Layout>
   );
 };
 
