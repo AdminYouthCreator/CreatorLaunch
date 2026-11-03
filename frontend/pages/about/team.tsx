@@ -7,7 +7,7 @@ const TeamPage = () => {
   return (
     <Layout
       title="Team | CreatorLaunch"
-      description="Meet the youth-led CreatorLaunch team building entrepreneurship workshops, partnerships, and digital tools for young founders."
+      description="Meet the youth-led CreatorLaunch team building programs, resources, and practical support for young entrepreneurs."
     >
       <main className="min-h-screen bg-white">
         <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">

@@ -10,12 +10,12 @@ interface HeaderProps {
 
 const CONTACT_EMAIL = 'qwentin@youthcreatorlaunch.org';
 const contactHref = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-  'CreatorLaunch Inquiry',
+  'CreatorLaunch Student Business Program Inquiry',
 )}`;
 
 const Header: React.FC<HeaderProps> = ({
   showAnnouncement = true,
-  announcementText = 'Bring CreatorLaunch workshops to your school, summer program, or community organization.',
+  announcementText = 'Upcoming groups are being planned for the free CreatorLaunch Student Business Program.',
 }) => {
   const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(showAnnouncement);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -67,7 +67,7 @@ const Header: React.FC<HeaderProps> = ({
 
   const mainNavigation = [
     { name: 'Home', href: '/' },
-    { name: 'Bring CreatorLaunch', href: '/bring-creatorlaunch' },
+    { name: 'Student Business Program', href: '/student-business-program' },
     { name: 'Games', href: '/games' },
     { name: 'Partners', href: '/partners' },
     { name: 'Support', href: '/support' },
@@ -94,10 +94,10 @@ const Header: React.FC<HeaderProps> = ({
       {isAnnouncementVisible && announcementText && (
         <div className="site-announcement">
           <div className="site-announcement-inner">
-            <span className="site-announcement-badge">Let&apos;s launch</span>
+            <span className="site-announcement-badge">New program</span>
             <p>{announcementText}</p>
-            <Link href="/bring-creatorlaunch" className="site-announcement-link">
-              Start here →
+            <Link href="/student-business-program" className="site-announcement-link">
+              Learn more →
             </Link>
           </div>
 

@@ -3,15 +3,15 @@ import Link from 'next/link';
 import Layout from '@/components/common/Layout';
 
 const CONTACT_EMAIL = 'qwentin@youthcreatorlaunch.org';
-const bringHref = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-  'Bring CreatorLaunch to our community'
+const programHref = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+  'CreatorLaunch Student Business Program Updates'
 )}`;
 
 const AboutPage = () => {
   return (
     <Layout
       title="About | CreatorLaunch"
-      description="Learn about CreatorLaunch, a youth-led nonprofit making entrepreneurship education more accessible through workshops, community partnerships, and digital tools."
+      description="Learn about CreatorLaunch, a youth-led nonprofit helping students explore entrepreneurship, develop business ideas, and practice real-world skills."
     >
       <main className="min-h-screen bg-white">
         <section className="bg-gradient-to-br from-white via-red-50 to-blue-50 py-20">
@@ -66,8 +66,8 @@ const AboutPage = () => {
 
                   <p>
                     We are building CreatorLaunch to be more than a class. It is a launchpad:
-                    a place where students can learn by doing, communities can bring workshops
-                    to their youth, and partners can help remove barriers for young founders.
+                    a place where students can learn by doing, families can understand the
+                    process, and young founders can get practical support to move forward.
                   </p>
 
                   <p>
@@ -115,8 +115,8 @@ const AboutPage = () => {
                   <p>
                     Qwentin started CreatorLaunch to help close that gap. Instead of waiting
                     for students to become adults before they are taught entrepreneurship,
-                    CreatorLaunch helps them learn now through workshops, community partnerships,
-                    creator tools, and hands-on activities.
+                    CreatorLaunch helps them learn now through a structured business program,
+                    coaching, creator tools, and hands-on project work.
                   </p>
 
                   <p>
@@ -164,8 +164,8 @@ const AboutPage = () => {
                 <div className="text-4xl mb-4">🤝</div>
                 <h2 className="text-2xl font-bold mb-4">Our Model</h2>
                 <p className="text-gray-200">
-                  We partner with schools, programs, and organizations to bring hands-on
-                  entrepreneurship workshops directly to communities.
+                  We bring students together in a free, 12-week program with small-group
+                  coaching, laptops, project work, and approved business purchases.
                 </p>
               </div>
 
@@ -196,10 +196,10 @@ const AboutPage = () => {
                 <div className="space-y-4">
                   {[
                     'We focus on practical, hands-on entrepreneurship instead of theory-only learning.',
-                    'We make workshops no-cost for students and families.',
+                    'We make the Student Business Program free for students and families.',
                     'We are youth-led, so students see entrepreneurship modeled by people closer to their own experience.',
-                    'We work with community partners who already serve youth.',
-                    'We are building a digital platform, but community impact comes first.',
+                    'We keep groups small so students have room to ask questions and get support.',
+                    'We provide laptops and can approve up to $500 in direct project purchases.',
                   ].map((item) => (
                     <div key={item} className="bg-white rounded-2xl p-5 border border-gray-100">
                       <p className="text-medium">{item}</p>
@@ -226,23 +226,23 @@ const AboutPage = () => {
             </h2>
 
             <p className="text-white/90 text-lg max-w-2xl mx-auto mb-8">
-              Whether you are a school, community organization, donor, sponsor, or supporter,
-              there is a place for you in the CreatorLaunch mission.
+              Students and families can learn about the program now and request updates as
+              dates, locations, and enrollment details are finalized.
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <a
-                href={bringHref}
+                href={programHref}
                 className="bg-white text-primary px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
               >
-                Bring CreatorLaunch
+                Get Program Updates
               </a>
 
               <Link
-                href="/donate"
+                href="/student-business-program"
                 className="bg-red-700 text-white px-8 py-4 rounded-lg font-semibold hover:bg-red-800 transition-colors"
               >
-                Donate
+                Explore the Program
               </Link>
             </div>
           </div>

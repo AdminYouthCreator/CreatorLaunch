@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
 import Layout from '@/components/common/Layout';
 import api from '@/utils/api';
-import MoxMascot from '@/components/common/MoxMascot';
 
 const STORAGE_KEY = 'creatorlaunch-build-a-business-response';
 
@@ -329,9 +327,13 @@ const CreatorToolsPage = () => {
                 <div className="bg-red-50 rounded-3xl p-8 border border-red-100">
                   <h3 className="text-2xl font-bold text-dark mb-3">Need inspiration?</h3>
                   <p className="text-medium mb-5">
-                    Use the Startup Wheel below to shake loose new ideas, or visit <Link href="/meet-mox" className="text-primary font-semibold hover:underline">Meet Mox</Link> for an extra push of creative energy.
+                    Use the Startup Wheel below to combine a customer, an offer, and a
+                    challenge into an idea you can test.
                   </p>
-                  <MoxMascot className="max-w-[260px] mx-auto" />
+                  <div className="rounded-2xl bg-white p-5 text-sm font-semibold leading-7 text-dark shadow-sm">
+                    Start small: choose one problem, talk to three possible customers, and
+                    write down what you learn before spending money.
+                  </div>
                 </div>
               </div>
             </div>

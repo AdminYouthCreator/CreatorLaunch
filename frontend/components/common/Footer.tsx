@@ -10,23 +10,23 @@ export const Footer = () => {
         <div className="footer-launch-card">
           <div>
             <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-cyan-300">
-              Make room for big ideas
+              Upcoming student groups
             </p>
-            <h2>Bring CreatorLaunch to your community.</h2>
+            <h2>Get updates about the Student Business Program.</h2>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/bring-creatorlaunch"
+            <a
+              href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('CreatorLaunch Student Business Program Updates')}`}
               className="site-button bg-white text-dark hover:bg-amber-50"
             >
-              Request a workshop <span aria-hidden="true">↗</span>
-            </Link>
+              Request updates <span aria-hidden="true">↗</span>
+            </a>
             <Link
-              href="/donate"
+              href="/student-business-program"
               className="site-button border border-white/15 bg-white/10 text-white hover:bg-white/15"
             >
-              Support the mission
+              Explore the program
             </Link>
           </div>
         </div>
@@ -41,8 +41,8 @@ export const Footer = () => {
 
             <p className="footer-desc">
               CreatorLaunch is a youth-led 501(c)(3) nonprofit helping young people
-              learn entrepreneurship, build ideas, and launch real ventures through
-              community workshops, partnerships, and digital tools.
+              explore entrepreneurship, develop business ideas, and practice real-world
+              skills with coaching, equipment, and practical support.
             </p>
 
             <a
@@ -88,31 +88,31 @@ export const Footer = () => {
           </div>
 
           <div className="footer-col">
-            <h3>For communities</h3>
+            <h3>Students &amp; families</h3>
             <ul className="footer-links">
-              <li><Link href="/bring-creatorlaunch" className="footer-link">Bring CreatorLaunch</Link></li>
-              <li><Link href="/partners" className="footer-link">Partners</Link></li>
-              <li><Link href="/support" className="footer-link">Ways to support</Link></li>
+              <li><Link href="/student-business-program" className="footer-link">Student Business Program</Link></li>
+              <li><Link href="/games" className="footer-link">CreatorGames</Link></li>
+              <li><Link href="/faq" className="footer-link">Frequently asked questions</Link></li>
               <li>
                 <a
-                  href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('Bring CreatorLaunch to our community')}`}
+                  href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent('CreatorLaunch Student Business Program Inquiry')}`}
                   className="footer-link"
                 >
-                  Request a workshop
+                  Ask about the program
                 </a>
               </li>
-              <li><Link href="/donate" className="footer-link">Donate</Link></li>
+              <li><Link href="/youth-safety" className="footer-link">Youth safety</Link></li>
             </ul>
           </div>
 
           <div className="footer-col">
-            <h3>Explore</h3>
+            <h3>Organization</h3>
             <ul className="footer-links">
-              <li><Link href="/games" className="footer-link">CreatorGames</Link></li>
-              <li><Link href="/meet-mox" className="footer-link">Meet Mox</Link></li>
-              <li><Link href="/progress" className="footer-link">Digital platform</Link></li>
               <li><Link href="/about" className="footer-link">About us</Link></li>
               <li><Link href="/about/team" className="footer-link">Team & Board</Link></li>
+              <li><Link href="/partners" className="footer-link">Partners</Link></li>
+              <li><Link href="/support" className="footer-link">Ways to support</Link></li>
+              <li><Link href="/donate" className="footer-link">Donate</Link></li>
               <li><Link href="/verify-certificate" className="footer-link">Verify certificate</Link></li>
             </ul>
           </div>
