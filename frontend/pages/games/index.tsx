@@ -57,8 +57,18 @@ const GamesHomePage: React.FC = () => {
 
             <div className="games-list">
               {filteredGames.map((game, index) => (
-                <Link key={game.slug} href={`/games/${game.slug}`}>
+                <Link
+                  key={game.slug}
+                  href={`/games/${game.slug}`}
+                  className="has-thumbnail"
+                >
                   <span className="games-list-number">{String(index + 1).padStart(2, '0')}</span>
+                  <img
+                    src={game.thumbnailUrl}
+                    alt={`${game.name} game thumbnail`}
+                    className="game-thumbnail"
+                    loading="lazy"
+                  />
                   <div>
                     <p className="games-topic">{game.activity}</p>
                     <h3>{game.name}</h3>

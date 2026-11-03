@@ -7,6 +7,8 @@ interface BlogPost {
   title: string;
   slug: string;
   excerpt: string;
+  coverImageUrl?: string;
+  coverImageIsPersonFree?: boolean;
   authorName: string;
   publishedAt?: string;
   scheduledFor?: string;
@@ -63,15 +65,26 @@ const BlogPage: React.FC = () => {
               <div className="empty-state"><h2>No posts have been published yet.</h2><p>Check back for program updates.</p></div>
             ) : (
               <div className="article-list">
-                {posts.map((post) => (
-                  <article key={post.id}>
-                    <p className="article-meta">{formatDate(post.publishedAt || post.scheduledFor)} · {post.authorName}</p>
-                    <h2><Link href={`/blog/${post.slug}`}>{post.title}</Link></h2>
-                    <p>{post.excerpt}</p>
-                    {post.tags?.length > 0 && <p className="article-tags">{post.tags.slice(0, 3).join(' · ')}</p>}
-                    <Link href={`/blog/${post.slug}`} className="text-link">Read post →</Link>
-                  </article>
-                ))}
+                {posts.map((post) => {
+                  const showCover = Boolean(post.coverImageUrl && post.coverImageIsPersonFree);
+
+                  return (
+                    <article key={post.id} className={showCover ? 'article-with-cover' : ''}>
+                      {showCover && (
+                        <Link href={`/blog/${post.slug}`} className="article-cover-link" aria-label={`Read ${post.title}`}>
+                          <img src={post.coverImageUrl} alt="" className="article-cover" loading="lazy" />
+                        </Link>
+                      )}
+                      <div className="article-list-copy">
+                        <p className="article-meta">{formatDate(post.publishedAt || post.scheduledFor)} · {post.authorName}</p>
+                        <h2><Link href={`/blog/${post.slug}`}>{post.title}</Link></h2>
+                        <p>{post.excerpt}</p>
+                        {post.tags?.length > 0 && <p className="article-tags">{post.tags.slice(0, 3).join(' · ')}</p>}
+                        <Link href={`/blog/${post.slug}`} className="text-link">Read post →</Link>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
             )}
           </div>

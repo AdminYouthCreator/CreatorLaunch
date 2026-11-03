@@ -32,6 +32,7 @@ const AdminEditBlogPostPage: React.FC = () => {
     excerpt: '',
     content: '',
     coverImageUrl: '',
+    coverImageIsPersonFree: false,
     authorName: '',
     authorTitle: '',
     status: 'draft',
@@ -68,6 +69,7 @@ const AdminEditBlogPostPage: React.FC = () => {
         excerpt: post.excerpt || '',
         content: post.content || '',
         coverImageUrl: post.coverImageUrl || '',
+        coverImageIsPersonFree: Boolean(post.coverImageIsPersonFree),
         authorName: post.authorName || '',
         authorTitle: post.authorTitle || '',
         status: post.status || 'draft',
@@ -175,6 +177,15 @@ const AdminEditBlogPostPage: React.FC = () => {
               onChange={(event) => updateField('title', event.target.value)}
               className="w-full px-4 py-2 border rounded-lg"
             />
+            <label className="flex items-start gap-2 mt-3 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={form.coverImageIsPersonFree}
+                onChange={(event) => setForm((prev) => ({ ...prev, coverImageIsPersonFree: event.target.checked }))}
+                className="mt-1"
+              />
+              <span>I confirm this cover contains no people. Use an object, product, place, game screen, or person-free graphic. Unconfirmed covers stay hidden.</span>
+            </label>
           </div>
 
           <div>

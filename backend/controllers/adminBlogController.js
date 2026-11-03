@@ -81,6 +81,7 @@ const normalizeAdminPost = (post) => {
     excerpt: obj.excerpt,
     content: obj.content,
     coverImageUrl: obj.coverImageUrl || '',
+    coverImageIsPersonFree: Boolean(obj.coverImageIsPersonFree),
     authorName: obj.authorName,
     authorTitle: obj.authorTitle || '',
     status: obj.status,
@@ -195,6 +196,7 @@ exports.createAdminPost = asyncHandler(async (req, res) => {
     excerpt,
     content,
     coverImageUrl = '',
+    coverImageIsPersonFree = false,
     authorName,
     authorTitle = '',
     status = 'draft',
@@ -232,6 +234,7 @@ exports.createAdminPost = asyncHandler(async (req, res) => {
     excerpt,
     content,
     coverImageUrl,
+    coverImageIsPersonFree: Boolean(coverImageIsPersonFree),
     authorName,
     authorTitle,
     status: finalStatus,
@@ -290,6 +293,7 @@ exports.updateAdminPost = asyncHandler(async (req, res) => {
     excerpt,
     content,
     coverImageUrl,
+    coverImageIsPersonFree,
     authorName,
     authorTitle,
     status,
@@ -305,6 +309,9 @@ exports.updateAdminPost = asyncHandler(async (req, res) => {
   if (typeof excerpt === 'string') post.excerpt = excerpt;
   if (typeof content === 'string') post.content = content;
   if (typeof coverImageUrl === 'string') post.coverImageUrl = coverImageUrl;
+  if (typeof coverImageIsPersonFree === 'boolean') {
+    post.coverImageIsPersonFree = coverImageIsPersonFree;
+  }
   if (typeof authorName === 'string') post.authorName = authorName;
   if (typeof authorTitle === 'string') post.authorTitle = authorTitle;
   if (typeof seoTitle === 'string') post.seoTitle = seoTitle;
