@@ -6,7 +6,7 @@ export default function BusinessProgramPortalRedirect() {
 
 export const getServerSideProps: GetServerSideProps = async () => ({
   redirect: {
-    destination: 'https://creatorlaunch-student-business.creatorlaunc-8659.chatgpt.site/portal',
+    destination: '/business-program/login',
     permanent: false,
   },
 });
