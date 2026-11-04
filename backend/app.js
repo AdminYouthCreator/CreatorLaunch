@@ -22,6 +22,7 @@ const adminSettingsRoutes = require('./routes/adminSettingsRoutes');
 const donationRoutes = require('./routes/donationRoutes');
 const certificateRoutes = require('./routes/certificateRoutes');
 const donationController = require('./controllers/donationController');
+const businessProgramRoutes = require('./routes/businessProgramRoutes');
 
 const app = express();
 
@@ -87,6 +88,7 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/admin/settings', adminSettingsRoutes);
 app.use('/api/donations', donationRoutes);
 app.use('/api/certificates', certificateRoutes);
+app.use('/api/business-program', businessProgramRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

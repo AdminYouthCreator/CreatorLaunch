@@ -13,8 +13,8 @@ import Layout from '@/components/common/Layout';
 export default function Login() {
   return (
     <Layout
-      title="Login | CreatorLaunch"
-      description="Login to your CreatorLaunch account."
+      title="CreatorLaunch Platform login | CreatorLaunch"
+      description="Login to the original CreatorLaunch Platform."
       showAnnouncement={false}
     >
       <section 
