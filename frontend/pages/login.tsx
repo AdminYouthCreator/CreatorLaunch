@@ -20,10 +20,7 @@ export default function LoginChooser() {
           </p>
 
           <div className="portal-picker-grid">
-            <Link
-              href="https://creatorlaunch-student-business.creatorlaunc-8659.chatgpt.site"
-              className="portal-choice portal-choice-program"
-            >
+            <Link href="/business-program/login" className="portal-choice portal-choice-program">
               <span className="portal-choice-icon"><FiBriefcase aria-hidden="true" /></span>
               <span className="portal-choice-label">Student Business Program</span>
               <h2>Program portal</h2>
