@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { FiArrowUpRight, FiBriefcase, FiLayers, FiUsers } from 'react-icons/fi';
+import { FiArrowUpRight, FiBriefcase, FiLayers } from 'react-icons/fi';
 import Layout from '@/components/common/Layout';
 
 export default function LoginChooser() {
@@ -20,7 +20,10 @@ export default function LoginChooser() {
           </p>
 
           <div className="portal-picker-grid">
-            <Link href="/business-program/login" className="portal-choice portal-choice-program">
+            <Link
+              href="https://creatorlaunch-student-business.creatorlaunc-8659.chatgpt.site"
+              className="portal-choice portal-choice-program"
+            >
               <span className="portal-choice-icon"><FiBriefcase aria-hidden="true" /></span>
               <span className="portal-choice-label">Student Business Program</span>
               <h2>Program portal</h2>
@@ -43,14 +46,6 @@ export default function LoginChooser() {
             </Link>
           </div>
 
-          <div className="portal-picker-training">
-            <FiUsers aria-hidden="true" />
-            <div>
-              <strong>Learning the new program portal?</strong>
-              <span>Explore Admin, Coach, and Student demos without changing live records.</span>
-            </div>
-            <Link href="/business-program/portal?training=1&role=admin">Open training mode</Link>
-          </div>
         </div>
       </main>
     </Layout>
