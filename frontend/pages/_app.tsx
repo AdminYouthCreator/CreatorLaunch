@@ -5,6 +5,8 @@ import type { AppProps } from 'next/app';
 import { AuthProvider } from '@/context/AuthContext';
 import { AdminAuthProvider } from '@/context/AdminAuthContext';
 import { CartProvider } from '@/context/CartContext';
+import { BusinessProgramProvider } from '@/context/BusinessProgramContext';
+import '@/styles/business-program.css';
 
 // ################## ----- MAIN APP COMPONENT ----- ##################
 // Root application component that wraps all pages
@@ -15,7 +17,9 @@ export default function App({ Component, pageProps }: AppProps) {
     <AuthProvider>
       <AdminAuthProvider>
         <CartProvider>
-          <Component {...pageProps} />
+          <BusinessProgramProvider>
+            <Component {...pageProps} />
+          </BusinessProgramProvider>
         </CartProvider>
       </AdminAuthProvider>
     </AuthProvider>

@@ -218,7 +218,7 @@ const Header: React.FC<HeaderProps> = ({
                 )}
               </div>
             ) : (
-              <Link href="/auth/login" className="site-nav-action site-nav-login">
+              <Link href="/login" className="site-nav-action site-nav-login">
                 Login
               </Link>
             )}
@@ -291,8 +291,8 @@ const Header: React.FC<HeaderProps> = ({
                 </button>
               </div>
             ) : (
-              <Link href="/auth/login" className="site-menu-link mt-2 bg-cyan-50 text-center text-cyan-800">
-                Creator login
+              <Link href="/login" className="site-menu-link mt-2 bg-cyan-50 text-center text-cyan-800">
+                Login
               </Link>
             )}
           </div>
