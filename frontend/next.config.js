@@ -18,6 +18,14 @@ const nextConfig = {
     return {
       beforeFiles: [
         {
+          source: '/interest',
+          destination: `${businessProgramOrigin}/_main/interest`,
+        },
+        {
+          source: '/interest-admin',
+          destination: `${businessProgramOrigin}/_main/interest-admin`,
+        },
+        {
           source: '/business-program',
           destination: `${businessProgramOrigin}/_main/login`,
         },
